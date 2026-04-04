@@ -2,11 +2,6 @@ pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
 ------------------------------
--- define pi for warp effect
-------------------------------
-pi = 3.14159
-
-------------------------------
 -- global variables & level progression
 ------------------------------
 game_state = "menu"   -- start at menu
@@ -34,7 +29,7 @@ end
 -- score variables
 ------------------------------
 score = 0
-score_streak = 5       -- starting streak (resets on damage)
+score_streak = 0       -- starting streak (resets on damage)
 score_multiplier = 1   -- increases by 1 every 5 score items
 final_score = 0        -- stored final score when game ends
 
@@ -68,7 +63,7 @@ function update_starfield()
   local spd_mult = 1
   if warp_time > 0 then
     local ratio = 1 - warp_time / warp_duration  -- goes from 0 to 1
-    spd_mult = 1 + sin(pi * ratio) * 19   -- ramps up to ~20れ❎ at mid-warp then back to 1
+    spd_mult = 1 - sin(ratio * 0.5) * 19  -- ramps up to ~20x at mid-warp then back to 1
   end
   for star in all(starfield) do
     star.y += star.speed * spd_mult
@@ -88,7 +83,7 @@ function draw_starfield()
   if warp_time > 0 then
     -- draw each star as a vertical streak.
     local ratio = 1 - warp_time / warp_duration
-    local spd_mult = 1 + sin(pi * ratio) * 19
+    local spd_mult = 1 - sin(ratio * 0.5) * 19
     for star in all(starfield) do
       -- use the multiplier to determine the streak length:
       line(star.x, star.y, star.x, star.y - spd_mult, star.col)
@@ -567,6 +562,7 @@ function update_game()
 
   if game_over then
     if credits > 0 and btnp(5) then
+      credits -= 1
       credits_used += 1
       game_over = false
       player.health = 3
@@ -576,6 +572,7 @@ function update_game()
       sfx(4)
       printh("continue! credits remaining: " .. credits)
     elseif btnp(4) then
+      game_state = "menu"
       init_game()
     end
     return
@@ -671,7 +668,7 @@ function update_game()
           del(bullets, bullet)
           if rnd(1) < 0.5 then
             spawn_powerup(enemy.x, enemy.y, "score", 100)
-          elseif rnd(1) < 0.5 then
+          else
             local ptype = (rnd(1) < 0.5) and "bomb" or "double"
             spawn_powerup(enemy.x, enemy.y, ptype)
           end
@@ -703,17 +700,31 @@ function update_game()
       end
     end
 
-    if enemy.y > 128 then
+    if not bomb_active and not enemy.type and collides(enemy, player) then
+      create_explosion(enemy.x, enemy.y, 1)
+      del(enemies, enemy)
+      if player.power then
+        player.power = false
+      else
+        player.health -= 1
+        score_streak = 0
+        score_multiplier = 1
+      end
+      if player.health <= 0 then
+        create_explosion(player.x, player.y, 2)
+        game_over = true
+      end
+    elseif enemy.y > 128 then
       del(enemies, enemy)
     end
   end
 
   if phase == "level_complete" and not boss_exists("final_boss") then
-    warp_time = warp_duration
     enemy_bullets = {}
     bullets = {}
     current_level += 1
     if current_level <= 5 then
+      warp_time = warp_duration
       printh("final boss defeated. warping to level " .. current_level)
       sfx(5)
     else
@@ -721,6 +732,7 @@ function update_game()
         spawn_true_last_boss()
         phase = "true_last_boss"
       else
+        final_score = score
         game_state = "game_complete"
       end
     end
@@ -768,7 +780,15 @@ function draw_game()
   end
   
   for enemy in all(enemies) do
-    spr(enemy.sprite, enemy.x, enemy.y)
+    if enemy.type == "true_last_boss" then
+      spr(enemy.sprite, enemy.x, enemy.y, 4, 4)
+    elseif enemy.type == "final_boss" then
+      spr(enemy.sprite, enemy.x, enemy.y, 3, 3)
+    elseif enemy.type == "mini_boss" then
+      spr(enemy.sprite, enemy.x, enemy.y, 2, 2)
+    else
+      spr(enemy.sprite, enemy.x, enemy.y)
+    end
   end
   
   for bullet in all(enemy_bullets) do
@@ -812,34 +832,6 @@ function draw_game()
 end
 
 ------------------------------
--- menu screen (arcade style)
-------------------------------
-function update_menu()
-  if btnp(4) then
-    credits += 1
-    sfx(4)
-    printh("credit inserted! total credits: " .. credits)
-  end
-  if btnp(5) and credits > 0 then
-    credits -= 1
-    credits_used = 1
-    game_state = "game"
-    init_game()
-    sfx(4)
-    printh("game started! credits remaining: " .. credits)
-  end
-end
-
-function draw_menu()
-  cls()
-  draw_starfield()
-  print("insert coin", 35, 40, 7)
-  print("press z to insert credit", 20, 50, 7)
-  print("press x to start", 35, 60, 7)
-  print("credits: " .. credits, 45, 80, 7)
-end
-
-------------------------------
 -- global _update and _draw
 ------------------------------
 function _update()
@@ -848,7 +840,10 @@ function _update()
   elseif game_state == "game" then
     update_game()
   elseif game_state == "game_complete" then
-    if btnp(4) then init_game() end
+    if btnp(4) then
+      game_state = "menu"
+      init_game()
+    end
   end
 end
 
@@ -870,7 +865,7 @@ function init_game()
   player.power = false
   player.bombs = 3
   score = 0
-  score_streak = 5
+  score_streak = 0
   score_multiplier = 1
   game_over = false
   bullets = {}
@@ -884,6 +879,7 @@ function init_game()
   enemy_kill_count = 0
   phase = "normal"
   warp_time = 0
+  credits_used = 0
   init_starfield()
   explosions = {}
   bomb_effect_timer = 0
