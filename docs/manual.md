@@ -120,7 +120,7 @@ When a boss is about to spawn, **"! WARNING !"** flashes at center screen for 3 
 
 ### Game over overlay
 
-When health reaches zero, **game over** appears mid-screen. After a short grace period: **Z** continues (costs 1 credit, only if credits remain), **X** sends you to the **menu**. A **10-second** countdown runs in the background; if it expires, you go to the menu automatically. The overlay does **not** show remaining credits -- check the **menu** before starting if you want to know how many continues you have left.
+When health reaches zero, **game over** appears mid-screen. After a short grace period: **Z** continues (costs 1 credit, only if credits remain), **X** sends you to the **menu**. The overlay shows **credits** left and a **countdown in seconds** so you are not guessing. **Z: continue** only appears when you have at least one credit. A **10-second** countdown runs in the background; if it expires, you go to the menu automatically.
 
 ---
 

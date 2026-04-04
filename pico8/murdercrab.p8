@@ -114,6 +114,10 @@ function init_save_system()
   cartdata("murdercrab_v1")
 end
 
+function ensure_cartdata()
+  if stat(6) == 0 then init_save_system() end
+end
+
 -- score helpers (component-based: {m=millions, k=thousands, u=units})
 function score_to_comp(n)
   return {m=flr(n/1000000), k=flr((n%1000000)/1000), u=n%1000}
@@ -137,7 +141,7 @@ end
 
 function init_high_scores()
   high_scores = {}
-  if stat(6) == 0 then init_save_system() end
+  ensure_cartdata()
   
   -- load saved initials (slots 18-20)
   local c1, c2, c3 = dget(18), dget(19), dget(20)
@@ -163,7 +167,7 @@ function init_high_scores()
 end
 
 function save_high_scores()
-  if stat(6) == 0 then init_save_system() end
+  ensure_cartdata()
   
   for i = 1, 3 do
     local e = high_scores[i]
@@ -515,7 +519,7 @@ function update_enter_initials()
       local str = current_initials[1] .. current_initials[2] .. current_initials[3]
       last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
       
-      if stat(6) == 0 then init_save_system() end
+      ensure_cartdata()
       dset(18, ord(current_initials[1]) or 65)
       dset(19, ord(current_initials[2]) or 67)
       dset(20, ord(current_initials[3]) or 69)
@@ -585,7 +589,7 @@ function draw_instructions()
   shadow_text("increase score", 90, 8)
   spr(7, hx - 12, 88)
   
-  shadow_text("10x cherries increase multiplier", 100, 8)
+  shadow_text("10 cherries raise multiplier", 100, 8)
   shadow_text("press x to return to menu", 120, 8)
 end
 
@@ -667,12 +671,7 @@ function release_bullet(b)
 end
 
 function get_enemy_bullet()
-  if #enemy_bullet_pool > 0 then
-    local b = enemy_bullet_pool[1]
-    deli(enemy_bullet_pool, 1)
-    return b
-  end
-  return {}
+  return #enemy_bullet_pool > 0 and deli(enemy_bullet_pool, 1) or {}
 end
 
 function release_enemy_bullet(b)
@@ -760,15 +759,10 @@ end
 
 function spawn_enemy_bullet(cx, cy, dx, dy)
   local b = get_enemy_bullet()
-  if b then
-    b.x = cx - 4
-    b.y = cy - 4
-    b.dx = dx
-    b.dy = dy
-    b.width = 8
-    b.height = 8
-    add(enemy_bullets, b)
-  end
+  b.x, b.y = cx - 4, cy - 4
+  b.dx, b.dy = dx, dy
+  b.width, b.height = 8, 8
+  add(enemy_bullets, b)
 end
 
 ----------------------------------------
@@ -1460,8 +1454,7 @@ function check_player_enemy_collisions()
   
   for enemy in all(enemies) do
     if enemy.state == 2 then
-      local kbox = {x = enemy.x + 3, y = enemy.y + 3, width = 2, height = 2}
-      if collides(player, kbox) then
+      if collides(player, enemy) then
         player_hit()
         create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
         del(enemies, enemy)
@@ -1816,8 +1809,12 @@ function draw_game()
   if game_over and game_over_grace <= 0 then
     local y_off = sin(time()) * 2
     center_text("game over", 64 + y_off, 8)
-    center_text("press z to continue", 72, 7)
-    center_text("press x for menu", 80, 7)
+    if credits > 0 then
+      center_text("z: continue", 72, 7)
+    end
+    center_text("x: menu", 80, 7)
+    center_text("credits "..credits, 88, 6)
+    center_text(flr(game_over_timer / 30) .. "s", 96, 5)
   end
   
   -- boss warning
