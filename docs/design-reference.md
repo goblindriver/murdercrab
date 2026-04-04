@@ -57,6 +57,55 @@ MurderCrab is a doujin work -- made by a small team out of passion, not obligati
 
 MurderCrab follows the same path: built on PICO-8 constraints, refined through play, stored in public Git, open to evolution. The Picotron port is the next version at the next Comiket, so to speak.
 
+## The mythic structure
+
+From the *Shmup_Lyf Metaphor* issue, mapping Joseph Campbell's monomyth to the shmup:
+
+| Monomyth element | Shmup equivalent |
+|-----------------|-----------------|
+| **The Hero** | The player/ship. "Gifted with prototype craft as a talisman, like a young knight entrusted with a great and enchanted weapon." |
+| **An enemy force** | The swarm. The reason for the conflict. |
+| **The ultimate fiend** | The final boss. "Often with multiple stages as they reveal their true powers, when pushed into a corner." |
+| **Threshold guardians** | Stage bosses. "The warlords of their domains." David vs Goliath encounters. |
+| **Hero helpers** | Power-up carriers, option fighters, supply ships. "By your side through thick and thin." |
+| **Journey through a world** | The stages themselves. "You move ever deeper into the lair or into foreign-held territory." |
+
+MurderCrab's five-stage structure maps cleanly to this: the player is thrust outward through increasingly hostile territory toward the hive core, encountering threshold guardians (mini-bosses, final bosses) before confronting the TLB.
+
+**Spatial metaphor:** "Shmups are about contest over territory. As a player you advance through a space owned by an opposing force and occupy it, cleansing and purging it of this 'evil' presence."
+
+## The Other: why crabs
+
+The *Metaphor* issue identifies how shmup enemies embody different forms of "the Other" -- the thing that is profoundly not-us:
+
+- **Biological Other** — "toxic, mutated, cannot be reasoned with, they only devour." Tentacles, insects, parasites.
+- **Insectile Other** — "glossy carapaces, segmented limbs and crunching mandible mouthpieces." Bees in DoDonPachi. Swarm behavior. Hive mind.
+- **Cyborgian Other** — biomechanical fusion, Giger-esque. The fear that technology will consume the organic.
+
+MurderCrab sits squarely in the **insectile/crustacean Other** space. Crabs are armored, alien in morphology, operate in swarms, and the "hive" language maps perfectly to crustacean biology (molting, carapace, chitin, brood). The crab enemy is the biological Other given military shell -- nature weaponized.
+
+From the DoDonPachi zine: "The enemy stronghold. The hive. The stings fly thick and fast, as the mindless drones attack." Replace bees with crabs and you have MurderCrab's final stages.
+
+## The ritual of play
+
+From the DoDonPachi zine's epigraph:
+
+> "Ritual is something that is part of our everyday lives; to engage in repetitive actions -- to centre ourselves, to add structure and continuity to life -- this is fundamental to being human. We enact it in the way we prepare ourselves for a day, when we eat, when we work, and of course in the games we play."
+
+> "Another launch, another loop around the rosary. A moment of contemplation, of concentration, of meditation. Practiced hands count the beads, twitch the stick. Trace a line through a world of enemy fire, flow through a much repeated passage. The game plays us. We are the ritual."
+
+This is the emotional truth behind route play and NG+ loops. Each run is a ritual repetition. The player doesn't just memorize -- they internalize until the game becomes meditation. MurderCrab's NG+ system should honor this: each loop is another passage through the rosary, familiar yet demanding deeper presence.
+
+## Learning as untying knots
+
+From the DoDonPachi zine on stage learning:
+
+> "Untying knots. That's the feeling in my brain when I think about what it is to learn a particular stage. A great thread flowing through the level, through the possibility space. Some sections are smooth already, not difficult to trace, but then there are the knots. The parts where the enemies pile up or the intersecting bullet waves create binds."
+
+> "In a run you can use a bomb and skip a particularly heinous knot -- wise -- but in stage focused practice you can take the time to understand the knots, to unpick them. Approach each one as a puzzle to be solved. Eventually you find a way to loosen it, and then through repeated action it becomes featureless."
+
+This is the experiential counterpart to ProMeTheus's practice doctrine. The player's journey through a shmup is fractal: survival knots, then scoring knots, then optimization knots. "There are multitudinous different ways to cut the thread and bind it together in even more intricate patterns."
+
 ---
 
 # 2. DESIGN PHILOSOPHY
