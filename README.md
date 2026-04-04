@@ -25,10 +25,10 @@ A vertical-scrolling shoot-em-up built for PICO-8, with a Picotron port in progr
 
 | Doc | What it is |
 |-----|------------|
-| [docs/manual.md](docs/manual.md) | Mechanics spec (accurate to the cart) |
-| [docs/manual-designed.md](docs/manual-designed.md) | Pack-in / zine manual + **figures** from the [media extraction pack](media/MurderCrab_Media_Extraction_Pack/) |
-| [docs/MurderCrab_Designed_Manual.pdf](docs/MurderCrab_Designed_Manual.pdf) | PDF booklet export (snapshot; markdown edition is maintained) |
-| [docs/design-reference.md](docs/design-reference.md) | Design philosophy + research |
+| [docs/player-manual.md](docs/player-manual.md) | **Player manual** — mechanics, stages, score, figures from the [media extraction pack](media/MurderCrab_Media_Extraction_Pack/) |
+| [docs/operator-manual.md](docs/operator-manual.md) | **Operator manual** — design vision, research, arcade-flow targets, PICO-8 cart budget, future features |
+| [docs/MurderCrab_Designed_Manual.pdf](docs/MurderCrab_Designed_Manual.pdf) | PDF booklet export (optional snapshot) |
+| [docs/manual.md](docs/manual.md), [docs/manual-designed.md](docs/manual-designed.md), [docs/design-reference.md](docs/design-reference.md) | Short redirects to the manuals above |
 
 ## Project Structure
 
@@ -39,8 +39,11 @@ pico8/
     split/                   # older split-cart version (menu + game, Jun 2025)
     legacy/                  # early shmup prototype, docs
 docs/
-  manual.md                  # pilot manual (systems)
-  manual-designed.md         # zine edition with art links
+  player-manual.md           # SSOT: players (mechanics + figures)
+  operator-manual.md         # SSOT: operators (design + cart budget)
+  manual.md                  # → player-manual (legacy link)
+  manual-designed.md         # → player-manual (legacy link)
+  design-reference.md        # → operator-manual (legacy link)
   MurderCrab_Designed_Manual.pdf
 media/
   MurderCrab_Media_Extraction_Pack/   # SVG, png_16x, GIFs, manifest (from cart gfx)
