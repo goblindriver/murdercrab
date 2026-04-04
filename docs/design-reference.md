@@ -11,16 +11,18 @@ This document preserves shmup genre research, design philosophy, and aspirationa
 ## CONTENTS
 
 1. Project Identity
-2. Design Philosophy
-3. Shmup Design Principles
-4. Combat Design Reference
-5. Threat Language Framework
-6. Boss Design Doctrine
-7. Score Attack Philosophy
-8. Practice Doctrine
-9. Glossary
-10. Future Features
-11. Sources and References
+2. Arcade Flow Model
+3. PICO-8 Cart Budget
+4. Design Philosophy
+5. Shmup Design Principles
+6. Combat Design Reference
+7. Threat Language Framework
+8. Boss Design Doctrine
+9. Score Attack Philosophy
+10. Practice Doctrine
+11. Glossary
+12. Future Features
+13. Sources and References
 
 ---
 
@@ -28,7 +30,8 @@ This document preserves shmup genre research, design philosophy, and aspirationa
 
 ## Core identity
 
-- **Platform origin:** PICO-8 fantasy console (128x128, 16 colors, 8192 tokens)
+- **Format:** Arcade game. Quarter in, play, die, initials, attract mode. No menus. No save files. No progression unlocks.
+- **Platform origin:** PICO-8 fantasy console (128x128, 16 colors, 8192 tokens, 32KB cart)
 - **Platform target:** Picotron port planned (480x270, 64 colors, no token limit)
 - **Visual spine:** cosmic industrial horror + crab biology + machine shell design
 - **Primary reference line:** Toaplan backbone, danmaku-aware boss design, doujin-style intensity
@@ -108,7 +111,140 @@ This is the experiential counterpart to ProMeTheus's practice doctrine. The play
 
 ---
 
-# 2. DESIGN PHILOSOPHY
+# 2. ARCADE FLOW MODEL
+
+MurderCrab is an arcade game. Not "inspired by arcade games." It IS one. The mental model is a cabinet: you walk up, drop a quarter, play until you die, put your initials in if you earned a spot, and the machine goes back to attract mode.
+
+## The loop
+
+```
+ATTRACT MODE (title + high scores + how-to-play cycling)
+       │
+       ▼  [press start — costs 1 credit]
+     GAME
+       │
+       ├── die ──► GAME OVER
+       │              │
+       │              ├── [have credits? press Z to continue]
+       │              │         └──► back to GAME (costs 1 credit, 3 HP)
+       │              │
+       │              └── [no credits or press X or timer expires]
+       │                        │
+       │                        ├── score qualifies? ──► ENTER INITIALS ──► ATTRACT MODE
+       │                        └── no high score ──► ATTRACT MODE
+       │
+       └── beat TLB ──► GAME COMPLETE
+                           │
+                           ├── [press Z] ──► NG+ loop (game continues, same credit)
+                           └── [press X or timeout]
+                                     │
+                                     ├── score qualifies? ──► ENTER INITIALS ──► ATTRACT MODE
+                                     └── no high score ──► ATTRACT MODE
+```
+
+## Key principles
+
+**No menu between attract and play.** The title screen IS attract mode. Press start to play. That's it. There is no separate menu with options. Instructions, high scores, and attract visuals cycle on the title screen itself.
+
+**Initials are entered when you earn them.** Not before the game. Not from a menu. When your run ends and your score makes the board, the game says "enter your initials" right there. You stamp your name and the cabinet resets to attract.
+
+**Credits are quarters.** You get 3 per session. Starting costs 1. Continuing costs 1. Continuing gives you 3 HP -- enough to see what's ahead, not enough to coast. Using a continue locks you out of the TLB.
+
+**NG+ is not a new game.** It's the game continuing. In arcade terms, clearing loop 1 sends you into loop 2 on the same credit. You play until you die. There is no "return to menu" option mid-run.
+
+**Attract mode cycles.** The idle screen should cycle through: title logo, high score table, brief how-to-play, back to title. The starfield scrolls. The music plays. The cabinet is alive even when nobody is playing.
+
+## Delta from current implementation
+
+The current cart has a separate menu state between title and gameplay with 4 options (start game, enter initials, instructions, high scores). This needs to be collapsed:
+
+| Current | Target |
+|---------|--------|
+| `title` → `menu` → `start_game` | `attract` → `game` (press start) |
+| `menu` → `enter_initials` (pre-game) | `game_over` → `enter_initials` (if qualified) → `attract` |
+| `menu` → `instructions` | Instructions cycle as part of attract mode |
+| `menu` → `highscores` | High scores cycle as part of attract mode |
+| `game_over` → `menu` | `game_over` → `enter_initials` or `attract` |
+| `game_complete` → `menu` (press X) | `game_complete` → `enter_initials` or `attract` (press X / timeout) |
+
+---
+
+# 3. PICO-8 CART BUDGET
+
+How MurderCrab fits on the cart. These are the hard walls.
+
+## Platform specs
+
+| Resource | Limit | Description |
+|----------|-------|-------------|
+| **Code tokens** | 8,192 | Each word/operator is 1 token. Brackets and strings each count as 1. `local`, `,`, `;`, `end`, comments are free. |
+| **Compressed code** | 15,360 bytes | For .p8.png/.p8.rom export. Not enforced for .p8 format. |
+| **Total cart data** | 32 KB | Encoded as PNG. Includes code, sprites, map, SFX, music. |
+| **Sprites** | 256 (128 + 128 shared) | 8x8 each, 16-color palette |
+| **Map** | 128x32 tiles (+ 128x32 shared) | Shares memory with lower sprite bank |
+| **SFX** | 64 slots | 4 channels, 32 notes per SFX |
+| **Music** | 64 patterns | Each pattern plays up to 4 SFX channels |
+| **Persistent storage** | 64 numbers (256 bytes) | Via `cartdata()` / `dget()` / `dset()` |
+| **CPU** | 4M VM insts/sec | At 30fps that's ~133K instructions per frame |
+| **Display** | 128x128, 16 fixed colors | No transparency, palette swaps via `pal()` |
+| **Input** | 6 buttons per player (DPAD + Z + X) | 2 players supported |
+| **Frame rate** | 30fps (`_update`) or 60fps (`_update60`) | MurderCrab uses 30fps |
+
+## Current usage
+
+| Resource | Used | Limit | Headroom |
+|----------|------|-------|----------|
+| **Lua code** | ~1,951 lines, 86 functions | 8,192 tokens | Moderate (exact token count requires PICO-8 `INFO` command) |
+| **Sprites** | 48 of 128 pixel rows populated (~37%) | 128 rows (+ 128 shared) | Significant — room for more enemy types, effects, backgrounds |
+| **SFX** | 27 of 64 slots | 64 | Good — 37 slots available for new sounds |
+| **Music** | 18 of 64 patterns | 64 | Good — 46 patterns available |
+| **Cartdata** | 63 of 64 slots | 64 | **Nearly full** — 1 slot remaining |
+| **Map** | Not used | 128x32 tiles | Fully available (could store level data, attract mode text, etc.) |
+
+### Cartdata allocation
+
+| Slots | Usage |
+|-------|-------|
+| 0-59 | High score table: 6 slots per entry (3 initials + 3 score components) x 10 entries |
+| 60-62 | Saved initials (3 ASCII character codes) |
+| 63 | **Free** |
+
+**Warning:** cartdata is essentially full. Any new persistent feature (settings, unlocks, statistics) would require restructuring. Options:
+- Pack multiple values into single slots using bit manipulation
+- Reduce high score entries from 10 to 8 (frees 12 slots)
+- Use `cstore()` to write directly to a second cartridge for overflow storage (requires a cart-swap animation)
+
+### Sprite allocation
+
+| Sprite(s) | Usage |
+|-----------|-------|
+| 1, 17, 33 | Player ship (center, left-tilt, right-tilt) |
+| 2, 18, 34, 50 | Player bullet animation (4 frames) |
+| 3, 19 | Enemy (normal, animated) |
+| 35 | Enemy (kamikaze dive sprite) |
+| 4 | Enemy bullet |
+| 5 | Bomb powerup |
+| 6 | Health powerup |
+| 7 | Cherry (score powerup) |
+| 8 (2x2) | Mini-boss / Final boss |
+| 10 (4x4) | True last boss |
+| 48+ | Explosion sprite(s) |
+
+The lower 6 rows (sprites 0-95) contain all game art. The upper 10 rows (sprites 96-255) are empty. The shared sprite/map region (sprites 128-255) is entirely unused.
+
+### Music layout
+
+| Patterns | Usage |
+|----------|-------|
+| 0-5 | Title / attract |
+| 6-9 | Gameplay |
+| 10-13 | Boss |
+| 14-17 | Additional (warp, victory, etc.) |
+| 18-63 | **Free** |
+
+---
+
+# 4. DESIGN PHILOSOPHY
 
 ## Why this game should feel good to play
 
@@ -165,7 +301,7 @@ The takeaway: **use distinct enemies to create tests which overlap to make more 
 
 ---
 
-# 3. SHMUP DESIGN PRINCIPLES
+# 5. SHMUP DESIGN PRINCIPLES
 
 These are genre-level principles that should inform every design decision in *MurderCrab*.
 
@@ -208,7 +344,7 @@ From the *Cho Ren Sha 68k* zine, on why explosions matter:
 
 ---
 
-# 4. COMBAT DESIGN REFERENCE
+# 6. COMBAT DESIGN REFERENCE
 
 This section documents combat systems as both current implementation and aspirational targets. Items marked **[CURRENT]** exist in the PICO-8 cart. Items marked **[FUTURE]** are design goals for the Picotron port or later revisions.
 
@@ -268,7 +404,7 @@ The ideal is to bomb as much as possible (never dying with bombs in stock), but 
 
 ---
 
-# 5. THREAT LANGUAGE FRAMEWORK
+# 7. THREAT LANGUAGE FRAMEWORK
 
 A good shmup teaches enemy meaning through shape and behavior. This framework defines the threat hierarchy that *MurderCrab* should build toward.
 
@@ -317,7 +453,7 @@ Suggested bullet families for future implementation:
 
 ---
 
-# 6. BOSS DESIGN DOCTRINE
+# 8. BOSS DESIGN DOCTRINE
 
 ## Principles
 
@@ -358,7 +494,7 @@ What a scorer exploits for damage, item value, cancels, or timer reward.
 
 ---
 
-# 7. SCORE ATTACK PHILOSOPHY
+# 9. SCORE ATTACK PHILOSOPHY
 
 ## The run is a route
 
@@ -431,7 +567,7 @@ The best scoring play comes from understanding resource economics:
 
 ---
 
-# 8. PRACTICE DOCTRINE
+# 10. PRACTICE DOCTRINE
 
 This may be the single most important philosophy in the whole project.
 
@@ -485,7 +621,7 @@ This is a design insight too: the game could build in run-tracking or statistics
 
 ---
 
-# 9. GLOSSARY
+# 11. GLOSSARY
 
 Standard shmup terminology for reference. This language should be used consistently in documentation, comments, and design discussion.
 
@@ -512,11 +648,13 @@ Standard shmup terminology for reference. This language should be used consisten
 
 | Term | Meaning |
 |------|---------|
+| Attract mode | Idle title screen. Cycles logo, high scores, how-to-play. The cabinet at rest. |
+| Credit | A quarter. 3 per session. 1 to start, 1 to continue. |
 | Cherry | Score powerup (sprite 7). Builds streak toward multiplier |
 | Streak | Cherry collection counter. 10 cherries = +1 multiplier |
 | Multiplier | Score multiplier. Resets on hit. The core scoring mechanic |
 | Warp | Level transition animation. 6-second sequence between stages |
-| Loop / NG+ | Replaying all 5 stages at higher difficulty after beating TLB |
+| Loop / NG+ | Replaying all 5 stages at higher difficulty after beating TLB. Same credit. |
 | TLB | True last boss. Level 6 encounter. Requires no-continue clear |
 | Rage mode | TLB phase 3. +10 bullets to all patterns. Visual aura |
 | Boss warning | 3-second flashing "! WARNING !" before boss spawn |
@@ -524,7 +662,7 @@ Standard shmup terminology for reference. This language should be used consisten
 
 ---
 
-# 10. FUTURE FEATURES
+# 12. FUTURE FEATURES
 
 Everything the first-pass manual assumed that doesn't exist yet but could. This is the wishlist for the Picotron port and beyond.
 
@@ -559,6 +697,13 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 - [ ] **No-miss / no-bomb bonus** — Per-stage or per-boss rewards for clean play.
 - [ ] **Replay recording** — Save and share runs for community study.
 
+## Arcade flow refactor
+
+- [ ] **Collapse menu into attract mode** — Title screen cycles: logo, high scores, how-to-play. Press start to play. No menu.
+- [ ] **Post-game initials entry** — When your run ends and your score qualifies, enter initials right there. No pre-game initials screen.
+- [ ] **Attract mode → game → initials → attract mode** — The full loop. Game over always returns to attract. No intermediate menu.
+- [ ] **Attract mode cycling** — Title logo (3-4 sec) → high score table (3-4 sec) → controls/how-to-play (3-4 sec) → repeat. Starfield scrolls. Music plays.
+
 ## Quality of life
 
 - [ ] **Practice mode** — Stage select, boss select, checkpoint restart. Endorsed by the game itself.
@@ -576,7 +721,7 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 
 ---
 
-# 11. SOURCES AND REFERENCES
+# 13. SOURCES AND REFERENCES
 
 All primary source PDFs are stored in `docs/reference-library/` for direct consultation.
 

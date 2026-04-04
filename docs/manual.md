@@ -9,17 +9,19 @@
 
 1. Warning to New Pilots
 2. What *MurderCrab* Is
-3. Basic Controls
-4. HUD Readout
-5. Core Combat Systems
-6. Resources
-7. Enemy Field Guide
-8. Stage Guide
-9. Boss Doctrine
-10. Score Attack
-11. Credits and Continues
-12. High Scores
-13. Technical Reference
+3. How the Cabinet Works
+4. Basic Controls
+5. HUD Readout
+6. Core Combat Systems
+7. Resources
+8. Enemy Field Guide
+9. Stage Guide
+10. Boss Doctrine
+11. Score Attack
+12. Credits and Continues
+13. High Scores
+14. Technical Reference
+15. Cart Budget
 
 ---
 
@@ -39,9 +41,9 @@ A clear proves you can live. A route proves you can drive.
 
 # 2. WHAT *MURDERCRAB* IS
 
-**MurderCrab!** is a vertically scrolling arcade shooter built for PICO-8. Five stages of escalating swarm density, two bosses per level, a true last boss gated behind skilled play, and a new game plus loop for pilots who want to push further.
+**MurderCrab!** is a vertically scrolling arcade shooter built for PICO-8. Five stages of escalating swarm density, two bosses per level, a true last boss gated behind skilled play, and a new game plus loop for pilots who want to push further. It follows the classic arcade cabinet model: attract mode, insert credit, play, die, put your name on the board, next player.
 
-The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a single combined cartridge. It was built within PICO-8's token and memory constraints.
+The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a single combined cartridge. Built within PICO-8's 8,192-token and 32KB cart constraints.
 
 > Humanity did not find peace in the void.
 > It found armored claws, chitin cathedrals, and wave after wave of shell-born murder.
@@ -49,7 +51,29 @@ The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a sing
 
 ---
 
-# 3. BASIC CONTROLS
+# 3. HOW THE CABINET WORKS
+
+This is an arcade game. It works like a cabinet.
+
+## The loop
+
+**Attract mode** runs when nobody is playing. The title screen shows the logo, cycles through the high score table and a brief how-to-play screen. The starfield scrolls. The music plays. The machine is alive.
+
+**Press start** to insert a credit and begin. You get 3 credits per session.
+
+**Play** until you die or clear the game.
+
+**Game over.** If your score earned a spot on the high score table, enter your 3-character initials. Then the cabinet returns to attract mode. If you didn't make the board, it goes straight back.
+
+**Continue.** If you have credits left, you can feed another quarter before the timer runs out. Continuing gives you 3 HP. It also locks you out of the true last boss.
+
+**Beat the TLB.** If you clear all 5 levels without continuing and defeat the true last boss, you can press Z to enter the next loop (NG+). Same credit, harder enemies, score carries over. You play until you die. When you finally go down, initials and attract mode, same as always.
+
+There is no menu. There is no save file. There is no progression system. You play, you score, you put your name on the board, and the next player steps up.
+
+---
+
+# 4. BASIC CONTROLS
 
 | Input | Action |
 |-------|--------|
@@ -61,13 +85,13 @@ The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a sing
 
 **Shoot** fires twin bullets from either side of the ship. Each press fires one volley. There is no auto-fire -- you tap for each shot. Bullets travel upward at 6 pixels per frame.
 
-**Bomb** is your panic button and your tactical tool. Details in section 5.
+**Bomb** is your panic button and your tactical tool. Details in section 6.
 
 There is no focus mode, no secondary fire, and no charge mechanic. Three inputs. That's the whole cockpit.
 
 ---
 
-# 4. HUD READOUT
+# 5. HUD READOUT
 
 The HUD displays during gameplay along the top and left edges of the screen:
 
@@ -94,13 +118,13 @@ When a boss is about to spawn, **"! WARNING !"** flashes at center screen for 3 
 
 ### Game over overlay
 
-When health reaches zero, the game over prompt appears mid-screen with options to continue (Z) or return to menu (X). This overlay has a brief grace period before accepting input to prevent accidental presses.
+When health reaches zero, the game over prompt appears mid-screen. If you have credits, press Z to continue or X to end the run. A 10-second countdown runs -- if it expires, the run ends. This overlay has a brief grace period before accepting input to prevent accidental presses.
 
 ---
 
-# 5. CORE COMBAT SYSTEMS
+# 6. CORE COMBAT SYSTEMS
 
-## 5.1 Movement
+## 6.1 Movement
 
 The ship moves at a fixed 2 pixels per frame. The player hitbox for enemy bullet collisions is a tight 2x2 pixel box centered on the ship sprite -- much smaller than the visual 8x8 sprite. This means you can thread through gaps that look impossible.
 
@@ -108,13 +132,13 @@ For kamikaze enemy collisions, the check uses the full ship sprite bounding box.
 
 The ship tilts left or right while strafing and displays a small exhaust thrust animation while moving in any direction.
 
-## 5.2 Shot
+## 6.2 Shot
 
 Each press of Z fires two bullets simultaneously, offset to the left and right of the ship's center. Bullets are 8x8 sprites with a 5-frame looping animation. They travel straight up at 6 pixels per frame and despawn when they leave the top of the screen.
 
 There is no weapon power system. Your gun is the same from the first second to the last.
 
-## 5.3 Bomb
+## 6.3 Bomb
 
 Press X to detonate a bomb. Requirements: at least 1 bomb in stock, and no bomb currently active.
 
@@ -133,13 +157,13 @@ Press X to detonate a bomb. Requirements: at least 1 bomb in stock, and no bomb 
 
 Bombs are not an apology. They are a conversion mechanic. Use them before death, not after regret.
 
-## 5.4 Invincibility
+## 6.4 Invincibility
 
 When hit, the player becomes invincible for 30 frames (1 second). The ship flickers during this window. Use it to reposition.
 
 ---
 
-# 6. RESOURCES
+# 7. RESOURCES
 
 ## Health
 
@@ -183,7 +207,7 @@ All powerups are attracted toward the player when within 48 pixels. They drift t
 
 ---
 
-# 7. ENEMY FIELD GUIDE
+# 8. ENEMY FIELD GUIDE
 
 ## Normal enemies
 
@@ -217,11 +241,11 @@ One core enemy type with two weapon variants and three behavior states.
 
 ## Bosses
 
-See section 9 for full boss doctrine.
+See section 10 for full boss doctrine.
 
 ---
 
-# 8. STAGE GUIDE
+# 9. STAGE GUIDE
 
 ## Progression structure
 
@@ -275,7 +299,7 @@ Between levels, a 6-second warp sequence plays: stars streak into lines, the scr
 
 ---
 
-# 9. BOSS DOCTRINE
+# 10. BOSS DOCTRINE
 
 Bosses in *MurderCrab* are exams, not spectacles.
 
@@ -350,7 +374,7 @@ For the final boss, a 90-frame (3 second) explosion celebration plays with perio
 
 ---
 
-# 10. SCORE ATTACK
+# 11. SCORE ATTACK
 
 ## Point values
 
@@ -397,33 +421,33 @@ The game stores 10 high scores with 3-character initials using PICO-8's cartdata
 
 ---
 
-# 11. CREDITS AND CONTINUES
+# 12. CREDITS AND CONTINUES
 
-## Starting a game
+## Credits
 
-From the main menu, selecting "start game" costs 1 credit. You begin with 3 credits, so you can start 3 separate games in one session (or 1 game with 2 continues).
+You get 3 credits per session. Think of them as quarters.
 
-The title screen resets credits to 3 every time you visit it.
+Pressing start on the attract screen costs 1 credit and starts the game. Credits reset to 3 every time the cabinet returns to attract mode.
 
 ## Continuing
 
 When you die:
 - A 10-second timer (300 frames) begins counting down
-- After a brief grace period, you can press Z to continue or X to quit to menu
-- Continuing costs 1 credit, restores 3 HP, and resets your multiplier and streak
-- If the timer expires, you return to the menu automatically
+- After a brief grace period, press Z to continue (costs 1 credit) or X to end the run
+- Continuing restores 3 HP and resets your multiplier and streak
+- If the timer expires, the run ends automatically
+
+Continuing is harsh by design. You get 3 more hits, not a fresh start. Enough to see what's ahead, not enough to coast.
 
 ## True ending condition
 
-The true last boss only appears if `credits_used == 0`. Any continue disqualifies you. After beating level 5's final boss without continuing, you warp to level 6 for the TLB encounter.
+The true last boss only appears if you used zero continues. Any continue disqualifies you. After beating level 5's final boss without continuing, you warp to level 6 for the TLB encounter.
 
-If you used continues, level 5's final boss defeat goes directly to the victory/game complete screen.
+If you used continues, level 5's final boss defeat goes directly to the game complete screen.
 
 ## New Game Plus
 
-After defeating the TLB, the game complete screen offers:
-- **Z:** Enter loop 2 (NG+). Credits reset to 3. Score carries over. Player HP and bombs carry over. Enemy stats scale up.
-- **X:** Return to menu. Loop counter resets.
+After defeating the TLB, press Z to enter the next loop. This is not a new game -- it's the game continuing on the same credit. Score carries over. HP and bombs carry over. Enemies get harder.
 
 NG+ scaling per loop:
 - Enemy HP: +1 per loop
@@ -433,31 +457,33 @@ NG+ scaling per loop:
 - Boss HP: x1.5 per loop
 - Boss bullet clusters: +1 per level (additive with base scaling)
 
+You play until you die. There is no "return to menu." When the last credit runs out, the run is over.
+
 ---
 
-# 12. HIGH SCORES
+# 13. HIGH SCORES
 
-## Viewing
+## The board
 
-Select "high scores" from the main menu to see the top 10 entries.
+The high score table holds 10 entries. It cycles on the attract screen so everyone walking by can see who's on top.
 
 ## Entering initials
 
-Select "enter initials" from the main menu to set your 3-character pilot tag. Navigate with up/down to change the character (full printable ASCII range, codes 33-126), left/right to move between positions, Z to confirm, X to cancel.
+When your run ends -- whether you died or cleared the game -- and your score earned a spot on the board, the game prompts you to enter your 3-character initials right there. Navigate with up/down to change the character (full printable ASCII range, codes 33-126), left/right to move between positions, Z to confirm.
 
-Your initials are saved to cartdata and persist between sessions. They are used automatically when your score qualifies for the high score table.
+Your initials persist between sessions. Once set, they're used for all future high score entries until you change them.
 
 ## When scores are recorded
 
-Scores are recorded automatically at two points:
-- When you die (game over timer starts)
+Scores are checked at two points:
+- When you die and the game over sequence begins
 - When you defeat the true last boss (victory)
 
-The final score includes the end-of-game bonus.
+The final score includes the end-of-game bonus. After initials entry (or if you didn't qualify), the cabinet returns to attract mode.
 
 ---
 
-# 13. TECHNICAL REFERENCE
+# 14. TECHNICAL REFERENCE
 
 ## Frame rate
 
@@ -495,6 +521,65 @@ Player bullets and enemy bullets use object pooling for memory efficiency. Kille
 |-------|-------|
 | 0-59 | High score table (6 slots per entry x 10 entries) |
 | 60-62 | Saved initials (ASCII codes) |
+
+---
+
+---
+
+# 15. CART BUDGET
+
+How MurderCrab fits on the PICO-8 cartridge.
+
+## Platform limits
+
+| Resource | Limit |
+|----------|-------|
+| Code | 8,192 tokens |
+| Compressed code | 15,360 bytes (for .p8.png export) |
+| Total cart | 32 KB |
+| Sprites | 256 (128 + 128 shared with map) |
+| Map | 128x32 tiles (+ 128x32 shared with sprites) |
+| SFX | 64 slots |
+| Music | 64 patterns |
+| Persistent storage | 64 numbers (256 bytes) |
+| Display | 128x128, 16 fixed colors |
+| CPU | 4M VM instructions/sec |
+| Frame rate | 30fps (using `_update`) |
+
+## Current usage
+
+| Resource | Used | Headroom |
+|----------|------|----------|
+| Lua code | ~1,951 lines, 86 functions | Moderate (within 8,192 token limit) |
+| Sprites | 6 of 16 rows populated (~37%) | Significant |
+| SFX | 27 of 64 | 37 free |
+| Music | 18 of 64 patterns | 46 free |
+| Cartdata | 63 of 64 slots | **1 free** |
+| Map | Unused | Fully available |
+
+## Cartdata allocation
+
+| Slots | Usage |
+|-------|-------|
+| 0-59 | High scores (6 per entry x 10 entries) |
+| 60-62 | Saved initials (3 ASCII codes) |
+| 63 | Free |
+
+Cartdata is nearly full. New persistent features would require bit-packing, reducing the high score table, or using `cstore()` to a second cartridge.
+
+## Sprite allocation
+
+| Sprite(s) | Usage |
+|-----------|-------|
+| 1, 17, 33 | Player ship (center, left-tilt, right-tilt) |
+| 2, 18, 34, 50 | Player bullet (4-frame animation) |
+| 3, 19 | Enemy (normal, animated) |
+| 35 | Enemy (kamikaze) |
+| 4 | Enemy bullet |
+| 5, 6, 7 | Powerups (bomb, health, cherry) |
+| 8 (2x2) | Mini-boss / Final boss |
+| 10 (4x4) | True last boss |
+| 48+ | Explosions |
 
 ---
 
