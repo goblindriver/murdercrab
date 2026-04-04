@@ -35,13 +35,13 @@ Your second objective is more important: **learn why the stage is built the way 
 
 Your third objective is where the good stuff starts: **turn survival into authority.**
 
-A clear proves you can live. A route proves you can drive.
+Clearing proves you can live. A route proves you can drive.
 
 ---
 
 # 2. WHAT *MURDERCRAB* IS
 
-**MurderCrab!** is a vertically scrolling arcade shooter built for PICO-8. Five stages of escalating swarm density, two bosses per level, a true last boss gated behind skilled play, and a new game plus loop for pilots who want to push further. It follows the classic arcade cabinet model: attract mode, insert credit, play, die, put your name on the board, next player.
+**MurderCrab!** is a vertically scrolling arcade shooter built for PICO-8. Five stages of escalating swarm density, two bosses per level, a true last boss gated behind skilled play, and a new game plus loop for pilots who want to push further. The **feel** is quarter-muncher: credits, continues, a top-3 board, and no campaign unlocks -- even though you pick options from a menu between the title and play.
 
 The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a single combined cartridge. Built within PICO-8's 8,192-token and 32KB cart constraints.
 
@@ -53,23 +53,25 @@ The game runs at 128x128 resolution with 16 colors, 8x8 base sprites, and a sing
 
 # 3. HOW THE CABINET WORKS
 
-This is an arcade game. It works like a cabinet.
+This is an arcade shooter. Think in quarters.
 
-## The loop
+## What you actually see (current build)
 
-**Attract mode** runs when nobody is playing. The title screen shows the logo, cycles through the high score table and a brief how-to-play screen. The starfield scrolls. The music plays. The machine is alive.
+**Title screen.** Logo, scrolling starfield, a big crab boss tease, and "press any button." Credits reset to **3** every time you land here.
 
-**Press start** to insert a credit and begin. You get 3 credits per session.
+**Main menu.** Four options: start game, enter initials, instructions, high scores. Your remaining credits show at the bottom. **Start game** costs 1 credit and launches the warp into level 1.
 
-**Play** until you die or clear the game.
+**During play.** When you die, **game over** appears with **Z to continue** (if you have credits) or **X for menu**. A **10-second** countdown runs; if it hits zero, you go to the menu. Continuing costs 1 credit, gives you **3 HP**, and **resets your multiplier and streak**. Any continue **locks out** the true last boss for that run.
 
-**Game over.** If your score earned a spot on the high score table, enter your 3-character initials. Then the cabinet returns to attract mode. If you didn't make the board, it goes straight back.
+**High scores.** Your score (including the end-of-run bonus) is checked **as soon as game over begins**. If you rank in the **top 3**, the board updates using whatever **3-character initials** you have saved (defaults start as **ACE** until you change them under **enter initials** on the menu). There is **no** separate "you made the board, type your name now" moment after death -- set your tag **before** the run if you care.
 
-**Continue.** If you have credits left, you can feed another quarter before the timer runs out. Continuing gives you 3 HP. It also locks you out of the true last boss.
+**After a run.** You return to the **menu** (not straight back to the title). From there you can start again, read instructions, or quit to the title with **X**.
 
-**Beat the TLB.** If you clear all 5 levels without continuing and defeat the true last boss, you can press Z to enter the next loop (NG+). Same credit, harder enemies, score carries over. You play until you die. When you finally go down, initials and attract mode, same as always.
+**Victory / NG+.** After the true last boss, **Z** starts the next loop on the same "life" of the run; **X** exits to the menu.
 
-There is no menu. There is no save file. There is no progression system. You play, you score, you put your name on the board, and the next player steps up.
+## The mental model (one sentence)
+
+You get **3 credits** per visit to the title screen: **1** to start, up to **2** more if you want harsh continues. No real-money quarters -- but the rhythm is "short runs, cheap retries, chase the board."
 
 ---
 
@@ -118,7 +120,7 @@ When a boss is about to spawn, **"! WARNING !"** flashes at center screen for 3 
 
 ### Game over overlay
 
-When health reaches zero, the game over prompt appears mid-screen. If you have credits, press Z to continue or X to end the run. A 10-second countdown runs -- if it expires, the run ends. This overlay has a brief grace period before accepting input to prevent accidental presses.
+When health reaches zero, **game over** appears mid-screen. After a short grace period: **Z** continues (costs 1 credit, only if credits remain), **X** sends you to the **menu**. A **10-second** countdown runs in the background; if it expires, you go to the menu automatically. The overlay does **not** show remaining credits -- check the **menu** before starting if you want to know how many continues you have left.
 
 ---
 
@@ -427,7 +429,7 @@ The game stores the top 3 high scores with 3-character initials using PICO-8's c
 
 You get 3 credits per session. Think of them as quarters.
 
-Pressing start on the attract screen costs 1 credit and starts the game. Credits reset to 3 every time the cabinet returns to attract mode.
+Choosing **start game** from the menu costs 1 credit. Credits reset to **3** every time you return to the **title** screen (from the menu).
 
 ## Continuing
 
@@ -457,7 +459,7 @@ NG+ scaling per loop:
 - Boss HP: x1.5 per loop
 - Boss bullet clusters: +1 per level (additive with base scaling)
 
-You play until you die. There is no "return to menu." When the last credit runs out, the run is over.
+During an NG+ chain you keep playing until you die or exit from the victory screen. When you are out of credits on game over, the timer eventually returns you to the menu.
 
 ---
 
@@ -465,21 +467,23 @@ You play until you die. There is no "return to menu." When the last credit runs 
 
 ## The board
 
-The high score table holds 3 entries. Top 3, that's it. It cycles on the attract screen so everyone walking by can see who's on top.
+The high score table holds **3** entries. View them anytime from **high scores** on the main menu.
 
 ## Entering initials
 
-When your run ends -- whether you died or cleared the game -- and your score earned a spot on the board, the game prompts you to enter your 3-character initials right there. Navigate with up/down to change the character (full printable ASCII range, codes 33-126), left/right to move between positions, Z to confirm.
+From the menu, choose **enter initials** to set your **3-character** tag. Up/down changes the character (printable ASCII, codes 33-126), left/right moves between positions, **Z** confirms, **X** cancels.
 
-Your initials persist between sessions. Once set, they're used for all future high score entries until you change them.
+Your initials are **saved** and used automatically whenever your run qualifies for the board. They persist between sessions. If you never change them, defaults apply until you do.
+
+**Tip for first-timers:** Set your initials **before** a serious run so the leaderboard shows *you*, not the default.
 
 ## When scores are recorded
 
-Scores are checked at two points:
-- When you die and the game over sequence begins
-- When you defeat the true last boss (victory)
+The game computes **final score** (current score + end bonus) and updates the table at:
+- **Game over** -- checked on the first frame of the countdown
+- **True last boss defeat** (victory path)
 
-The final score includes the end-of-game bonus. After initials entry (or if you didn't qualify), the cabinet returns to attract mode.
+If you qualify for top 3, your **saved** initials are written with that score. You then continue from **menu** or **title** as usual -- there is no mandatory name-entry screen after death in the current build.
 
 ---
 
@@ -522,8 +526,6 @@ Player bullets and enemy bullets use object pooling for memory efficiency. Kille
 | 0-17 | High score table (6 slots per entry x 3 entries) |
 | 18-20 | Saved initials (ASCII codes) |
 | 21-63 | Free |
-
----
 
 ---
 
