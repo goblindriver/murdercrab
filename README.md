@@ -46,7 +46,7 @@ docs/
   design-reference.md        # → operator-manual (legacy link)
   MurderCrab_Designed_Manual.pdf
 media/
-  MurderCrab_Media_Extraction_Pack/   # SVG, png_16x, GIFs, manifest (from cart gfx)
+  MurderCrab_Media_Extraction_Pack/   # v2: svg, png_16x/64x, gifs, raw sheet, backgrounds, hud, diagrams + docs/
 picotron/                    # Picotron port (planned)
 ```
 

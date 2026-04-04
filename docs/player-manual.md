@@ -1,4 +1,5 @@
 # MURDERCRAB!
+
 ## Player’s manual
 
 > **8-bit shell. 16-bit attitude. Arcade doctrine.**
@@ -7,26 +8,26 @@
 
 Operators (design vision, research, cart limits, tuning targets, future features): **[operator-manual.md](operator-manual.md)**.
 
-**Art in this doc:** PNG figures are **16× nearest-neighbor** exports from the cart; see `media/MurderCrab_Media_Extraction_Pack/docs/asset_manifest.json` for sprite IDs. **GIFs** (banking, bullet cycle, enemy idle): `media/MurderCrab_Media_Extraction_Pack/assets/gifs/`. **Optional PDF booklet:** [MurderCrab_Designed_Manual.pdf](MurderCrab_Designed_Manual.pdf) (design export; this markdown stays authoritative).
+**Art in this doc:** PNG figures are **16× nearest-neighbor** exports from the cart; **64×** and extras (backgrounds, HUD, boss-pattern diagrams) live in the same pack — see `media/MurderCrab_Media_Extraction_Pack/docs/README.md`. Sprite IDs: `media/MurderCrab_Media_Extraction_Pack/docs/asset_manifest.json`. **GIFs** (banking, bullet cycle, enemy idle): `media/MurderCrab_Media_Extraction_Pack/assets/gifs/`. **Optional PDF booklet:** [MurderCrab_Designed_Manual.pdf](MurderCrab_Designed_Manual.pdf) (design export; this markdown stays authoritative).
 
 ---
 
 ## Contents
 
-1. Warning to New Pilots  
-2. What *MurderCrab* Is  
-3. Mission Brief *(flavor)*  
-4. How the Cabinet Works  
-5. Basic Controls  
-6. HUD Readout  
-7. Core Combat Systems  
-8. Resources  
-9. Enemy Field Guide  
-10. Stage Guide  
-11. Boss Doctrine  
-12. Score Attack  
-13. Credits and Continues  
-14. High Scores  
+1. Warning to New Pilots
+2. What *MurderCrab* Is
+3. Mission Brief *(flavor)*
+4. How the Cabinet Works
+5. Basic Controls
+6. HUD Readout
+7. Core Combat Systems
+8. Resources
+9. Enemy Field Guide
+10. Stage Guide
+11. Boss Doctrine
+12. Score Attack
+13. Credits and Continues
+14. High Scores
 
 ---
 
@@ -90,15 +91,17 @@ You get **3 credits** per visit to the title screen: **1** to start, up to **2**
 
 # 5. BASIC CONTROLS
 
-| Input | Action |
-|-------|--------|
+
+| Input              | Action    |
+| ------------------ | --------- |
 | Arrow keys / D-pad | Move ship |
-| Z (button 4) | Shoot |
-| X (button 5) | Bomb |
+| Z (button 4)       | Shoot     |
+| X (button 5)       | Bomb      |
+
 
 **Movement** is digital at 2 pixels per frame in all four directions. No inertia, no acceleration. Diagonals move at full speed on both axes.
 
-**Shoot** fires twin bullets from either side of the ship. The cart uses PICO-8's **`btnp`** on Z: you get a volley on the first press, and the engine **repeats** the button while you hold it (same as most PICO-8 games). You can tap for single bursts or **hold for rapid fire**. Bullets travel upward at 6 pixels per frame.
+**Shoot** fires twin bullets from either side of the ship. The cart uses PICO-8's `**btnp`** on Z: you get a volley on the first press, and the engine **repeats** the button while you hold it (same as most PICO-8 games). You can tap for single bursts or **hold for rapid fire**. Bullets travel upward at 6 pixels per frame.
 
 **Bomb** is your panic button and your tactical tool. Details in section 7.
 
@@ -108,16 +111,18 @@ There is no focus mode, no secondary fire, and no charge mechanic. Three inputs.
 
 ### Ship art *(exports 16×, nearest-neighbor)*
 
+
 | Bank left | Idle | Bank right |
-|:---:|:---:|:---:|
-| ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bank_left.png) | ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_idle.png) | ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bank_right.png) |
+| --------- | ---- | ---------- |
+|           |      |            |
+
 
 **Twin shot — graphic frames**
 
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bullet_f1.png)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bullet_f2.png)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bullet_f3.png)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/player_bullet_f4.png)
+
+
+
+
 
 ---
 
@@ -133,14 +138,16 @@ LEVEL: 2
 x3 (7/10)
 ```
 
-| Element | Location | Details |
-|---------|----------|---------|
-| **Score** | Top left | Current score, comma-formatted for large values |
-| **Hi-Score** | Top right | Best score from the high score table. Flashes gold/orange when your current score beats it |
-| **Health** | Below score | Current HP. Flashes red when at 2 or below |
-| **Bombs** | Below health | Remaining bomb stock |
-| **Level** | Below bombs | Current level number. Shows "3-2" format in NG+ (level 3, loop 2) |
-| **Multiplier** | Below level | Current multiplier and streak progress toward next increase (e.g. "x3 (7/10)") |
+
+| Element        | Location     | Details                                                                                    |
+| -------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| **Score**      | Top left     | Current score, comma-formatted for large values                                            |
+| **Hi-Score**   | Top right    | Best score from the high score table. Flashes gold/orange when your current score beats it |
+| **Health**     | Below score  | Current HP. Flashes red when at 2 or below                                                 |
+| **Bombs**      | Below health | Remaining bomb stock                                                                       |
+| **Level**      | Below bombs  | Current level number. Shows "3-2" format in NG+ (level 3, loop 2)                          |
+| **Multiplier** | Below level  | Current multiplier and streak progress toward next increase (e.g. "x3 (7/10)")             |
+
 
 ### Boss warning
 
@@ -173,6 +180,7 @@ There is no weapon power system. Your gun is the same from the first second to t
 Press X to detonate a bomb. Requirements: at least 1 bomb in stock, and no bomb currently active.
 
 **What the bomb does:**
+
 - Clears **all enemy bullets** from the screen instantly
 - Clears **all player bullets** from the screen
 - Deals **30 damage** to every boss-type enemy on screen
@@ -225,11 +233,13 @@ Continuing is harsh by design. You get 3 more hits, not a fresh start. It's enou
 
 Defeated normal enemies have a **90% chance** to spawn a powerup burst: 2-4 cherry (score) pickups that scatter outward, plus a **5% chance** of an additional bomb or health pickup.
 
-| Powerup | Sprite | Effect |
-|---------|--------|--------|
-| Cherry | 7 | +100 points (x multiplier), +1 streak progress |
-| Health | 6 | +1 HP |
-| Bomb | 5 | +1 bomb |
+
+| Powerup | Sprite | Effect                                         |
+| ------- | ------ | ---------------------------------------------- |
+| Cherry  | 7      | +100 points (x multiplier), +1 streak progress |
+| Health  | 6      | +1 HP                                          |
+| Bomb    | 5      | +1 bomb                                        |
+
 
 Cherries have a **30-frame lifespan** and will expire with a small flash if not collected. They blink when about to expire (last 15 frames).
 
@@ -237,9 +247,11 @@ All powerups are attracted toward the player when within 48 pixels. They drift t
 
 ### Pickup icons
 
+
 | Bomb | Health | Cherry |
-|:---:|:---:|:---:|
-| ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/pickup_bomb.png) | ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/pickup_health.png) | ![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/pickup_cherry.png) |
+| ---- | ------ | ------ |
+|      |        |        |
+
 
 **Cherry law.** Chasing a cherry that kills you is not scoreplay. Preserving the route usually preserves more score.
 
@@ -255,10 +267,10 @@ One core enemy type with two weapon variants and three behavior states.
 
 ### Sprites *(normal + bullet + dive)*
 
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/enemy_normal_f1.png)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/enemy_normal_f2.png)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/enemy_hit_frame.png) (dive)
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/enemy_bullet.png)
+
+
+ (dive)
+
 
 ### Behavior states
 
@@ -276,15 +288,17 @@ One core enemy type with two weapon variants and three behavior states.
 
 ### Scaling
 
-| Property | Base (Level 1) | Per level | Per NG+ loop |
-|----------|----------------|-----------|--------------|
-| Speed | 2.0 | +0.4 | +0.3 |
-| Max speed | 3.5 | -- | +0.5 |
-| Shoot interval | 60 frames | -4 | -6 to -8 |
-| Min shoot interval | 40 frames | -- | decreases further |
-| HP | 1 | -- | +1 per loop |
-| Spawn count | 1 | 2 at level 4+ | -- |
-| Spawn delay | 75 frames | -6 | -5 |
+
+| Property           | Base (Level 1) | Per level     | Per NG+ loop      |
+| ------------------ | -------------- | ------------- | ----------------- |
+| Speed              | 2.0            | +0.4          | +0.3              |
+| Max speed          | 3.5            | --            | +0.5              |
+| Shoot interval     | 60 frames      | -4            | -6 to -8          |
+| Min shoot interval | 40 frames      | --            | decreases further |
+| HP                 | 1              | --            | +1 per loop       |
+| Spawn count        | 1              | 2 at level 4+ | --                |
+| Spawn delay        | 75 frames      | -6            | -5                |
+
 
 ## Bosses
 
@@ -308,35 +322,41 @@ Each of the 5 levels follows the same structure:
 
 ### Kill thresholds
 
+
 | Level | Mini-boss threshold | Final boss threshold |
-|-------|-------------------|---------------------|
-| 1 | 8 kills | 12 kills |
-| 2 | 12 kills | 15 kills |
-| 3 | 16 kills | 18 kills |
-| 4 | 20 kills | 21 kills |
-| 5 | 24 kills | 24 kills |
+| ----- | ------------------- | -------------------- |
+| 1     | 8 kills             | 12 kills             |
+| 2     | 12 kills            | 15 kills             |
+| 3     | 16 kills            | 18 kills             |
+| 4     | 20 kills            | 21 kills             |
+| 5     | 24 kills            | 24 kills             |
+
 
 Kill count resets after each boss defeat.
 
 ### Boss count per level
 
+
 | Level | Mini-bosses | Final bosses |
-|-------|-------------|-------------|
-| 1 | 1 | 1 |
-| 2-5 | 2 | 2 |
+| ----- | ----------- | ------------ |
+| 1     | 1           | 1            |
+| 2-5   | 2           | 2            |
+
 
 ## Stage aesthetics
 
 Each level has a distinct starfield that communicates depth and escalation:
 
-| Level | Background | Star colors | Density | Feel |
-|-------|-----------|-------------|---------|------|
-| 1 | Black | White | 90 stars | Clean void. Training ground. |
-| 2 | Dark blue | White, light blue, blue-grey | 100 stars | Deeper space. Colder. |
-| 3 | Dark green | White, green, dark green | 110 stars | Biological territory. Something alive out here. |
-| 4 | Dark purple | White, blue-grey, pink, dark blue | 120 stars | Approaching the hive. Colors shifting. |
-| 5 | Dark red | White, yellow, blue-grey, light blue | 130 stars | The core. Everything is wrong. |
-| 6 (TLB) | Shifting | All colors | 150 stars | Hyperspace. Reality breaking. |
+
+| Level   | Background  | Star colors                          | Density   | Feel                                            |
+| ------- | ----------- | ------------------------------------ | --------- | ----------------------------------------------- |
+| 1       | Black       | White                                | 90 stars  | Clean void. Training ground.                    |
+| 2       | Dark blue   | White, light blue, blue-grey         | 100 stars | Deeper space. Colder.                           |
+| 3       | Dark green  | White, green, dark green             | 110 stars | Biological territory. Something alive out here. |
+| 4       | Dark purple | White, blue-grey, pink, dark blue    | 120 stars | Approaching the hive. Colors shifting.          |
+| 5       | Dark red    | White, yellow, blue-grey, light blue | 130 stars | The core. Everything is wrong.                  |
+| 6 (TLB) | Shifting    | All colors                           | 150 stars | Hyperspace. Reality breaking.                   |
+
 
 Star scroll speed increases with level. Stars twinkle more aggressively in later levels.
 
@@ -353,12 +373,12 @@ Bosses in *MurderCrab* are exams, not spectacles.
 ### Boss composites *(export canvas 32×32 px; 2×2 / 4×4 tiles in-game)*
 
 **Mini / final (shared family):**  
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/boss_standard_32x32.png)
+
 
 **True last boss:**  
-![](../media/MurderCrab_Media_Extraction_Pack/assets/png_16x/true_last_boss_32x32.png)
 
-Full **GFX sheet** snapshot: `media/MurderCrab_Media_Extraction_Pack/assets/raw/spritesheet_from_code.png`.
+
+Full **GFX sheet** snapshot: `media/MurderCrab_Media_Extraction_Pack/assets/raw/spritesheet_from_cart.png` (v2 pack; rebuilt from cart `__gfx__`).
 
 ## Mini-boss
 
@@ -371,11 +391,13 @@ Full **GFX sheet** snapshot: `media/MurderCrab_Media_Extraction_Pack/assets/raw/
 
 ### Level 1 HP reference
 
+
 | Loop | Mini-boss HP |
-|------|-------------|
-| 1 | 60 |
-| 2 | 90 |
-| 3 | 120 |
+| ---- | ------------ |
+| 1    | 60           |
+| 2    | 90           |
+| 3    | 120          |
+
 
 ## Final boss
 
@@ -388,11 +410,13 @@ Full **GFX sheet** snapshot: `media/MurderCrab_Media_Extraction_Pack/assets/raw/
 
 ### Level 1 HP reference
 
+
 | Loop | Final boss HP |
-|------|--------------|
-| 1 | 100 |
-| 2 | 150 |
-| 3 | 200 |
+| ---- | ------------- |
+| 1    | 100           |
+| 2    | 150           |
+| 3    | 200           |
+
 
 ## True last boss
 
@@ -422,6 +446,7 @@ Bullet speed scales with level (+0.15 per level) and boss damage state (+0.3 at 
 ## Boss defeat
 
 When the last boss of a type is destroyed:
+
 - All enemy bullets convert to small explosions (visual reward + safety)
 - Cinematic explosion chain at the boss position
 - Heavy screen shake
@@ -435,13 +460,15 @@ For the final boss, a 90-frame (3 second) explosion celebration plays with perio
 
 ## Point values
 
-| Source | Base value | Notes |
-|--------|-----------|-------|
-| Normal enemy kill | 10 | Multiplied by current multiplier |
-| Cherry pickup | 100 | Multiplied by current multiplier |
-| Mini-boss kill | 50 | Multiplied by current multiplier |
-| Final boss kill | 100 | Multiplied by current multiplier |
-| TLB kill | 50 | Multiplied by current multiplier |
+
+| Source            | Base value | Notes                            |
+| ----------------- | ---------- | -------------------------------- |
+| Normal enemy kill | 10         | Multiplied by current multiplier |
+| Cherry pickup     | 100        | Multiplied by current multiplier |
+| Mini-boss kill    | 50         | Multiplied by current multiplier |
+| Final boss kill   | 100        | Multiplied by current multiplier |
+| TLB kill          | 50         | Multiplied by current multiplier |
+
 
 ## Multiplier system
 
@@ -489,6 +516,7 @@ Choosing **start game** from the menu costs 1 credit. Credits reset to **3** eve
 ## Continuing
 
 When you die:
+
 - A 10-second timer (300 frames) begins counting down
 - After a brief grace period, press Z to continue (costs 1 credit) or X to end the run
 - Continuing restores 3 HP and resets your multiplier and streak
@@ -507,6 +535,7 @@ If you used continues, level 5's final boss defeat goes directly to the game com
 After defeating the TLB, press Z to enter the next loop. This is not a new game -- it's the game continuing on the same credit. Score carries over. HP and bombs carry over. Enemies get harder.
 
 NG+ scaling per loop:
+
 - Enemy HP: +1 per loop
 - Enemy speed: +0.3 base, +0.5 max
 - Enemy shoot interval: reduced by 6-8 frames
@@ -535,6 +564,7 @@ Your initials are **saved** and used automatically whenever your run qualifies f
 ## When scores are recorded
 
 The game computes **final score** (current score + end bonus) and updates the table at:
+
 - **Game over** -- checked on the first frame of the countdown
 - **True last boss defeat** (victory path)
 
@@ -542,12 +572,14 @@ If you qualify for top 3, your **saved** initials are written with that score. Y
 
 ### Player glossary *(quick)*
 
-| Term | Meaning |
-|------|---------|
-| **TLB** | True last boss (stage 6) |
-| **No-continue** | Never used continue this run — required for TLB |
-| **Route** | Planned path through a wave or stage |
-| **Cherry chain** | Streak toward the next multiplier step |
+
+| Term             | Meaning                                         |
+| ---------------- | ----------------------------------------------- |
+| **TLB**          | True last boss (stage 6)                        |
+| **No-continue**  | Never used continue this run — required for TLB |
+| **Route**        | Planned path through a wave or stage            |
+| **Cherry chain** | Streak toward the next multiplier step          |
+
 
 **Hitboxes** (bullets vs you: **2×2** centered in the ship; kamikaze ram: **full ship vs enemy**): full tables and **cart limits** live in **[operator-manual.md](operator-manual.md)** (cart budget + implementation notes).
 
@@ -556,3 +588,4 @@ If you qualify for top 3, your **saved** initials are written with that score. Y
 > **THE SWARM IS LEARNING. SO ARE YOU.**
 > Route five stages of shell-born violence. Cash power. Spend bombs before regret.
 > Push for the clear, then come back for the score.
+

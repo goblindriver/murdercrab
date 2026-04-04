@@ -1,149 +1,166 @@
 {
   "source_cart": "murdercrab-main/pico8/murdercrab.p8",
-  "generated_assets": [
+  "readme_source": "murdercrab-main/README.md",
+  "assets": [
     {
       "name": "player_idle",
       "sprite_id": 1,
       "w": 1,
       "h": 1,
-      "notes": "player neutral frame",
+      "kind": "player",
       "svg": "assets/svg/player_idle.svg",
-      "png_16x": "assets/png_16x/player_idle.png"
-    },
-    {
-      "name": "player_bullet_f1",
-      "sprite_id": 2,
-      "w": 1,
-      "h": 1,
-      "notes": "player bullet frame 1",
-      "svg": "assets/svg/player_bullet_f1.svg",
-      "png_16x": "assets/png_16x/player_bullet_f1.png"
-    },
-    {
-      "name": "enemy_normal_f1",
-      "sprite_id": 3,
-      "w": 1,
-      "h": 1,
-      "notes": "normal enemy frame 1",
-      "svg": "assets/svg/enemy_normal_f1.svg",
-      "png_16x": "assets/png_16x/enemy_normal_f1.png"
-    },
-    {
-      "name": "enemy_bullet",
-      "sprite_id": 4,
-      "w": 1,
-      "h": 1,
-      "notes": "enemy bullet",
-      "svg": "assets/svg/enemy_bullet.svg",
-      "png_16x": "assets/png_16x/enemy_bullet.png"
-    },
-    {
-      "name": "pickup_bomb",
-      "sprite_id": 5,
-      "w": 1,
-      "h": 1,
-      "notes": "extra bomb icon/pickup",
-      "svg": "assets/svg/pickup_bomb.svg",
-      "png_16x": "assets/png_16x/pickup_bomb.png"
-    },
-    {
-      "name": "pickup_health",
-      "sprite_id": 6,
-      "w": 1,
-      "h": 1,
-      "notes": "extra health icon/pickup",
-      "svg": "assets/svg/pickup_health.svg",
-      "png_16x": "assets/png_16x/pickup_health.png"
-    },
-    {
-      "name": "pickup_cherry",
-      "sprite_id": 7,
-      "w": 1,
-      "h": 1,
-      "notes": "score cherry pickup",
-      "svg": "assets/svg/pickup_cherry.svg",
-      "png_16x": "assets/png_16x/pickup_cherry.png"
-    },
-    {
-      "name": "boss_standard_32x32",
-      "sprite_id": 8,
-      "w": 4,
-      "h": 4,
-      "notes": "standard/final boss composite sprite",
-      "svg": "assets/svg/boss_standard_32x32.svg",
-      "png_16x": "assets/png_16x/boss_standard_32x32.png"
-    },
-    {
-      "name": "true_last_boss_32x32",
-      "sprite_id": 10,
-      "w": 4,
-      "h": 4,
-      "notes": "true last boss composite sprite",
-      "svg": "assets/svg/true_last_boss_32x32.svg",
-      "png_16x": "assets/png_16x/true_last_boss_32x32.png"
+      "png_16x": "assets/png_16x/player_idle.png",
+      "png_64x": "assets/png_64x/player_idle.png"
     },
     {
       "name": "player_bank_left",
       "sprite_id": 17,
       "w": 1,
       "h": 1,
-      "notes": "player moving left",
+      "kind": "player",
       "svg": "assets/svg/player_bank_left.svg",
-      "png_16x": "assets/png_16x/player_bank_left.png"
-    },
-    {
-      "name": "player_bullet_f2",
-      "sprite_id": 18,
-      "w": 1,
-      "h": 1,
-      "notes": "player bullet frame 2",
-      "svg": "assets/svg/player_bullet_f2.svg",
-      "png_16x": "assets/png_16x/player_bullet_f2.png"
-    },
-    {
-      "name": "enemy_normal_f2",
-      "sprite_id": 19,
-      "w": 1,
-      "h": 1,
-      "notes": "normal enemy frame 2",
-      "svg": "assets/svg/enemy_normal_f2.svg",
-      "png_16x": "assets/png_16x/enemy_normal_f2.png"
+      "png_16x": "assets/png_16x/player_bank_left.png",
+      "png_64x": "assets/png_64x/player_bank_left.png"
     },
     {
       "name": "player_bank_right",
       "sprite_id": 33,
       "w": 1,
       "h": 1,
-      "notes": "player moving right",
+      "kind": "player",
       "svg": "assets/svg/player_bank_right.svg",
-      "png_16x": "assets/png_16x/player_bank_right.png"
+      "png_16x": "assets/png_16x/player_bank_right.png",
+      "png_64x": "assets/png_64x/player_bank_right.png"
+    },
+    {
+      "name": "player_bullet_f1",
+      "sprite_id": 2,
+      "w": 1,
+      "h": 1,
+      "kind": "bullet",
+      "svg": "assets/svg/player_bullet_f1.svg",
+      "png_16x": "assets/png_16x/player_bullet_f1.png",
+      "png_64x": "assets/png_64x/player_bullet_f1.png"
+    },
+    {
+      "name": "player_bullet_f2",
+      "sprite_id": 18,
+      "w": 1,
+      "h": 1,
+      "kind": "bullet",
+      "svg": "assets/svg/player_bullet_f2.svg",
+      "png_16x": "assets/png_16x/player_bullet_f2.png",
+      "png_64x": "assets/png_64x/player_bullet_f2.png"
     },
     {
       "name": "player_bullet_f3",
       "sprite_id": 34,
       "w": 1,
       "h": 1,
-      "notes": "player bullet frame 3",
+      "kind": "bullet",
       "svg": "assets/svg/player_bullet_f3.svg",
-      "png_16x": "assets/png_16x/player_bullet_f3.png"
-    },
-    {
-      "name": "enemy_hit_frame",
-      "sprite_id": 35,
-      "w": 1,
-      "h": 1,
-      "notes": "enemy hit/damage state",
-      "svg": "assets/svg/enemy_hit_frame.svg",
-      "png_16x": "assets/png_16x/enemy_hit_frame.png"
+      "png_16x": "assets/png_16x/player_bullet_f3.png",
+      "png_64x": "assets/png_64x/player_bullet_f3.png"
     },
     {
       "name": "player_bullet_f4",
       "sprite_id": 50,
       "w": 1,
       "h": 1,
-      "notes": "player bullet frame 4",
+      "kind": "bullet",
       "svg": "assets/svg/player_bullet_f4.svg",
-      "png_16x": "assets/png_16x/player_bullet_f4.png"
+      "png_16x": "assets/png_16x/player_bullet_f4.png",
+      "png_64x": "assets/png_64x/player_bullet_f4.png"
+    },
+    {
+      "name": "enemy_normal_f1",
+      "sprite_id": 3,
+      "w": 1,
+      "h": 1,
+      "kind": "enemy",
+      "svg": "assets/svg/enemy_normal_f1.svg",
+      "png_16x": "assets/png_16x/enemy_normal_f1.png",
+      "png_64x": "assets/png_64x/enemy_normal_f1.png"
+    },
+    {
+      "name": "enemy_normal_f2",
+      "sprite_id": 19,
+      "w": 1,
+      "h": 1,
+      "kind": "enemy",
+      "svg": "assets/svg/enemy_normal_f2.svg",
+      "png_16x": "assets/png_16x/enemy_normal_f2.png",
+      "png_64x": "assets/png_64x/enemy_normal_f2.png"
+    },
+    {
+      "name": "enemy_hit_frame",
+      "sprite_id": 35,
+      "w": 1,
+      "h": 1,
+      "kind": "enemy",
+      "svg": "assets/svg/enemy_hit_frame.svg",
+      "png_16x": "assets/png_16x/enemy_hit_frame.png",
+      "png_64x": "assets/png_64x/enemy_hit_frame.png"
+    },
+    {
+      "name": "enemy_bullet",
+      "sprite_id": 4,
+      "w": 1,
+      "h": 1,
+      "kind": "bullet",
+      "svg": "assets/svg/enemy_bullet.svg",
+      "png_16x": "assets/png_16x/enemy_bullet.png",
+      "png_64x": "assets/png_64x/enemy_bullet.png"
+    },
+    {
+      "name": "pickup_bomb",
+      "sprite_id": 5,
+      "w": 1,
+      "h": 1,
+      "kind": "pickup",
+      "svg": "assets/svg/pickup_bomb.svg",
+      "png_16x": "assets/png_16x/pickup_bomb.png",
+      "png_64x": "assets/png_64x/pickup_bomb.png"
+    },
+    {
+      "name": "pickup_health",
+      "sprite_id": 6,
+      "w": 1,
+      "h": 1,
+      "kind": "pickup",
+      "svg": "assets/svg/pickup_health.svg",
+      "png_16x": "assets/png_16x/pickup_health.png",
+      "png_64x": "assets/png_64x/pickup_health.png"
+    },
+    {
+      "name": "pickup_cherry",
+      "sprite_id": 7,
+      "w": 1,
+      "h": 1,
+      "kind": "pickup",
+      "svg": "assets/svg/pickup_cherry.svg",
+      "png_16x": "assets/png_16x/pickup_cherry.png",
+      "png_64x": "assets/png_64x/pickup_cherry.png"
+    },
+    {
+      "name": "boss_standard_32x32",
+      "sprite_id": 8,
+      "w": 4,
+      "h": 4,
+      "kind": "boss",
+      "svg": "assets/svg/boss_standard_32x32.svg",
+      "png_16x": "assets/png_16x/boss_standard_32x32.png",
+      "png_64x": "assets/png_64x/boss_standard_32x32.png"
+    },
+    {
+      "name": "true_last_boss_32x32",
+      "sprite_id": 10,
+      "w": 4,
+      "h": 4,
+      "kind": "boss",
+      "svg": "assets/svg/true_last_boss_32x32.svg",
+      "png_16x": "assets/png_16x/true_last_boss_32x32.png",
+      "png_64x": "assets/png_64x/true_last_boss_32x32.png"
     }
   ],
   "animations": {
@@ -155,7 +172,7 @@
         "player_idle"
       ],
       "duration": 120,
-      "notes": "constructed from explicit directional player states in code",
+      "notes": "directional player banking states",
       "gif": "assets/gifs/player_flight_banking.gif"
     },
     "player_bullet_cycle": {
@@ -167,7 +184,7 @@
         "player_bullet_f3"
       ],
       "duration": 70,
-      "notes": "exact bullet frame order used in draw loop",
+      "notes": "exact bullet frame cycle from code",
       "gif": "assets/gifs/player_bullet_cycle.gif"
     },
     "enemy_normal_cycle": {
@@ -176,8 +193,85 @@
         "enemy_normal_f2"
       ],
       "duration": 180,
-      "notes": "exact 2-frame enemy cycle used in update loop",
+      "notes": "normal enemy 2-frame cycle from code",
       "gif": "assets/gifs/enemy_normal_cycle.gif"
     }
-  }
+  },
+  "background_logic": {
+    "star_counts": {
+      "1": 90,
+      "2": 100,
+      "3": 110,
+      "4": 120,
+      "5": 130,
+      "6": 140
+    },
+    "large_chance": {
+      "1": 0.2,
+      "2": 0.25,
+      "3": 0.3,
+      "4": 0.35,
+      "5": 0.4,
+      "6": 0.5
+    },
+    "level_star_colors": {
+      "1": [
+        "7"
+      ],
+      "2": [
+        "7",
+        "c",
+        "d"
+      ],
+      "3": [
+        "7",
+        "b",
+        "3"
+      ],
+      "4": [
+        "7",
+        "d",
+        "e",
+        "2"
+      ],
+      "5": [
+        "7",
+        "6",
+        "d",
+        "c"
+      ],
+      "6": [
+        "7",
+        "6",
+        "d",
+        "e",
+        "b",
+        "c",
+        "1",
+        "2"
+      ]
+    }
+  },
+  "hud_strings": [
+    "movement: arrow keys",
+    "shoot: z button",
+    "bomb: x button",
+    "collect powerups",
+    "extra health",
+    "extra bomb",
+    "increase score",
+    "10x cherries increase multiplier",
+    "press x to return to menu",
+    "health: <n>",
+    "bombs: <n>",
+    "level: <n>",
+    "x<multiplier> (<streak>/<target>)",
+    "! warning !"
+  ],
+  "notes": [
+    "No __map__ section present in cart.",
+    "Backgrounds are procedural starfields.",
+    "Boss pattern sheets are logic-backed diagrams, not captured frames.",
+    "Faux gameplay frame is assembled from exact extracted assets, not live runtime capture."
+  ]
 }
