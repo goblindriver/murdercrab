@@ -1,0 +1,6 @@
+.DS_Store
+.cursor/
+*.bak
+*.bak*
+*~
+*.p8.png
