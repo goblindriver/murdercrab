@@ -819,9 +819,9 @@ function normal_enemy_fire(enemy)
     if enemy.weapon == "shotgun" then
       -- shotgun: 3 bullets at once, spread
       for i = -1, 1 do
-        local _o = i * E_B_SPREAD / 360
-        local _c, _s = cos(_o), -sin(_o)
-        local rx, ry = ndx * _c - ndy * _s, ndx * _s + ndy * _c
+        local offset = i * E_B_SPREAD / 360
+        local c, s = cos(offset), -sin(offset)
+        local rx, ry = ndx * c - ndy * s, ndx * s + ndy * c
         spawn_enemy_bullet(x, y, E_B_SPD * rx, E_B_SPD * ry)
       end
       sfx(6, 3)
