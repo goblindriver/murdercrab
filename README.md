@@ -21,6 +21,15 @@ A vertical-scrolling shoot-em-up built for PICO-8, with a Picotron port in progr
 | Z | Shoot |
 | X | Bomb |
 
+## Documentation
+
+| Doc | What it is |
+|-----|------------|
+| [docs/manual.md](docs/manual.md) | Mechanics spec (accurate to the cart) |
+| [docs/manual-designed.md](docs/manual-designed.md) | Pack-in / zine manual + **figures** from the [media extraction pack](media/MurderCrab_Media_Extraction_Pack/) |
+| [docs/MurderCrab_Designed_Manual.pdf](docs/MurderCrab_Designed_Manual.pdf) | PDF booklet export (snapshot; markdown edition is maintained) |
+| [docs/design-reference.md](docs/design-reference.md) | Design philosophy + research |
+
 ## Project Structure
 
 ```
@@ -29,6 +38,12 @@ pico8/
   archive/
     split/                   # older split-cart version (menu + game, Jun 2025)
     legacy/                  # early shmup prototype, docs
+docs/
+  manual.md                  # pilot manual (systems)
+  manual-designed.md         # zine edition with art links
+  MurderCrab_Designed_Manual.pdf
+media/
+  MurderCrab_Media_Extraction_Pack/   # SVG, png_16x, GIFs, manifest (from cart gfx)
 picotron/                    # Picotron port (planned)
 ```
 
