@@ -101,12 +101,6 @@ function collides(a, b)
               a.y + a.height < b.y or b.y + b.height < a.y)
 end
 
-function rotate_vector(dx, dy, offset_deg)
-  local offset = offset_deg / 360
-  local c, s = cos(offset), -sin(offset)
-  return dx * c - dy * s, dx * s + dy * c
-end
-
 ----------------------------------------
 -- save system
 ----------------------------------------
@@ -825,7 +819,9 @@ function normal_enemy_fire(enemy)
     if enemy.weapon == "shotgun" then
       -- shotgun: 3 bullets at once, spread
       for i = -1, 1 do
-        local rx, ry = rotate_vector(ndx, ndy, i * E_B_SPREAD)
+        local offset = i * E_B_SPREAD / 360
+        local c, s = cos(offset), -sin(offset)
+        local rx, ry = ndx * c - ndy * s, ndx * s + ndy * c
         spawn_enemy_bullet(x, y, E_B_SPD * rx, E_B_SPD * ry)
       end
       sfx(6, 3)
@@ -1359,15 +1355,19 @@ end
 ----------------------------------------
 -- boss defeat handling (consolidated)
 ----------------------------------------
+function check_end_mini_boss()
+  if boss_exists("mini_boss") == 0 then
+    convert_enemy_bullets_to_explosions()
+    phase = "normal"
+    phase_state = "post_mini_boss"
+    enemy_kill_count = 0
+    update_music("game")
+  end
+end
+
 function handle_boss_defeat(enemy)
   if enemy.type == "mini_boss" then
-    if boss_exists("mini_boss") == 0 then
-      convert_enemy_bullets_to_explosions()
-      phase = "normal"
-      phase_state = "post_mini_boss"
-      enemy_kill_count = 0
-      update_music("game")
-    end
+    check_end_mini_boss()
     add_score(50)
   elseif enemy.type == "final_boss" then
     add_score(100)
@@ -1576,13 +1576,7 @@ function update_game()
       sfx(5, 2)
     end
   elseif phase == "mini_boss" then
-    if boss_exists("mini_boss") == 0 then
-      convert_enemy_bullets_to_explosions()
-      phase = "normal"
-      phase_state = "post_mini_boss"
-      enemy_kill_count = 0
-      update_music("game")
-    end
+    check_end_mini_boss()
   elseif phase == "final_boss" then
     if boss_exists("final_boss") == 0 then
       phase = "level_complete"
@@ -1597,27 +1591,17 @@ function update_game()
       if boss_defeat_grace > 0 and boss_defeat_grace % 30 == 0 then create_explosion(64 + rnd(40) - 20, 40 + rnd(20) - 10, 2) shake_amount = 8 end
       if boss_defeat_grace == 20 then sfx(19, 3) end
     else
-      if current_level == max_level then
-        if credits_used < 1 then
-          current_level += 1
-          warp_time = warp_duration
-          phase = "warping"
-          sfx(19, 3)
-          update_music("silent")
-        else
-          phase = "victory_lap"
-          game_complete_grace = 120
-        end
+      if current_level == max_level and credits_used >= 1 then
+        phase = "victory_lap"
+        game_complete_grace = 120
+      elseif current_level < max_level and #explosions > 0 then
+        boss_defeat_grace = 1
       else
-        if #explosions == 0 then
-          current_level += 1
-          warp_time = warp_duration
-          phase = "warping"
-          sfx(19, 3)
-          update_music("silent")
-        else
-          boss_defeat_grace = 1
-        end
+        current_level += 1
+        warp_time = warp_duration
+        phase = "warping"
+        sfx(19, 3)
+        update_music("silent")
       end
     end
   elseif phase == "victory_lap" then
