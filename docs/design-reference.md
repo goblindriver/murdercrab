@@ -2,7 +2,7 @@
 
 ## Source of Truth for What We're Building
 
-This document preserves shmup genre research, design philosophy, and aspirational goals for the *MurderCrab* project. It draws from the first-pass manual research and serves as the guiding vision -- particularly for the Picotron port, where PICO-8's constraints no longer apply.
+This document preserves shmup genre research, design philosophy, and aspirational goals for the *MurderCrab* project. It draws from the first-pass manual research and serves as the guiding vision for the PICO-8 game and any future ports.
 
 **This is not the game manual.** For how the game actually works today, see [manual.md](manual.md). This document is about *why* the game is built the way it is and *where it should go*.
 
@@ -32,7 +32,7 @@ This document preserves shmup genre research, design philosophy, and aspirationa
 
 - **Format:** Arcade game. Quarter in, play, die, initials, attract mode. No menus. No save files. No progression unlocks.
 - **Platform origin:** PICO-8 fantasy console (128x128, 16 colors, 8192 tokens, 32KB cart)
-- **Platform target:** Picotron port planned (480x270, 64 colors, no token limit)
+- **Future port:** Picotron fork when the PICO-8 version is polished (480x270, 64 colors, no token limit)
 - **Visual spine:** cosmic industrial horror + crab biology + machine shell design
 - **Primary reference line:** Toaplan backbone, danmaku-aware boss design, doujin-style intensity
 - **Player fantasy:** tiny ship against impossible density, learning to cut stable lines through hostile space
@@ -58,7 +58,7 @@ The manual and surrounding material should feel like a late-era **Super Nintendo
 
 MurderCrab is a doujin work -- made by a small team out of passion, not obligation. The Shmup_Lyf zines use "doujin" lovingly, as "a marker of an artefact of immense passion created by a small group or an individual." The CRS68k issue shows how that game was developed iteratively across multiple Comiket events, shaped by community feedback, in conversation with the arcade games of its era.
 
-MurderCrab follows the same path: built on PICO-8 constraints, refined through play, stored in public Git, open to evolution. The Picotron port is the next version at the next Comiket, so to speak.
+MurderCrab follows the same path: built on PICO-8 constraints, refined through play, stored in public Git, open to evolution.
 
 ## The mythic structure
 
@@ -198,21 +198,18 @@ How MurderCrab fits on the cart. These are the hard walls.
 | **Sprites** | 48 of 128 pixel rows populated (~37%) | 128 rows (+ 128 shared) | Significant — room for more enemy types, effects, backgrounds |
 | **SFX** | 27 of 64 slots | 64 | Good — 37 slots available for new sounds |
 | **Music** | 18 of 64 patterns | 64 | Good — 46 patterns available |
-| **Cartdata** | 63 of 64 slots | 64 | **Nearly full** — 1 slot remaining |
+| **Cartdata** | 21 of 64 slots | 64 | Good — 43 slots available |
 | **Map** | Not used | 128x32 tiles | Fully available (could store level data, attract mode text, etc.) |
 
 ### Cartdata allocation
 
 | Slots | Usage |
 |-------|-------|
-| 0-59 | High score table: 6 slots per entry (3 initials + 3 score components) x 10 entries |
-| 60-62 | Saved initials (3 ASCII character codes) |
-| 63 | **Free** |
+| 0-17 | High score table: 6 slots per entry (3 score components + 3 initials) x 3 entries |
+| 18-20 | Saved initials (3 ASCII character codes) |
+| 21-63 | **Free** (43 slots available) |
 
-**Warning:** cartdata is essentially full. Any new persistent feature (settings, unlocks, statistics) would require restructuring. Options:
-- Pack multiple values into single slots using bit manipulation
-- Reduce high score entries from 10 to 8 (frees 12 slots)
-- Use `cstore()` to write directly to a second cartridge for overflow storage (requires a cart-swap animation)
+Plenty of room for future persistent features: settings, statistics, unlocks, or expanding the leaderboard later.
 
 ### Sprite allocation
 
@@ -275,7 +272,7 @@ From the *Shmup_Lyf Backgrounds* zine:
 
 Each environment type carries psychological weight. The black void is "where the monsters wait, the things that do not wish to be seen or understood." The enemy factory is "beyond the gates of the keep now, deep within the final stronghold." The final boss arena may exist "in an ura space, a place beyond space and time."
 
-**Current state:** The PICO-8 version uses distinct starfield color palettes per level (black void -> blue -> green -> purple -> red -> chromatic chaos), which communicates progression but doesn't yet have foreground elements, terrain, or environmental storytelling. The Picotron port's higher resolution creates room for real background art, parallax layers, and the kind of spatial narrative Marty_DYR describes.
+**Current state:** The PICO-8 version uses distinct starfield color palettes per level (black void -> blue -> green -> purple -> red -> chromatic chaos), which communicates progression but doesn't yet have foreground elements, terrain, or environmental storytelling. A future port's higher resolution would create room for real background art, parallax layers, and the kind of spatial narrative Marty_DYR describes.
 
 ### Background archetypes from the Shmup_Lyf Backgrounds zine
 
@@ -340,13 +337,13 @@ From the *Cho Ren Sha 68k* zine, on why explosions matter:
 
 > CRS68k creator Yoshida-san wanted "the feeling of destruction" as a key part of the experience. His explosions "unpack like a fractal" -- a core 16x16 sprite animation repeated flipped, mirrored, and palette-swapped, triggered in a procedural layered cluster over a few frames. The lingering smoke cloud -- "a silhouette of flat colour that holds its shape for a few frames, unlike the rapid flash bang of the explosion, like the fumes of burning oil" -- is what makes the destruction feel weighty.
 
-**Design takeaway for MurderCrab:** Boss explosions and bomb detonations should feel monumental even in 128x128. Lingering smoke/flash, screen shake, and layered sprite animations sell the "feeling of destruction." The Picotron port should go further with anime-style radial lines and nuclear-sphere flash backgrounds for boss kills.
+**Design takeaway for MurderCrab:** Boss explosions and bomb detonations should feel monumental even in 128x128. Lingering smoke/flash, screen shake, and layered sprite animations sell the "feeling of destruction."
 
 ---
 
 # 6. COMBAT DESIGN REFERENCE
 
-This section documents combat systems as both current implementation and aspirational targets. Items marked **[CURRENT]** exist in the PICO-8 cart. Items marked **[FUTURE]** are design goals for the Picotron port or later revisions.
+This section documents combat systems as both current implementation and aspirational targets. Items marked **[CURRENT]** exist in the PICO-8 cart. Items marked **[FUTURE]** are design goals for later revisions or a future port.
 
 ## Movement
 
@@ -449,7 +446,7 @@ Suggested bullet families for future implementation:
 | Slow bloom clusters | Trap construction | Expanding patterns |
 | Crusher beams | Territory denial | Thick, lingering |
 
-**Current state:** The PICO-8 version uses one bullet sprite for all enemy projectiles. Behavior varies (aimed, spread, spiral, radial) but visual distinction is limited by the 16-color palette and sprite constraints. The Picotron port should differentiate bullet families visually.
+**Current state:** The PICO-8 version uses one bullet sprite for all enemy projectiles. Behavior varies (aimed, spread, spiral, radial) but visual distinction is limited by the 16-color palette and sprite constraints.
 
 ---
 
@@ -573,7 +570,7 @@ This may be the single most important philosophy in the whole project.
 
 ## Practice mode is part of the game
 
-If *MurderCrab* includes stage select, boss select, checkpoints, or any lab feature (especially in the Picotron port), the game should endorse their use openly.
+If *MurderCrab* ever includes stage select, boss select, checkpoints, or any lab feature, the game should endorse their use openly.
 
 ProMeTheus is categorical about this:
 
@@ -617,7 +614,7 @@ From *The Full Extent of the Jam*:
 
 > "Every fifty runs or so, look back... make statistics. In how many runs did you pass the first loop without dying? In how many runs did you die at this really critical part? Looking at these statistics is good for you to keep track of how feasible your goal really is, and also to keep track of your progress, which is not represented by your best score."
 
-This is a design insight too: the game could build in run-tracking or statistics features (especially for the Picotron port).
+This is a design insight too: the game could build in run-tracking or statistics features.
 
 ---
 
@@ -664,7 +661,7 @@ Standard shmup terminology for reference. This language should be used consisten
 
 # 12. FUTURE FEATURES
 
-Everything the first-pass manual assumed that doesn't exist yet but could. This is the wishlist for the Picotron port and beyond.
+Everything the first-pass manual assumed that doesn't exist yet but could. This is the wishlist -- some may fit on the PICO-8 cart, others are for a future port.
 
 ## Combat expansion
 
@@ -686,7 +683,7 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 
 - [ ] **Stage names and theming** — Each level should have a name and identity beyond "Level N"
   - Working concepts: Edge of the Shellfield / Shell Reef / Biomech Corridors / Cruel Approach / Hive Core
-- [ ] **Background art** — Foreground/midground elements, environmental storytelling. Picotron's resolution supports real parallax backgrounds.
+- [ ] **Background art** — Foreground/midground elements, environmental storytelling.
 - [ ] **Stage-specific mechanics** — Environmental hazards, destructible terrain, scrolling obstacles.
 - [ ] **Stage-end bonus** — Points for speed, no-miss, no-bomb, or other per-stage criteria.
 

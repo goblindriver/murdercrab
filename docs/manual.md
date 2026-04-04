@@ -417,7 +417,7 @@ On a clean loop 1 clear with 100 HP and 3 bombs remaining, that's a 2,575 point 
 
 ## High score persistence
 
-The game stores 10 high scores with 3-character initials using PICO-8's cartdata system. Scores are stored in component form (millions / thousands / units) across 6 cartdata slots per entry to handle large values. Your initials are also persisted between sessions.
+The game stores the top 3 high scores with 3-character initials using PICO-8's cartdata system. Scores are stored in component form (millions / thousands / units) across 6 cartdata slots per entry to handle large values. Your initials are also persisted between sessions.
 
 ---
 
@@ -465,7 +465,7 @@ You play until you die. There is no "return to menu." When the last credit runs 
 
 ## The board
 
-The high score table holds 10 entries. It cycles on the attract screen so everyone walking by can see who's on top.
+The high score table holds 3 entries. Top 3, that's it. It cycles on the attract screen so everyone walking by can see who's on top.
 
 ## Entering initials
 
@@ -519,8 +519,9 @@ Player bullets and enemy bullets use object pooling for memory efficiency. Kille
 
 | Slots | Usage |
 |-------|-------|
-| 0-59 | High score table (6 slots per entry x 10 entries) |
-| 60-62 | Saved initials (ASCII codes) |
+| 0-17 | High score table (6 slots per entry x 3 entries) |
+| 18-20 | Saved initials (ASCII codes) |
+| 21-63 | Free |
 
 ---
 
@@ -554,18 +555,16 @@ How MurderCrab fits on the PICO-8 cartridge.
 | Sprites | 6 of 16 rows populated (~37%) | Significant |
 | SFX | 27 of 64 | 37 free |
 | Music | 18 of 64 patterns | 46 free |
-| Cartdata | 63 of 64 slots | **1 free** |
+| Cartdata | 21 of 64 slots | 43 free |
 | Map | Unused | Fully available |
 
 ## Cartdata allocation
 
 | Slots | Usage |
 |-------|-------|
-| 0-59 | High scores (6 per entry x 10 entries) |
-| 60-62 | Saved initials (3 ASCII codes) |
-| 63 | Free |
-
-Cartdata is nearly full. New persistent features would require bit-packing, reducing the high score table, or using `cstore()` to a second cartridge.
+| 0-17 | High scores (6 per entry x 3 entries) |
+| 18-20 | Saved initials (3 ASCII codes) |
+| 21-63 | Free (43 slots) |
 
 ## Sprite allocation
 

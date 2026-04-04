@@ -139,14 +139,14 @@ function init_high_scores()
   high_scores = {}
   if stat(6) == 0 then init_save_system() end
   
-  -- load saved initials (slots 60-62)
-  local c1, c2, c3 = dget(60), dget(61), dget(62)
+  -- load saved initials (slots 18-20)
+  local c1, c2, c3 = dget(18), dget(19), dget(20)
   if c1 >= 32 and c1 <= 126 then last_entered_initials[1] = chr(c1) end
   if c2 >= 32 and c2 <= 126 then last_entered_initials[2] = chr(c2) end
   if c3 >= 32 and c3 <= 126 then last_entered_initials[3] = chr(c3) end
   
-  -- load high scores (slots 0-59, 6 per entry) as components
-  for i = 1, 10 do
+  -- load high scores (slots 0-17, 6 per entry, 3 entries)
+  for i = 1, 3 do
     local base = (i - 1) * 6
     local m, k, u = dget(base), dget(base+1), dget(base+2)
     local c1, c2, c3 = dget(base+3), dget(base+4), dget(base+5)
@@ -165,7 +165,7 @@ end
 function save_high_scores()
   if stat(6) == 0 then init_save_system() end
   
-  for i = 1, 10 do
+  for i = 1, 3 do
     local e = high_scores[i]
     local s = e.score
     local base = (i - 1) * 6
@@ -185,16 +185,16 @@ function update_high_scores(new_score, initials)
   if not initials or #initials < 3 then initials = get_initials() end
   initials = sub(initials, 1, 3)
   
-  local pos = 11
-  for i = 1, 10 do
+  local pos = 4
+  for i = 1, 3 do
     if score_gt(ns, high_scores[i].score) then
       pos = i
       break
     end
   end
   
-  if pos <= 10 then
-    for i = 10, pos + 1, -1 do
+  if pos <= 3 then
+    for i = 3, pos + 1, -1 do
       high_scores[i] = high_scores[i - 1]
     end
     high_scores[pos] = {score={m=ns.m,k=ns.k,u=ns.u}, initials=initials}
@@ -481,11 +481,11 @@ function draw_highscores()
   draw_starfield()
   shadow_text("high scores", 10, 8)
   
-  local y = 22
-  for i = 1, 10 do
+  local y = 30
+  for i = 1, 3 do
     local e = high_scores[i]
     shadow_text(i .. ". " .. e.initials .. " " .. score_fmt(e.score), y, 8)
-    y += 9
+    y += 14
   end
   
   shadow_text("press x to return to menu", 115, 8)
@@ -516,9 +516,9 @@ function update_enter_initials()
       last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
       
       if stat(6) == 0 then init_save_system() end
-      dset(60, ord(current_initials[1]) or 65)
-      dset(61, ord(current_initials[2]) or 67)
-      dset(62, ord(current_initials[3]) or 69)
+      dset(18, ord(current_initials[1]) or 65)
+      dset(19, ord(current_initials[2]) or 67)
+      dset(20, ord(current_initials[3]) or 69)
       
       if final_score > 0 then
         update_high_scores(final_score, str)
