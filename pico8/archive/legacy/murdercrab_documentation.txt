@@ -1,0 +1,57 @@
+5:-- define pi for warp effect
+8:-- global variables & level progression
+23:-- Unified ship entity for both title and gameplay
+48:-- Remove old global variables and replace references throughout the code with these new structured tables.
+73:-- GAME BALANCE VARIABLES
+74:-- Adjust these to tune the game's difficulty & feel
+76:-- Player variables
+81:-- Weapon variables
+88:-- Enemy variables
+98:-- Boss variables
+105:-- Scoring variables
+115:-- Powerup variables
+120:-- score variables
+127:-- bomb & powerup globals
+135:-- utility functions
+142:-- starfield background
+241:-- Simplified Effects System
+269:-- Simplify boss death effects
+318:-- collision detection
+320:-- Generic collision detection function
+331:-- player & player bullets
+427:-- enemies & enemy bullets
+437:-- Keep the existing get_bullet function as it handles pooling
+439:-- Generic constructor for enemies
+459:-- Generic constructor for powerups
+472:-- Generic constructor for explosions
+484:-- Now replace enemy creation in spawn_enemy with create_enemy
+500:-- Replace existing create_explosion with our generic one
+509:-- helper: rotate vector
+520:-- normal enemy: sequential 3-shot burst
+571:-- boss enemies: radial burst (touhou style)
+573:-- Optimize boss shooting patterns
+638:-- boss spawning & health
+713:-- powerup & score items
+771:-- bomb functionality
+837:-- menu screen (arcade style)
+839:-- Note: Menu screen functionality has been completely removed.
+840:-- All navigation now happens directly through the title screen.
+842:-- Instructions screen
+895:-- High score screen
+948:-- Enter initials screen
+950:-- Global variables to track initial selection
+1035:-- main game update (level progression, warp, & continue)
+1060:-- New helper functions to break up update_game
+1415:-- draw game
+1515:-- High score table
+1749:-- init game
+1826:-- Minimal Visual Effects
+1828:-- Simple muzzle flash
+1837:-- bomb visual effect (minimal)
+1839:-- bomb_effect_timer is now declared in the global variables section
+1884:-- Title screen
+1886:-- No need to initialize title_bullets here anymore
+2205:-- Generic constructor for enemy bullets
+2475:-- Ship update function for gameplay (not title screen)
+2601:-- Helper function for collision detection
+2609:-- Draw explosion effects

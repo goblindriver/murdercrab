@@ -1,0 +1,470 @@
+5:-- define pi for warp effect
+8:-- global variables & level progression
+23:-- Unified ship entity for both title and gameplay
+48:-- Remove old global variables and replace references throughout the code with these new structured tables.
+73:-- GAME BALANCE VARIABLES
+74:-- Adjust these to tune the game's difficulty & feel
+76:-- Player variables
+81:-- Weapon variables
+88:-- Enemy variables
+98:-- Boss variables
+105:-- Scoring variables
+115:-- Powerup variables
+120:-- score variables
+127:-- bomb & powerup globals
+135:-- utility functions
+142:-- starfield background
+241:-- Simplified Effects System
+269:-- Simplify boss death effects
+318:-- collision detection
+320:-- Generic collision detection function
+331:-- player & player bullets
+427:-- enemies & enemy bullets
+437:-- Keep the existing get_bullet function as it handles pooling
+439:-- Generic constructor for enemies
+459:-- Generic constructor for powerups
+472:-- Generic constructor for explosions
+484:-- Now replace enemy creation in spawn_enemy with create_enemy
+500:-- Replace existing create_explosion with our generic one
+509:-- helper: rotate vector
+520:-- normal enemy: sequential 3-shot burst
+571:-- boss enemies: radial burst (touhou style)
+573:-- Optimize boss shooting patterns
+638:-- boss spawning & health
+713:-- powerup & score items
+771:-- bomb functionality
+837:-- menu screen (arcade style)
+839:-- Note: Menu screen functionality has been completely removed.
+840:-- All navigation now happens directly through the title screen.
+842:-- Instructions screen
+895:-- High score screen
+948:-- Enter initials screen
+950:-- Global variables to track initial selection
+1035:-- main game update (level progression, warp, & continue)
+1060:-- New helper functions to break up update_game
+1415:-- draw game
+1515:-- High score table
+1749:-- init game
+1826:-- Minimal Visual Effects
+1828:-- Simple muzzle flash
+1837:-- bomb visual effect (minimal)
+1839:-- bomb_effect_timer is now declared in the global variables section
+1884:-- Title screen
+1886:-- No need to initialize title_bullets here anymore
+2205:-- Generic constructor for enemy bullets
+2475:-- Ship update function for gameplay (not title screen)
+2601:-- Helper function for collision detection
+2609:-- Draw explosion effects
+26:  y = 115,  -- Position for title screen
+32:  is_title = true  -- Flag to track if we're in title mode
+38:  bullets = {}  -- Store bullets as part of the title table
+51:last_entered_initials = {"A", "A", "A"}  -- Global to store last entered initials
+54:game_over_timer = 10 * 30  -- 10 seconds at 30fps
+55:game_over_grace = 30       -- Grace period before accepting input (1 second)
+56:game_complete_grace = 30   -- Grace period for the game completion screen
+77:PLAYER_SPEED = 2           -- Player movement speed
+78:PLAYER_HEALTH_NORMAL = 3   -- Player health
+79:PLAYER_BOMBS_NORMAL = 3    -- Starting bombs
+82:BULLET_SPEED = 3           -- Player bullet speed
+83:BULLET_WIDTH = 8           -- Player bullet width
+84:BULLET_HEIGHT = 8          -- Player bullet height
+85:BOMB_DURATION = 90         -- How long bomb effect lasts (increased from 60)
+86:BOMB_DAMAGE = 30           -- Damage bombs do to enemies (increased from 20)
+89:ENEMY_SPAWN_RATE_NORMAL = 2     -- % chance to spawn enemies in normal phase
+90:ENEMY_SPAWN_RATE_POST_MINI = 5  -- % chance to spawn enemies after mini boss
+91:ENEMY_BASE_SPEED = 1            -- Base enemy movement speed
+92:ENEMY_SPEED_LEVEL_SCALING = 0.1 -- How much enemy speed increases per level
+93:ENEMY_BULLET_SPEED = 3          -- Speed of enemy bullets
+94:BOSS_BULLET_SPEED = 3           -- Speed of boss bullets
+95:ENEMY_SHOOT_INTERVAL_BASE = 15  -- Base time between enemy shots
+96:ENEMY_SHOOT_INTERVAL_SCALING = 2 -- How much faster enemies shoot per level
+99:MINI_BOSS_BASE_HEALTH = 20      -- Mini boss base health
+100:MINI_BOSS_HEALTH_SCALING = 10   -- Mini boss health increase per level
+101:FINAL_BOSS_BASE_HEALTH = 40     -- Final boss base health
+102:FINAL_BOSS_HEALTH_SCALING = 20  -- Final boss health increase per level
+103:TRUE_LAST_BOSS_HEALTH = 300     -- True last boss health (increased from 200)
+106:SCORE_NORMAL_ENEMY = 10          -- Score for killing normal enemy (reduced from 10)
+107:SCORE_MINI_BOSS = 25             -- Score for killing mini boss (reduced from 50)
+108:SCORE_FINAL_BOSS = 50           -- Score for killing final boss (reduced from 100)
+109:SCORE_TRUE_LAST_BOSS = 500       -- Score for killing true last boss (reduced from 200)
+110:SCORE_ITEM_VALUE = 25           -- Base value of score items (reduced from 100)
+111:SCORE_STREAK_THRESHOLD = 5      -- Pickups needed to increase multiplier
+112:SCORE_BOMB_BONUS = 25           -- Score bonus per remaining bomb (reduced from 250)
+113:SCORE_HEALTH_BONUS = 25         -- Score bonus per remaining health point (reduced from 125)
+116:POWERUP_SPEED = 0.5             -- Powerup falling speed
+117:POWERUP_ATTRACT_DISTANCE = 32   -- Distance at which powerups are attracted to player
+118:POWERUP_SCORE_DURATION = 60     -- How long score powerups last before disappearing
+123:score_streak = 1       -- starting streak (resets on damage)
+124:score_multiplier = 1   -- increases by 1 every 5 score items
+125:final_score = 0        -- stored final score when game ends
+133:powerups = {}  -- holds powerups and score items
+148:  for i=1,40 do  -- Reduced from 100 to 40 stars
+154:      size = rnd(1) < 0.1 and 2 or 1  -- 10% chance of larger stars (reduced from 20%)
+162:    local ratio = 1 - game.warp_time / game.warp_duration  -- goes from 0 to 1
+163:    spd_mult = 1 + ratio * 29  -- linearly increase speed to ~30
+165:    -- Add screen shake during warp
+167:      game.shake_amount = 3 + flr(ratio * 8)  -- Stronger shake as warp progresses
+170:    -- Play warp sound effects at intervals
+182:      -- Changing star colors during warp
+184:        star.col = 7 + flr(rnd(8)) -- rainbow colors
+193:      star.size = rnd(1) < 0.2 and 2 or 1  -- Refresh size when recycling
+200:    -- Simple background color during warp
+207:      -- Calculate streak length based on warp progress
+210:      -- Simple color cycling
+223:    -- Flash near the end
+230:    -- Normal starfield drawing
+244:MAX_EXPLOSIONS = 10  -- Reduced from 20 to 10
+250:  -- Limit explosion particles
+252:    -- Remove oldest explosions if we're at the limit
+258:  -- Just one explosion per call
+271:  -- Only create one explosion
+346:bullet_particles = {}  -- New table for bullet particles
+380:  -- Left bullet
+390:  -- Right bullet
+400:  sfx(0)  -- player shoot sound
+410:      if bullet.anim_timer >= 3 then  -- Change frame every 3 frames
+413:        if bullet.anim_frame >= 3 then  -- If we reach the final frame
+414:          bullet.anim_frame = 2  -- Stay on final frame
+415:          bullet.anim_complete = true  -- Mark animation as complete
+549:      -- Smaller hitbox for enemy bullets
+575:  -- Allow more bullets per pattern (removed cap of 8)
+578:  -- Create a spiral pattern for extra patterns when at lower health
+580:    -- Spiral pattern with tighter angle between bullets
+581:    for i = 0, cluster_count + 4 do  -- Add more bullets for the spiral
+582:      local angle_deg = (i * (25)) + (enemy.rotate_counter or 0)  -- Tighter spacing
+589:      -- Only add bullets if there aren't too many already
+590:      if #enemy_bullets < 100 then  -- Increased from 80 to 100
+608:  -- Standard circular pattern
+610:    -- Calculate the angle to evenly space bullets
+618:    -- Only add bullets if there aren't too many already
+619:    if #enemy_bullets < 100 then  -- Increased from 80 to 100
+628:      b.hit_width = 2  -- Smaller hitbox for boss bullets
+665:  mini.target_y = 20  -- They descend to y=32
+718:    p.timer = POWERUP_SCORE_DURATION  -- score item now lasts 60 frames
+753:        -- Double powerup now only restores health
+779:    -- Create just one simple shock wave circle
+796:          -- 80% chance to spawn score item when killed by bomb
+804:        -- Add visual feedback of boss being damaged - just one explosion
+821:            game.final_score = score  -- preserve final score
+848:  -- Helper function to center text
+875:    instructions_grace_period = 30 -- 1 second grace period
+878:  -- Decrement grace period if active
+881:    return -- Skip button detection during grace period
+888:    ship.grace_period = 30  -- Add a 1-second grace period (30 frames)
+890:    game.state = "title"  -- Return to title screen
+901:  -- Helper function to center text
+910:  -- Show top 10 high scores
+928:    highscores_grace_period = 30 -- 1 second grace period
+931:  -- Decrement grace period if active
+934:    return -- Skip button detection during grace period
+941:    ship.grace_period = 30  -- Add a 1-second grace period (30 frames)
+943:    game.state = "title"  -- Return to title screen
+955:  -- Initialize the selected letter for each position from last entered if available
+962:  -- Handle input
+963:  if btnp(0) then -- Left
+966:  elseif btnp(1) then -- Right
+969:  elseif btnp(2) then -- Up
+974:  elseif btnp(3) then -- Down
+979:  elseif btnp(4) then -- Z to confirm
+980:    -- Save selected initials
+986:    -- Return to title screen
+990:    ship.grace_period = 30  -- Add a grace period
+991:  elseif btnp(5) then -- X to cancel
+992:    -- Return to title without saving
+996:    ship.grace_period = 30  -- Add a grace period
+1005:  -- Center box
+1009:  -- Title and instructions
+1012:  -- Draw initials
+1017:      -- Highlight selected position
+1020:      -- Draw cursor
+1029:  -- Instructions
+1038:  update_starfield() -- Always update starfield for all screens
+1044:    -- Use our unified update_game function
+1056:  -- Increment global timer (used for animations)
+1062:  -- Decrease game over timer
+1065:  -- Decrease grace period timer if it's active
+1070:  -- Calculate final score with bonus (only do this once)
+1071:  if game_over_timer == 10 * 30 - 1 then  -- First frame of game over
+1072:    -- Add bonus score for remaining bombs and health
+1076:    -- Use last entered initials automatically
+1079:    -- Always try to record the score, the function will check if it qualifies
+1083:  -- Auto-return to title screen when timer runs out
+1085:    game.state = "title"  -- Return to title screen instead of menu
+1092:  -- Only accept input after grace period
+1094:    -- Print the state of the button for debugging
+1097:    if game.credits > 0 and btnp(4) then  -- Z to continue
+1109:    elseif btn(5) then  -- X to return to title screen
+1110:      game.state = "title"  -- Return to title screen instead of menu
+1122:  -- Add screen shake during warp
+1128:  -- Warp sound effects at key points
+1136:  -- Clear powerups at start of warp
+1146:    -- Add a screen flash when warp completes
+1150:    game.shake_amount = 12  -- Final big shake when warp completes
+1183:    if game.current_level <= 5 then  -- Changed back to 5 for original 5-stage layout
+1223:  -- Example thruster animation
+1233:    -- Different movement for bosses vs regular enemies
+1235:      -- Boss movement - move to the top area and hover
+1237:        enemy.y += enemy.speed  -- Continue moving down until y reaches 20
+1239:        -- Hover movement pattern when at the top
+1243:        -- Simple side-to-side movement
+1252:        -- Keep boss within screen bounds
+1257:      -- Regular enemy movement (just move down)
+1261:    -- Enemy shooting logic
+1272:    -- Bullet collision detection
+1276:          -- Regular enemy hit - use single simplified explosion
+1280:          -- Add hit flash and screen shake
+1281:          enemy.hit_flash = 5  -- Flash for 5 frames
+1282:          screen_shake = 2     -- Small shake on hit
+1284:          -- Play hit sound (sfx ID 6 - to be added in PICO-8)
+1290:          -- Just one simple explosion 
+1292:          -- No need for enemy_death_effect here to save memory
+1296:          -- Spawn powerups with reduced chance
+1306:          -- Boss hit effect
+1307:          enemy.hit_flash = 10  -- Flash for 10 frames (longer for bosses)
+1308:          screen_shake = 5      -- Bigger shake on boss hit
+1310:          -- Play boss hit sound (sfx ID 6 - to be added in PICO-8)
+1313:          -- Create fewer hit particles
+1329:          -- Add extra bullet patterns when boss is damaged
+1330:          -- When health drops below certain thresholds, add extra patterns
+1339:            -- Fire an extra bullet pattern immediately
+1343:          -- When bosses get to low health, reduce their shoot interval for more intensity
+1351:            -- Enhanced boss death effect
+1365:              game.final_score = score  -- preserve final score
+1379:    -- Regular enemies go off-screen, bosses don't
+1396:      -- Player takes damage directly (no power state)
+1400:      game.shake_amount = 10  -- Shake for health loss
+1402:      -- Play hit sound for player damage (sfx ID 7 - to be added in PICO-8)
+1434:  -- Apply screen shake
+1446:  -- Draw bullets
+1450:             7)  -- White color
+1453:  -- Draw enemies
+1464:  -- Draw powerups
+1473:  -- Draw ship with blink effect during grace period
+1475:    local sprite = 1  -- Default center sprite
+1477:      sprite = 17  -- Left tilt sprite
+1479:      sprite = 33  -- Right tilt sprite
+1483:    -- Draw thruster animation
+1492:  -- Draw UI
+1493:  camera(0, 0)  -- Reset camera for UI
+1495:  -- Health
+1500:  -- Bombs
+1505:  -- Score
+1508:  -- Level
+1511:  -- Multiplier
+1523:  if new_score <= 0 then return end  -- Don't update if score is 0
+1525:  -- Always check if the score is higher than at least the lowest score
+1528:    -- Find where to insert the new score
+1529:    local insert_pos = 11  -- Default position (beyond the end)
+1537:    -- If we found a position, shift scores and insert
+1539:      -- Shift scores down
+1543:      -- Insert the new score
+1546:      -- Play a sound effect to indicate a high score
+1554:  -- Use last entered initials if available
+1560:  local delay = 2  -- Reduced from 5 to 2 for much snappier response
+1561:  local repeat_delay = 12  -- Frames to wait before auto-repeat kicks in
+1562:  local repeat_speed = 2   -- Speed of auto-repeat (lower = faster)
+1570:  -- Track how long buttons are held
+1579:    -- Print instructions centered
+1582:    -- Print current initials centered
+1585:    -- Print confirmation instruction centered
+1594:    -- Handle input with reduced delay and auto-repeat
+1598:      -- Check each button
+1605:      -- Up button with auto-repeat
+1610:          sfx(0)  -- Sound feedback
+1616:      -- Down button with auto-repeat
+1621:          sfx(0)  -- Sound feedback
+1627:      -- Left button (no auto-repeat for navigation)
+1632:        sfx(0)  -- Sound feedback
+1635:      -- Right button (no auto-repeat for navigation)
+1640:        sfx(0)  -- Sound feedback
+1643:      -- Z button to confirm
+1645:        sfx(3)  -- Play a sound when confirming
+1646:        -- Save the initials before returning
+1664:  -- Return the final initials string
+1671:      -- Add bonus score for remaining bombs and health
+1675:      -- Record high score on the first frame after grace period
+1676:      -- This ensures it only happens once
+1678:        -- Use last entered initials automatically
+1680:        -- Always try to record the score, the function will check if it qualifies
+1684:      -- Handle player input after grace period
+1685:      if btnp(4) then  -- Z to return to title screen
+1686:        -- Add a grace period to prevent accidental button input
+1687:        menu_grace_period = 30  -- 1 second grace period
+1691:            -- Store the buttons that are being held down
+1699:        ship.grace_period = 30  -- Add a 1-second grace period (30 frames)
+1701:        game.state = "title"  -- Transition to title screen
+1702:      elseif btnp(5) then  -- X to restart game
+1716:  -- Helper function to center text
+1723:  -- Create a larger box that can fit all the text
+1724:  -- Increased height to ensure all text fits
+1731:  -- Show bonus scores
+1739:  -- Only show options after the grace period
+1743:    -- Increased spacing between these two lines
+1752:  -- Set up ship for gameplay mode (not title screen)
+1754:  ship.x = 64  -- Center horizontally
+1755:  ship.y = 100  -- Position near bottom
+1767:  game.current_level = 1  -- Initialize current level
+1768:  game.phase = "normal"   -- Set initial game phase
+1771:  -- Initialize stars for starfield
+1774:  -- init_level(level) - Removed reference to non-existent function
+1778:  -- Make sure we properly initialize the title table with all required properties
+1785:  -- Set up the unified ship for title screen
+1792:  game.state = "title" -- Start at title screen instead of menu
+1800:  init_starfield() -- Ensure starfield is initialized
+1846:  -- Simple bomb effect - just one explosion
+1873:    -- Simple white flash
+1889:  -- Ensure ship is in title mode
+1892:  -- Check if TLB exists and spawn if needed
+1901:  -- Spawn TLB if it doesn't exist and we're not warping
+1908:  -- Handle ship movement
+1927:  -- Thruster animation
+1937:  -- Decrease grace period if active
+1940:    return -- Skip edge detection during grace period
+1943:  -- Check if warping to level one
+1947:    -- Add screen shake during warp
+1953:    -- Warp sound effects at key points
+1961:    -- When warp is complete, start the game
+1968:      sfx(5)  -- Final warp sound
+1974:  -- Edge detection for navigation - using full edges
+1976:  -- Left edge - Instructions (use full left edge)
+1980:    sfx(3)  -- Confirmation sound
+1984:  -- Right edge - High scores (use full right edge)
+1988:    sfx(3)  -- Confirmation sound
+1992:  -- Bottom edge - Initials (use full bottom edge)
+1995:    sfx(3)  -- Confirmation sound
+1999:  -- Keep ship on screen with margins - adjusted Y range to allow ship to reach bottom
+2005:  -- Handle Z button - Only shoot (no credit insertion)
+2007:    -- Ship shoots bullet
+2016:    sfx(0)  -- Fire sound
+2026:      if bullet.anim_timer >= 3 then  -- Change frame every 3 frames
+2029:        if bullet.anim_frame >= 3 then  -- If we reach the final frame
+2030:          bullet.anim_frame = 2  -- Stay on final frame
+2031:          bullet.anim_complete = true  -- Mark animation as complete
+2042:      -- Create explosion at TLB position
+2052:      -- Add screen shake
+2055:      -- Play explosion sound
+2058:      -- Clear bullets
+2061:      -- Start warp effect to level one
+2064:      sfx(5)  -- Warp sound
+2068:    -- Remove off-screen bullets
+2079:  -- Apply screen shake
+2088:  -- Pulsing red title effect
+2089:  local pulse_base = 8  -- Dark red
+2090:  local pulse_bright = 14  -- Pink/bright red
+2091:  local pulse_factor = (sin(time() * 2) + 1) / 2  -- 0 to 1 pulse
+2093:  -- Calculate color between dark red and bright red
+2101:  local title_x = (128 - #title_text * 4) / 2  -- Center the text
+2104:  print(title_text, title_x + 1, 12 + 1, 1)  -- Shadow with offset
+2106:  -- Then draw the title with pulsing red
+2109:  -- Add the True Last Boss floating in the middle of the screen
+2110:  local tlb_x = 64 - 16  -- Center horizontally (32 pixels wide, so offset by 16)
+2111:  local tlb_y = 42       -- Middle of the screen, slightly adjusted up
+2113:  -- Gentle floating motion
+2114:  local float_y = sin(time() * 0.5) * 5  -- Slightly more dramatic floating
+2116:  -- Better aura effect - pulsing circle
+2118:  circfill(tlb_x + 16, tlb_y + float_y + 16, 28 + pulse, 1)  -- Dark blue aura
+2119:  circfill(tlb_x + 16, tlb_y + float_y + 16, 18 + pulse/2, 13)  -- Lavender inner glow
+2121:  -- Modified color cycling effect for the TLB - only bright red parts should cycle
+2123:  local accent_color = 10 + flr(cycle_time % 6)  -- Cycle through brighter colors for accents
+2125:  -- Apply color cycling to the TLB on title screen, only changing the bright red parts
+2126:  pal(9, accent_color)  -- Replace bright red with cycling bright color
+2127:  pal(1, 0)             -- Make dark blue black for better contrast
+2135:  -- Simplified navigation text without bordered boxes
+2137:  -- Pulsing effect for navigation options
+2138:  local pulse_nav = (sin(time() * 4) + 1) / 2  -- Faster pulse
+2139:  local nav_color = pulse_nav > 0.6 and 7 or 6  -- White or darker
+2141:  -- Left side - Instructions
+2144:  -- Right side - High scores - MOVED LEFT to ensure it's not cut off
+2147:  -- Bottom - Initials - MOVED DOWN to bottom edge
+2155:    local sprite = 2  -- Default sprite
+2157:      sprite = 18     -- Second frame
+2159:      sprite = 34     -- Third frame
+2164:  local sprite = 1  -- Default center sprite
+2166:    sprite = 17  -- Left tilt sprite
+2168:    sprite = 33  -- Right tilt sprite
+2172:  -- Draw thruster animation
+2178:  -- Reset camera
+2186:  -- Choose sprite based on movement
+2187:  local sprite = player.sprite  -- Default center sprite
+2189:  if btn(0) then -- Left tilt
+2190:    sprite = 17  -- Left tilt sprite
+2191:  elseif btn(1) then -- Right tilt
+2192:    sprite = 33  -- Right tilt sprite
+2198:  -- Simplified thruster effect
+2226:  -- Calculate direction vector to player
+2232:  -- Normalize the direction vector
+2242:  -- Scale by enemy bullet speed
+2246:  -- Only add bullets if there aren't too many already
+2264:  -- Update the ship
+2267:  -- Update bullets
+2269:    -- Move bullet upwards
+2272:    -- Remove off-screen bullets
+2277:    -- Check for collisions with enemies
+2285:        -- Damage the enemy
+2288:        -- Remove the bullet
+2291:        -- Create a small explosion
+2301:        -- Play hit sound
+2304:        -- If enemy is defeated
+2306:          -- Add score
+2309:          -- Create explosion
+2319:          -- Random powerup chance (20%)
+2321:            -- 50/50 chance for health or bomb
+2331:          -- Remove the enemy
+2334:          -- Screen shake
+2337:          -- Play explosion sound
+2341:        break  -- Exit the enemy loop once a collision is found
+2346:  -- Update enemies
+2348:    -- Basic enemy movement
+2352:      -- Simple horizontal movement
+2356:        -- Just moves down
+2359:    -- Bomber enemy movement
+2363:      -- Move toward player horizontally
+2370:    -- Boss movement
+2372:      -- If boss is still entering
+2376:        -- Boss has reached its position, now move in a pattern
+2381:      -- Boss shooting
+2383:        -- Create 3 bullets in a spread
+2385:          local angle = 0.25 + i * 0.05  -- Angles around downward
+2388:            y = enemy.y + 20,  -- Fire from bottom of boss
+2401:    -- Remove off-screen enemies
+2407:  -- Update powerups
+2411:    -- Remove off-screen powerups
+2417:  -- Update explosions
+2427:  -- Spawn enemies
+2429:    -- 80% chance for basic enemy, 20% for bomber
+2432:      x = 16 + rnd(96),  -- Random x position
+2433:      y = -8,  -- Start above screen
+2434:      speed = 0.5 + rnd(1),  -- Random speed
+2445:  -- Boss check
+2447:    -- Spawn boss warning
+2449:    game.warning_timer = 90  -- 3 seconds
+2452:  -- Handle boss warning phase
+2457:      -- Spawn boss
+2459:        x = 64,  -- Center horizontally
+2460:        y = -32,  -- Start above screen
+2461:        target_y = 40,  -- Target y position
+2468:        fire_rate = 90  -- Fire every 3 seconds
+2477:  -- Skip update if in grace period
+2483:  -- Movement controls
+2502:  -- Thruster animation
+2509:  -- Shooting (Z button)
+2511:    -- Create a new bullet
+2521:    sfx(0)  -- Shoot sound
+2524:  -- Bomb (X button)
+2527:    -- Clear all enemies and bullets
+2529:      -- Add score for each enemy killed by bomb
+2531:      -- Create explosion
+2543:    sfx(2)  -- Bomb sound
+2546:  -- Check for collisions with enemies
+2549:      -- Take damage
+2552:      -- Add explosion
+2562:      -- Screen shake
+2565:      -- Remove the enemy
+2568:      -- Add grace period
+2571:      -- Play hit sound
+2574:      -- Check for game over
+2582:  -- Check for collisions with powerups
+2585:      -- Apply powerup effect
+2592:      -- Remove the powerup
+2595:      -- Play powerup sound
+2613:    -- Add a smaller inner circle for detail
