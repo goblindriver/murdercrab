@@ -51,6 +51,12 @@ This document preserves shmup genre research, design philosophy, and aspirationa
 
 The manual and surrounding material should feel like a late-era **Super Nintendo / Sega Genesis pack-in manual** that got expanded into a **strategy zine** by people who actually play shmups seriously. Clean manual copy for systems. Magazine-style interstitials for philosophy. Operator notes for route-minded players.
 
+## Doujin spirit
+
+MurderCrab is a doujin work -- made by a small team out of passion, not obligation. The Shmup_Lyf zines use "doujin" lovingly, as "a marker of an artefact of immense passion created by a small group or an individual." The CRS68k issue shows how that game was developed iteratively across multiple Comiket events, shaped by community feedback, in conversation with the arcade games of its era.
+
+MurderCrab follows the same path: built on PICO-8 constraints, refined through play, stored in public Git, open to evolution. The Picotron port is the next version at the next Comiket, so to speak.
+
 ---
 
 # 2. DESIGN PHILOSOPHY
@@ -59,13 +65,13 @@ The manual and surrounding material should feel like a late-era **Super Nintendo
 
 Dense shmups only work when they are **legible under pressure**. Even when a game becomes overwhelming, the player still needs readable movement, readable threat classes, and readable reasons for each tool at their disposal. The point is not "make it easy." The point is **make the player's decisions informed**.
 
-> Source: Boghog's danmaku design guide stresses that readability under density is the core constraint of bullet hell design.
-
 If a section kills the player, the player should eventually be able to say **why**.
 
 ## Survival is not the whole game
 
-Shmups become richer when played for score, because scoring forces more deliberate, more complex play than vague survival improvisation.
+ProMeTheus opens *The Full Extent of the Jam* with what should be a north star for this project:
+
+> "One thing I would like to stress is how much more fun STGs become when you play them for score instead of survival. I absolutely love scoring! Getting better and learning how to score means playing in a much, much more complex way. You will be playing with a plan in mind. Scoring opportunities will have to be balanced depending on how much risk they represent."
 
 That doesn't mean the design should sneer at beginners. It means it should quietly teach them that the game opens up once they start asking different questions:
 
@@ -76,25 +82,37 @@ That doesn't mean the design should sneer at beginners. It means it should quiet
 
 That is where the long tail is.
 
-> Source: *The Full Extent of the Jam* (ProMeTheus) makes this point directly: score play means balancing risk and reward while performing a learned sequence rather than improvising your whole way through.
-
 ## Backgrounds are not wallpaper
 
-Backgrounds tell the **spatial story** of a run and affect how a player experiences scale, danger, and transition. In shmups, backgrounds are places you go, not just textures under bullets.
+From the *Shmup_Lyf Backgrounds* zine:
 
-If *MurderCrab* moves from open void to shell reef to biomech corridors to a final hive-core, the experience should not flatten those spaces into "Stage 1 / Stage 2 / Stage 3." Each stage should teach the player what kind of place it is and how that changes the psychological read of the action.
+> "In shmups, backgrounds aren't just pieces of art we see but also places we go. They help, in large part, to tell the spatial narrative of a game. They build and bind sequences together to make a story -- an action adventure. To make us feel powerful, or infinitesimal. In the middle of history, or entirely alone."
 
-> Source: Marty_DYR's *Shmup_Lyf* work makes this point about backgrounds as spatial storytelling.
+Each environment type carries psychological weight. The black void is "where the monsters wait, the things that do not wish to be seen or understood." The enemy factory is "beyond the gates of the keep now, deep within the final stronghold." The final boss arena may exist "in an ura space, a place beyond space and time."
 
-**Current state:** The PICO-8 version uses distinct starfield color palettes per level (black void -> blue -> green -> purple -> red -> chromatic chaos), which communicates progression but doesn't yet have foreground elements, terrain, or environmental storytelling. The Picotron port's higher resolution creates room for real background art.
+**Current state:** The PICO-8 version uses distinct starfield color palettes per level (black void -> blue -> green -> purple -> red -> chromatic chaos), which communicates progression but doesn't yet have foreground elements, terrain, or environmental storytelling. The Picotron port's higher resolution creates room for real background art, parallax layers, and the kind of spatial narrative Marty_DYR describes.
+
+### Background archetypes from the Shmup_Lyf Backgrounds zine
+
+These are the genre's spatial vocabulary. Consider which apply to MurderCrab's five stages:
+
+- **The Black** — infinite void and absence. Where we start. Pin pricks of distant stars as hope.
+- **The Launchpad** — a birth, a beginning, a setting forth.
+- **The Endless Metropolis** — faceless geometry, dehumanized, "fractal and endlessly repeatable."
+- **Low Planetary Orbit** — humbling view of floating giants, perception of your own minuteness.
+- **The Armada Battle** — epic grandness contrasted with your infinitesimal nature within it.
+- **The Enemy Factory** — the bowels of the goliath, alone in the realm of the other.
+- **The Nexus** — the throne of the monstrous god brain, the seat of power of the great evil.
 
 ## What a stage should teach
 
 A stage is not just content. It is a lesson wrapped in rhythm.
 
-The best shmup design keeps circling back to this: stages are memorable not only because of background art or music, but because each one changes what the player has to understand. The manual should keep asking, stage by stage: **what is this section trying to make the player better at?**
+From the *Cho Ren Sha 68k* zine, Marty_DYR highlights a stage design breakdown by forum user Durandal that should inform MurderCrab's level design:
 
-> Sources: Marty_DYR frames this as spatial and experiential storytelling. Community glossary and strategy discourse frame it as route literacy.
+> "introduction 1 -> break -> test 1 -> introduction 2 -> test 1 & 2 -> break -> test 1 & 2 climax. A stage with only introductions will fail to capitalize on anything, a stage with only tests doesn't bring anything new to the table, and a stage with constant climaxes without breaks or proper build-up will fail to properly end with a climax."
+
+The takeaway: **use distinct enemies to create tests which overlap to make more difficult challenges, with breaks in between.** If you do this you have the makings of a strong enemy-centric rhythm and a story for a stage. Even without elaborate backgrounds, Cho Ren Sha 68k -- which uses the same parallax background throughout -- creates captivating stages purely through varied and structured enemy encounters.
 
 ---
 
@@ -110,19 +128,17 @@ Players must be able to read the screen under pressure. This means:
 - Visible hitbox feedback (during focus, if added)
 - Audio cues that reinforce visual information
 
-> Source: Boghog's guide argues that even classic dense danmaku should be built from readable fundamentals and clear player tools, not arbitrary chaos.
-
 ## Silhouette hierarchy
 
-Enemy silhouette is paramount. The player must decide instantly what needs to be deleted first. Larger forms generally imply more commitment and threat unless the design is intentionally subverting that expectation.
+From the *Cho Ren Sha 68k* zine:
 
-> Source: Marty_DYR's *Cho Ren Sha 68k* zine spells this out -- enemy readability through silhouette is a foundational shmup design principle.
+> "In a lot, if not all, games the silhouette of an enemy is important for fast identification -- in shmups it's paramount due to the need to respond to the situation emerging on screen as soon as possible. Will you clear up the popcorn before spending time on the one that you know is going to be harder work because of its size? Or do you take that one out first while micro-dodging zaku fire because you know it's probably going to unload a nasty movement restricting spray if you give it too much of a chance?"
+
+**Rule: Bigger means stronger.** Like all rules there are exceptions, but they should work because they play against the expectation. A big enemy that actually goes down easily gives a "Argh!!! Wait? oh thank God" feeling. Break this rule knowingly, not accidentally.
 
 ## Response feel
 
-A shmup lives or dies on response feel. Stick, pad, or keyboard are all valid, and consistency matters more than dogma about "real" arcade input. Quick directional reversals and short taps are what matter functionally.
-
-> Source: *The Full Extent of the Jam* is explicit here -- use whatever input lets you make fast, repeatable, low-panic corrections.
+ProMeTheus is explicit about input: stick, pad, or keyboard are all valid. He personally believes keyboards are superior because "they're much faster at changing directions, and they're also better at tapping one direction very shortly multiple times." What matters is consistency and the ability to make fast, repeatable, low-panic corrections -- not dogma about "real" arcade input.
 
 ## Informed density
 
@@ -132,6 +148,14 @@ When the screen gets dense, the player still needs:
 - Readable reasons for using each tool (wide shot vs focused fire, bomb vs dodge)
 
 The goal is not reduced difficulty. The goal is informed decision-making under pressure.
+
+## The feeling of destruction
+
+From the *Cho Ren Sha 68k* zine, on why explosions matter:
+
+> CRS68k creator Yoshida-san wanted "the feeling of destruction" as a key part of the experience. His explosions "unpack like a fractal" -- a core 16x16 sprite animation repeated flipped, mirrored, and palette-swapped, triggered in a procedural layered cluster over a few frames. The lingering smoke cloud -- "a silhouette of flat colour that holds its shape for a few frames, unlike the rapid flash bang of the explosion, like the fumes of burning oil" -- is what makes the destruction feel weighty.
+
+**Design takeaway for MurderCrab:** Boss explosions and bomb detonations should feel monumental even in 128x128. Lingering smoke/flash, screen shake, and layered sprite animations sell the "feeling of destruction." The Picotron port should go further with anime-style radial lines and nuclear-sphere flash backgrounds for boss kills.
 
 ---
 
@@ -185,7 +209,13 @@ Bombs are not an apology. They are a conversion mechanic.
 - Use bombs to convert impossible density into controllable space.
 - Use bombs before death, not after regret.
 
-> Source: *The Full Extent of the Jam* treats bombing as a skill: the player should bomb when they no longer have a path for the next second of play, rather than hoard resources and die with stock in reserve.
+From *The Full Extent of the Jam*:
+
+> "Think of the bomb button as an emergency button, that you must press when you feel danger is extremely high and you are one second away from death... The best time to bomb is indeed less than one second before dangerous bullets reach your ship's hitbox."
+
+> "Always bomb if you don't have a path through the bullets in your mind for the next second."
+
+The ideal is to bomb as much as possible (never dying with bombs in stock), but also as little as possible (only in emergencies).
 
 ---
 
@@ -283,15 +313,23 @@ What a scorer exploits for damage, item value, cancels, or timer reward.
 
 ## The run is a route
 
-A strong score run is repeated, not improvised. The game repeats from run to run, so the player's job is to find and stabilize a sequence of actions that makes survival and scoring as efficient as possible.
+ProMeTheus on why route play works:
 
-> Source: *The Full Extent of the Jam* is especially strong on this: competitive shmup play is executing a plan under pressure, adjusting only where the plan breaks.
+> "Because the game doesn't change from run to run, you have the possibility of making everything happen exactly the same from run to run, by executing the same sequence of actions every run. By doing this, you reduce the unpredictable to a minimum, and allow yourself, at each point in time, to put all of your focus on the one detail that you know is most dangerous for you at this moment."
+
+> "You haven't looked directly at them, but you know they're here and exactly where they are. Therefore, you can concentrate on doing your best at dodging the bullets that are already near your hitbox."
+
+A strong score run is repeated, not improvised. The game repeats from run to run, so the player's job is to find and stabilize a sequence of actions that makes survival and scoring as efficient as possible.
 
 ## Study replays
 
-Do not fetishize ignorance. Using stronger players' replays to learn routes is not cheating. Routes are communal knowledge refined through shared observation.
+Do not fetishize ignorance. ProMeTheus is emphatic:
 
-> Source: ProMeTheus explicitly rejects the idea that replay study is cheating, comparing shmup study to chess study.
+> "Do you think chess players learn to play by themselves, playing against themselves or against a few friends only, studying the game without outside help? No, they study the game in books, get help from chess teachers, take inspiration from their opponents' play, and from games that they spectate."
+
+> "Stop thinking of the game as something you have to overcome all by yourself... Outside of that final high scoring run, any means, and I mean ANY, are good to practice and learn."
+
+Routes are communal knowledge refined through shared observation. This project should actively encourage replay sharing and study.
 
 ## Score values must be transparent
 
@@ -318,6 +356,20 @@ The manual and in-game feedback should make scoring completely legible. Players 
 - A no-bomb bonus per level could create a risk/reward decision
 - Bomb damage to bosses could have a different point value than bullet damage
 
+## Dodging techniques that should inform pattern design
+
+These techniques from *The Full Extent of the Jam* should be considered when designing bullet patterns for MurderCrab. Good patterns are ones that reward these techniques; bad patterns are ones that can only be survived through luck.
+
+| Technique | How it works | Design implication |
+|-----------|-------------|-------------------|
+| **Bottom line speed reduction** | Holding diagonal against the screen border reduces lateral speed | Spread patterns should be denser at the top and reward patient bottom-screen play |
+| **Speed trick** | Moving perpendicular to the needed adjustment axis reduces speed on that axis | Aimed streams should leave room for orthogonal adjustment |
+| **Moving with the flow** | Moving in the same direction as bullets buys time to find gaps | Dense curtains should have exploitable gaps that appear when moving with the flow |
+| **Bullet herding** | Slow lateral bait, then fast arc near the source to spread the aimed stream | Aimed patterns should reward controlled movement and punish panicked zigzagging |
+| **Changing location** | Identifying safer spots away from the bottom line | Patterns should not always be safest at the bottom -- reward spatial awareness |
+
+**Pattern design rule:** Every dense pattern should have at least one technique that makes it tractable. If the only survival strategy is "hope for a gap," the pattern is bad.
+
 ## Resource routing
 
 > Don't just ask whether a bomb saves you. Ask what that bomb preserves.
@@ -336,9 +388,15 @@ This may be the single most important philosophy in the whole project.
 
 ## Practice mode is part of the game
 
-If *MurderCrab* includes stage select, boss select, checkpoints, or any lab feature (especially in the Picotron port), the game should endorse their use openly. Isolated drilling is vastly faster than replaying easy sections endlessly just to revisit the one part you still fail.
+If *MurderCrab* includes stage select, boss select, checkpoints, or any lab feature (especially in the Picotron port), the game should endorse their use openly.
 
-> Source: *The Full Extent of the Jam* argues that targeted practice is the single biggest accelerator of improvement.
+ProMeTheus is categorical about this:
+
+> "If you use 'my' way of practicing, I guarantee your results will improve at least four or five times faster than if you were not using saved states."
+
+> "The poor Japanese players who played in arcades before DoDonPachi was playable on MAME had to practice this way. If they could have practiced differently, I'm sure they would have."
+
+The *Shmup_Lyf Backgrounds* zine also references *Shmup Ascension* by Dace Anaxyrus as a book that changed the author's approach to practice. The core insight: "I had been playing by just sinking a single credit and trying to get as far as possible. I was thinking like I didn't deserve to get to learn later levels until I could get there cleanly... If I actually wanted to get better I could focus on getting good at all the levels simultaneously, not just building from the front. It's why practice modes and save states exist, and frankly it's just more fun."
 
 ## Practice ladder
 
@@ -348,20 +406,33 @@ If *MurderCrab* includes stage select, boss select, checkpoints, or any lab feat
 4. Reconnect checkpoints into longer segments.
 5. Return to full runs only after consistency improves.
 
+ProMeTheus recommends spending at least 80% of time in practice mode and no more than 20% doing full scoring runs.
+
 ## Learn what you cannot do
 
-**Don't practice what you can already do.** Practice the exact detail you still fail. Cut dead time. Drill the hard thing.
+> "Don't practice what you can do, practice what you can't do. If a hard section is preceded by 20 seconds of gameplay that you already kind of master, cut those 20 seconds out by saving after them and practice only the next seconds."
 
-> Source: ProMeTheus's strongest line of advice is basically this -- stop replaying easy sections to feel good and start spending time on the thing that kills you.
+> "Don't be afraid to repeat a 10 or even 5 seconds detail many times in a row to get it down."
 
 ## Nerves
 
 When the PB pace appears:
-- Breathe
-- Stop thinking about the ending
-- Play the next pattern
 
-> Source: *The Full Extent of the Jam* discusses warm-up, breathing, and shutting down "what if" thinking during live runs.
+> "Breathing deeply when you start getting nervous helps a great deal... Something else linked to nervousness is starting to think about 'what ifs.' What if I screw up at the boss? What if I don't and make a huge score? What are they going to say about it on the forum? Chase those thoughts out of your mind as soon as they come, and concentrate on the game!"
+
+> "To help yourself focus, you can try picturing your next few actions in your mind as you play. This will keep your mind busy thinking about what you are doing and prevent it from straying."
+
+Also: don't play when sick, depressed, or physically exhausted. Cold hands affect precision -- warm up before serious runs.
+
+## Tracking progress
+
+From *The Full Extent of the Jam*:
+
+> "As soon as you start doing your final runs, create a little text file in which you shortly document each run that you play. Number the replay files, and write down in which stage you died first, and what kind of mistake you did."
+
+> "Every fifty runs or so, look back... make statistics. In how many runs did you pass the first loop without dying? In how many runs did you die at this really critical part? Looking at these statistics is good for you to keep track of how feasible your goal really is, and also to keep track of your progress, which is not represented by your best score."
+
+This is a design insight too: the game could build in run-tracking or statistics features (especially for the Picotron port).
 
 ---
 
@@ -458,43 +529,114 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 
 # 11. SOURCES AND REFERENCES
 
-Research sources that informed the design philosophy of this project. These should be consulted when making design decisions, especially for the Picotron port.
+All primary source PDFs are stored in `docs/reference-library/` for direct consultation.
 
-## *The Full Extent of the Jam* — ProMeTheus
+---
 
-Shmup strategy guide covering competitive play philosophy. Key topics:
-- Score play as a fundamentally different (and richer) mode of engagement than survival
-- Route-based play: the game repeats, so the player's job is to learn and stabilize a sequence
-- Replay study as legitimate and recommended practice (compared to chess study)
-- Emergency bombing as a skill: bomb when you have no path, not when you're already dead
-- Targeted practice: drill the thing that kills you, stop replaying easy sections
-- Nerves management: breathe, stop future-thinking, play the next pattern
-- Input consistency matters more than input type
+## *The Full Extent of the Jam* — Dimitri "ProMeTheus" Aupetit (2010)
 
-## Boghog — Danmaku design guide
+**File:** `reference-library/Full Extent of the Jam (English).pdf`
 
-Design reference for bullet hell game construction. Key topics:
-- Readability under density is the core constraint
-- Even overwhelming screens need readable movement, threat classes, and tool usage
-- The fast-shot / slower-focus pairing as a foundational player affordance
-- Dense patterns should be built from readable fundamentals, not arbitrary chaos
-- Player decisions should be informed, not lucky
+A 44-page guide to playing shooting games competitively, written by the occidental DoDonPachi record holder (547M, 2-ALL with spare lives after ~600 hours of play). Uses DoDonPachi as primary example but principles apply universally.
 
-## Marty_DYR — *Shmup_Lyf* and *Cho Ren Sha 68k* zine
+### Key concepts for MurderCrab
 
-Fan publications covering shmup visual design, game design, culture, and history. Key topics:
-- Backgrounds as spatial storytelling, not decoration
-- Enemy silhouette as paramount for instant threat reading
-- Larger forms imply commitment and threat (break this rule knowingly, not accidentally)
-- Stages as experiential and spatial stories, not just content containers
+- **Score play is the real game.** Scoring forces complex, planned play. Survival is just the prerequisite.
+- **Route play.** The game repeats, so the player's job is to find, stabilize, and repeat a scoring sequence.
+- **Replay study is not cheating.** Routes are communal knowledge. "Outside of that final high scoring run, any means, and I mean ANY, are good to practice and learn."
+- **Targeted practice.** Saved states / stage select = 4-5x faster improvement. "Don't practice what you can do, practice what you can't do."
+- **Emergency bombing.** "Always bomb if you don't have a path through the bullets in your mind for the next second."
+- **Nerves.** Breathe, chase out "what if" thoughts, picture your next actions to stay focused.
+- **Input.** Stick, pad, keyboard all valid. Consistency > dogma. ProMeTheus holds the record on keyboard.
+- **Progress tracking.** Document every run. Track statistics per 50-run block.
+- **The music analogy.** A full shmup run is like playing a 45-minute song. You decompose it, practice the hard bars, reassemble.
+- **80/20 rule.** 80% practice mode, 20% full scoring runs.
 
-## Shmups Wiki
+### Technique library from the guide
 
-Community reference for genre terminology and technique. Key topics:
-- Standard glossary (1CC, bullet cancel, herding, streaming, caravan, etc.)
-- Technique documentation (micrododging, streaming, safespots)
-- Bullet cancel as a core scoring component in many designs
-- Shared language that enables community knowledge transfer
+| Technique | Description |
+|-----------|-------------|
+| Lower Speed on Bottom Line | Diagonal input against screen border reduces lateral speed for precision |
+| Changing Location | Identify safer spots you can't reach from the bottom line |
+| Speed Trick | Moving perpendicular to your needed adjustment reduces speed in that axis |
+| Moving With the Flow | Move in the same direction as bullets to buy time finding gaps |
+| Bullet Herding | Bait aimed shots slowly, then make a fast arc near the source to spread density |
+| Emergency Bombing | Bomb when you have no visible path for the next second |
+
+### The Shmup Story
+
+ProMeTheus also includes a personal narrative (Section IV) tracking his progression from beginner to record holder, including tournament wins (Guwange tournament at Arcade Extreme, 49.8M from 100 hours of practice against established players), community meets (London, Milan, Paris, Toulouse), and a TV appearance on NoLifeTV's "Superplay" show. This demonstrates the community dimension of competitive shmup play -- congratulations, shared replays, travel to meets, and mutual improvement.
+
+---
+
+## *Shmup_Lyf* Zine Series — Marty_DYR
+
+A series of fan publications covering shmup visual design, game design, culture, collecting, doujin history, and creative philosophy. Richly illustrated. All issues stored in `reference-library/`.
+
+### Issues in the library
+
+| File | Focus |
+|------|-------|
+| `Shmup_Lyf Zine #01 - MagCloud (1).pdf` | First issue, general coverage |
+| `Shmup_Lyf Zine #02 - Metaphor (1).pdf` | Phenomenological / metaphorical analysis of shmup experiences |
+| `Shmup_Lyf Zine SP - Doujins - MGCL (1).pdf` | Doujin shmup special |
+| `Shmup_Lyf Zine - Backgrounds.pdf` | Background art as spatial storytelling |
+| `Shmup_Lyf Zine - ChoRenSha68k (3).pdf` | Deep dive on Cho Ren Sha 68k |
+| `Shmup_Lyf Zine - DoDonpachi (1).pdf` | DoDonPachi coverage |
+| `Shmup_Lyf Zine - Dezaemon Dimensions (1).pdf` | Dezaemon shmup creation tool |
+| `Shmup_Lyf Zine - Doujin Depths.pdf` | Doujin deep dives |
+| `Shmup_Lyf Zine - Doujin Discordancy (2).pdf` | More doujin coverage |
+
+### Key concepts from the Backgrounds issue
+
+- **Backgrounds are places you go**, not just art you see. They tell the spatial narrative.
+- **Each environment archetype carries psychological weight.** The Black = void/fear. The Sky = freedom. The Port = military industrial. The Metropolis = dehumanized geometry. The Enemy Factory = you're alone in the realm of the other. The Nexus = the seat of power.
+- **Perceptual skullduggery.** The one-plane paradox (forward fire that hits both aircraft and ground tanks). Isometric lean from Japanese animation. Camera tilt from ground-tracking to space.
+- **"Scramble Kit Bashing."** Reusing a common asset set (from STG Builder) creatively, like physical model kit-bashing. Demonstrates that what you do with assets matters more than their origin.
+- **PICO-8 as emerging shmup platform.** The zine covers several PICO-8 shmups (Kalikan, Steel Surge: Revolution, "not sid meier's Danmaku") and notes "the galaxy of Pico8 is increasingly becoming a place of shmup emergence."
+- **Background work is the "unsung hero of the genre"** -- a great place to tell the story without traditional narrative tools.
+- **BIRDCAGE interview.** Insight from dev Giannis: "I'm constantly surprised at how fun it is to simply avoid projectiles. There's something about the direct connection between your ship and your reflexes that makes you feel incredible when you weave through bullet patterns."
+- Sound design insight from Barry: "Even getting a placeholder sound in place to attach to a mechanic can add so much tactility to a player action."
+
+### Key concepts from the Cho Ren Sha 68k issue
+
+- **Enemy design: bigger means stronger.** Break the rule knowingly for surprise tension/release.
+- **Stage rhythm formula.** "introduction -> break -> test -> introduction 2 -> test 1 & 2 -> break -> test 1 & 2 climax." Stages need all three: introductions, tests, and breaks.
+- **Telling a story with enemies.** Even with a repeating background, CRS68k creates compelling stages through "varied and structured enemy encounters" using distinct enemy types that push the player around the screen in specific ways.
+- **The art of detonation.** Explosions as fractal layered sprite animations. Palette swaps, flip/mirror variants, procedural clustering, lingering smoke clouds. "Pretty kaboom make good."
+- **Invincibility frames as design tool.** Brief invulnerability on item pickup creates tactical opportunities beyond mere collection.
+- **Rapid fire as tactile design.** CRS68k creator Yoshida-san considered the feeling of rapid-fire input to be "one of the chief pleasures of STG games."
+- **Toaplan as foundation.** CRS68k's default scoreboard names are all Toaplan games. Left-right alternating enemy patterns, twin bosses, ominous eye motifs, and the powering-up system all trace back to Toaplan design language. But CRS68k stepped beyond Toaplan by incorporating Batsugun-era bullet hell elements: no death restart, less memorization dependence, more improvisational dodging.
+- **Iterative development.** CRS68k appeared in incremental versions at successive Comiket events (C47 through C54, 1994-1998), shaped by community feedback through BBS forums. The game was developed "in conversation with" contemporary arcade releases like DonPachi, DoDonPachi, and Battle Garegga.
+
+---
+
+## *Cave Shooting Artworks*
+
+**File:** `reference-library/Cave Shooting Artworks.cbz`
+
+Visual reference for Cave's art direction across their shmup catalog. Useful for boss design, enemy design language, and the visual standards of the genre's most influential studio.
+
+---
+
+## *MurderCrab First Pass Manual* — Original research document
+
+**File:** `reference-library/MurderCrab_First_Pass_Manual.md`
+
+The original research document that prompted the creation of this design reference and the separate game manual. Contains a mix of accurate game documentation and aspirational design goals. Preserved as a historical artifact of the project's early design thinking.
+
+---
+
+## Additional referenced works
+
+| Source | Description |
+|--------|-------------|
+| Boghog | Danmaku design guide -- readability under density, foundational player affordances |
+| *Shmup Ascension* — Dace Anaxyrus | Mindset guide for competitive shmup play. Referenced in the Backgrounds zine |
+| Shmups Forum / Shmups Wiki | Community glossary, technique documentation, shared language |
+| DoDonPachi @ Bee Preying (Bernard Doria) | DDP rules and scoring system reference |
+| Lazy Devs PICO-8 Shmup Tutorial | PICO-8 shmup development tutorials. Credited by Marty_DYR as catalyzing the PICO-8 shmup scene |
+| shmuplations.com | Translated developer interviews and notes, including CRS68k dev notes by Yoshida-san |
 
 ---
 

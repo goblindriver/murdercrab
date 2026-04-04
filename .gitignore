@@ -4,3 +4,6 @@
 *.bak*
 *~
 *.p8.png
+
+# Reference library (PDFs/CBZ too large for git, kept local)
+docs/reference-library/
