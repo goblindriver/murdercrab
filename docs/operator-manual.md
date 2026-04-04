@@ -1,10 +1,11 @@
-# MURDERCRAB! DESIGN REFERENCE
+# MURDERCRAB!
+## Operator manual
 
-## Source of Truth for What We're Building
+**Single source of truth for operators** — design vision, genre research, arcade-flow targets, PICO-8 cart budget, tuning notes, glossary, and future features.
 
-This document preserves shmup genre research, design philosophy, and aspirational goals for the *MurderCrab* project. It draws from the first-pass manual research and serves as the guiding vision for the PICO-8 game and any future ports.
+For the **player-facing manual** (controls, HUD, enemies, stages, score, credits, high scores, figures): **[player-manual.md](player-manual.md)**.
 
-**This is not the game manual.** For how the game actually works today, see [manual.md](manual.md). This document is about *why* the game is built the way it is and *where it should go*.
+This document is *why* the game is built the way it is, *where it should go*, and *implementation limits* that affect tuning. It draws from the first-pass manual research and guides the PICO-8 cart and any future ports.
 
 ---
 
@@ -12,7 +13,7 @@ This document preserves shmup genre research, design philosophy, and aspirationa
 
 1. Project Identity
 2. Arcade Flow Model
-3. PICO-8 Cart Budget
+3. PICO-8 Cart Budget (platform limits, usage, cartdata, sprites, music, hitboxes, bullet pools)
 4. Design Philosophy
 5. Shmup Design Principles
 6. Combat Design Reference
@@ -238,6 +239,26 @@ The lower 6 rows (sprites 0-95) contain all game art. The upper 10 rows (sprites
 | 10-13 | Boss |
 | 14-17 | Additional (warp, victory, etc.) |
 | 18-63 | **Free** |
+
+## Hitboxes (implementation)
+
+Frame loop: `_update()` at **30fps** (not `_update60`).
+
+| Entity | Collision box | Notes |
+|--------|----------------|-------|
+| Player vs **enemy bullets** | 2×2 px | Centered in the 8×8 ship sprite (`player.x+3`, `player.y+3`) |
+| Player vs **normal enemies** (not diving) | 2×2 px | Same hitbox vs enemy AABB |
+| Player vs **kamikaze** (dive, `state == 2`) | 8×8 px | Full player sprite vs enemy AABB |
+| Player bullets | 8×8 px | Per bullet table |
+| Enemy bullets | 8×8 px | Spawned centered on origin |
+| Normal enemies | 8×8 px | |
+| Mini-boss / final boss | 16×16 px | 2×2 tile sprite |
+| True last boss | 32×32 px | 4×4 tile sprite |
+| Powerups | 8×8 px | |
+
+## Bullet object pools
+
+Player bullets and enemy bullets are **pooled** (`get_bullet` / `release_bullet`, `get_enemy_bullet` / `release_enemy_bullet`) so freed bullets are reused instead of churning new tables every shot.
 
 ---
 
