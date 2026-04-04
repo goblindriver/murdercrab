@@ -85,7 +85,7 @@ You get **3 credits** per visit to the title screen: **1** to start, up to **2**
 
 **Movement** is digital at 2 pixels per frame in all four directions. No inertia, no acceleration. Diagonals move at full speed on both axes.
 
-**Shoot** fires twin bullets from either side of the ship. Each press fires one volley. There is no auto-fire -- you tap for each shot. Bullets travel upward at 6 pixels per frame.
+**Shoot** fires twin bullets from either side of the ship. The cart uses PICO-8's **`btnp`** on Z: you get a volley on the first press, and the engine **repeats** the button while you hold it (same as most PICO-8 games). You can tap for single bursts or **hold for rapid fire**. Bullets travel upward at 6 pixels per frame.
 
 **Bomb** is your panic button and your tactical tool. Details in section 6.
 
@@ -136,7 +136,7 @@ The ship tilts left or right while strafing and displays a small exhaust thrust 
 
 ## 6.2 Shot
 
-Each press of Z fires two bullets simultaneously, offset to the left and right of the ship's center. Bullets are 8x8 sprites with a 5-frame looping animation. They travel straight up at 6 pixels per frame and despawn when they leave the top of the screen.
+Each time the fire input triggers (press or repeat while held), Z spawns two bullets simultaneously, offset to the left and right of the ship's center. Bullets are 8x8 sprites with a 5-frame looping animation. They travel straight up at 6 pixels per frame and despawn when they leave the top of the screen.
 
 There is no weapon power system. Your gun is the same from the first second to the last.
 

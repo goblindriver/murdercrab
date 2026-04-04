@@ -363,7 +363,7 @@ If focus is added:
 
 ## Shot
 
-**[CURRENT]** Twin forward bullets, tap-to-fire. No power levels, no spread change, no pierce.
+**[CURRENT]** Twin forward bullets on **Z**, using **`btnp`**: PICO-8 repeats the fire button while held (built-in repeat timing), so holding Z is already rapid fire without a separate autofire flag. No power levels, no spread change, no pierce.
 
 **[FUTURE]** Consider a power-up progression system:
 - Power levels that change spread, projectile count, or damage
@@ -667,7 +667,7 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 
 - [ ] **Focus mode** — Slow movement + visible hitbox + concentrated fire. The single biggest missing affordance from the bullet hell playbook.
 - [ ] **Power levels** — Weapon progression through pickups. Wider spread, more projectiles, or more damage per level. Partial loss on death for stakes.
-- [ ] **Auto-fire option** — Toggle or hold-to-fire. Reduces RSI, lets player focus on movement.
+- [ ] **Turbo / cadence option** — PICO-8 already repeats Z while held via `btnp`; optional faster fixed cadence or toggle for players who want a different rhythm than the default repeat rate.
 - [ ] **Point-blank bonus** — Extra damage or score for attacking at close range. Rewards aggression.
 - [ ] **Bullet cancel conversion** — Boss/bomb kills convert bullets to score items. Creates bomb-routing and risk/reward depth.
 

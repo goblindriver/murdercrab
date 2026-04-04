@@ -575,7 +575,7 @@ function draw_instructions()
   
   shadow_text("instructions", 10, 8)
   shadow_text("movement: arrow keys", 24, 8)
-  shadow_text("shoot: z button", 34, 8)
+  shadow_text("shoot: z (hold=rapid)", 34, 8)
   shadow_text("bomb: x button", 44, 8)
   shadow_text("collect powerups", 58, 8)
   
