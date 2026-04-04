@@ -603,6 +603,7 @@ function start_game()
 end
 
 function init_game()
+  game_loop = 1
   phase = "normal"
   phase_state = "pre_mini_boss"
   current_level = 1
@@ -719,6 +720,7 @@ function player_hit()
   sfx(7, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
+  score_streak = 0
   
   if player.health <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
@@ -1002,6 +1004,10 @@ function update_boss_phase(enemy)
 end
 
 function update_boss_enemy(enemy)
+  if enemy.y < 5 then
+    enemy.y = min(5, enemy.y + 2)
+    return
+  end
   enemy.y = mid(5, enemy.y, 25)
   enemy.x += enemy.dx
   
@@ -1323,8 +1329,8 @@ function activate_bomb()
         enemy.health -= BMB_DMG
         if enemy.health <= 0 then
           create_explosion_chain(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, 8, enemy.width)
-          handle_boss_defeat(enemy)
           del(enemies, enemy)
+          handle_boss_defeat(enemy)
         end
       else
         add_score(S_NRM)
@@ -1434,8 +1440,8 @@ function check_bullet_enemy_collisions()
               create_explosion(enemy.x + rnd(enemy.width), enemy.y + rnd(enemy.height), 1)
             end
             shake_amount = 10
-            handle_boss_defeat(enemy)
             del(enemies, enemy)
+            handle_boss_defeat(enemy)
           end
           
           del(bullets, bullet)
@@ -1577,10 +1583,12 @@ function update_game()
       sfx(5, 2)
     end
   elseif phase == "mini_boss" then
-    if #enemies == 0 then
+    if boss_exists("mini_boss") == 0 then
+      convert_enemy_bullets_to_explosions()
       phase = "normal"
       phase_state = "post_mini_boss"
       enemy_kill_count = 0
+      update_music("game")
     end
   elseif phase == "final_boss" then
     if boss_exists("final_boss") == 0 then
@@ -1904,7 +1912,13 @@ function _update()
       enemy_kill_count = 0
       enemies = {}
       enemy_bullets = {}
+      bullets = {}
+      explosions = {}
       powerups = {}
+      bomb_active = false
+      bomb_timer = 0
+      bomb_effect_timer = 0
+      shake_amount = 0
       warp_time = warp_duration
       game_state = "game"
       sfx(19, 3)
