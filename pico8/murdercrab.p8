@@ -1418,7 +1418,7 @@ function check_bullet_enemy_collisions()
           shake_amount = 3
           del(enemies, enemy)
           del(bullets, bullet)
-          release_bullet(bullet, bullet_pool)
+          release_bullet(bullet)
           if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
           break
         else
@@ -1439,7 +1439,7 @@ function check_bullet_enemy_collisions()
           end
           
           del(bullets, bullet)
-          release_bullet(bullet, bullet_pool)
+          release_bullet(bullet)
           break
         end
       end
@@ -1788,7 +1788,7 @@ function draw_game()
   -- draw HUD
   local hiscore = high_scores[1].score
   local hi_text = score_fmt(hiscore)
-  local sc_text = ""..score
+  local sc_text = score_fmt(score)
   
   -- high score (flash if beating it!)
   local hi_col = score_gt(score, hiscore) and (time() * 8 % 2 < 1 and 10 or 9) or 7
@@ -1843,9 +1843,9 @@ function draw_game_complete()
       center_text("loop " .. game_loop .. " clear!", 38, 11)
     end
     center_text("pilot: " .. get_initials(), 48, 9)
-    center_text("score: " .. score, 58, 7)
+    center_text("score: " .. score_fmt(score), 58, 7)
     center_text("bonus: " .. calc_bonus(), 68, 8)
-    center_text("final: " .. (score + calc_bonus()), 78, 7)
+    center_text("final: " .. score_fmt(score + calc_bonus()), 78, 7)
     
     if game_complete_grace > 0 then
       center_text("calculating...", 90, 7)
