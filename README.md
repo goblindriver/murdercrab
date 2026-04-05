@@ -29,6 +29,8 @@ A vertical-scrolling shoot-em-up built for PICO-8, with a Picotron port in progr
 | [docs/operator-manual.md](docs/operator-manual.md) | **Operator manual** — design vision, research, arcade-flow targets, PICO-8 cart budget, future features |
 | [docs/MurderCrab_Designed_Manual.pdf](docs/MurderCrab_Designed_Manual.pdf) | PDF booklet export (optional snapshot) |
 | [docs/manual.md](docs/manual.md), [docs/manual-designed.md](docs/manual-designed.md), [docs/design-reference.md](docs/design-reference.md) | Short redirects to the manuals above |
+| [docs/MurderCrab_Balance_Brief.md](docs/MurderCrab_Balance_Brief.md) | **Balance brief** — Loop 2 / TLB tuning targets for `murdercrab.p8` |
+| [docs/MurderCrab_Media_Brief.md](docs/MurderCrab_Media_Brief.md) | **Media brief** — asset layer role, provenance, runtime capture roadmap |
 
 ## Project Structure
 
@@ -45,6 +47,8 @@ docs/
   manual-designed.md         # → player-manual (legacy link)
   design-reference.md        # → operator-manual (legacy link)
   MurderCrab_Designed_Manual.pdf
+  MurderCrab_Balance_Brief.md   # tuning targets (Loop 2 / TLB)
+  MurderCrab_Media_Brief.md    # media pack + capture pipeline
 media/
   MurderCrab_Media_Extraction_Pack/   # v2: svg, png_16x/64x, gifs, raw sheet, backgrounds, hud, diagrams + docs/
 picotron/                    # Picotron port (planned)

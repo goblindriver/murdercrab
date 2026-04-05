@@ -23,7 +23,7 @@ This document is *why* the game is built the way it is, *where it should go*, an
 10. Practice Doctrine
 11. Glossary
 12. Future Features
-13. Sources and References
+13. Sources and References (PDF library + working briefs)
 
 ---
 
@@ -742,6 +742,13 @@ Everything the first-pass manual assumed that doesn't exist yet but could. This 
 # 13. SOURCES AND REFERENCES
 
 All primary source PDFs are stored in `docs/reference-library/` for direct consultation.
+
+## Working briefs
+
+| Brief | Use |
+|-------|-----|
+| [MurderCrab_Balance_Brief.md](MurderCrab_Balance_Brief.md) | Loop 2 and TLB difficulty tuning — targets, levers, and implementation order for `murdercrab.p8` |
+| [MurderCrab_Media_Brief.md](MurderCrab_Media_Brief.md) | Media extraction pack as canonical repo assets; provenance rules; runtime capture as next step |
 
 ---
 
