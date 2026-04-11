@@ -408,7 +408,7 @@ function update_enter_initials()
   end
   if btnp(0) then current_index = ((current_index - 2) % 3) + 1 end
   if btnp(1) then current_index = (current_index % 3) + 1 end
-  if btnp(4) then
+  if btnp(4) or btnp(5) then
     local str = current_initials[1] .. current_initials[2] .. current_initials[3]
     last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
     ensure_cartdata()
@@ -420,7 +420,6 @@ function update_enter_initials()
     game_state = "title"
     title_timer = 0
   end
-  if btnp(5) then current_initials = nil game_state = "title" title_timer = 0 end
 end
 
 function draw_enter_initials()
@@ -435,7 +434,7 @@ function draw_enter_initials()
     if (time() * 10) % 2 < 1 then line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8) end
   end
   shadow_text("up/down: letter  left/right: position", 80, 8)
-  shadow_text("z: confirm  x: cancel", 90, 8)
+  shadow_text("z/x: confirm", 90, 8)
 end
 
 ----------------------------------------
@@ -1264,14 +1263,19 @@ function check_bullet_enemy_collisions()
     for enemy in all(enemies) do
       if collides(enemy, bullet) then
         if not enemy.type or enemy.type == "normal" then
-          add_score(S_NRM)
-          enemy_kill_count += 1
-          create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
-          shake_amount = 3
-          del(enemies, enemy)
+          enemy.health -= 1
           del(bullets, bullet)
           release_bullet(bullet)
-          if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
+          if enemy.health <= 0 then
+            add_score(S_NRM)
+            enemy_kill_count += 1
+            create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
+            shake_amount = 3
+            del(enemies, enemy)
+            if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
+          else
+            create_hit_feedback(bullet.x, bullet.y)
+          end
           break
         else
           enemy.health -= 1
@@ -1467,6 +1471,7 @@ function update_game()
     else
       game_state = "game_complete"
       game_complete_grace = 45
+      warp_time = 0
     end
   end
   
@@ -1663,6 +1668,7 @@ end
 -- game complete screen
 ----------------------------------------
 function draw_game_complete()
+  pal()
   if #explosions > 0 then
     explosions = {}
     enemy_bullets = {}
