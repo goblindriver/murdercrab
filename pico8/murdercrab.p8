@@ -43,6 +43,7 @@ last_entered_initials = {"A", "C", "E"}
 current_initials = nil
 current_index = 1
 high_scores = {}
+rank = 0
 
 -- player constants
 P_SPD, P_HP, P_BMBS = 2, 100, 3
@@ -475,6 +476,7 @@ function init_game()
   bomb_effect_timer = 0
   spawn_timer = 0
   shoot_cd = 0
+  rank = 0
   update_spawn_delay()
   
   player = {
@@ -530,9 +532,14 @@ end
 ----------------------------------------
 function draw_player()
   if player.invincible_timer > 0 and time() % 0.2 < 0.1 then return end
-  
+
+  -- rank aura
+  if rank >= 3 then
+    circfill(player.x + 4, player.y + 4, 5 + sin(time() * 4) * rank * 0.3, rank >= 7 and 8 or 12)
+  end
+
   spr(player.sprite, player.x, player.y)
-  
+
   if player.thrust_frame > 0 then
     local x, y = player.x + 4, player.y + 8
     local h = btn(0) and 1 or (btn(1) and -1 or 0)
@@ -540,6 +547,10 @@ function draw_player()
     pset(x + h, y + 1 + f, 8 + f)
     pset(x + h + (f - 1), y + 2, 9)
     if rnd(1) < 0.7 then pset(x + h, y + 2 + f, 8) end
+    -- engine trail sparks
+    if rnd(1) < 0.5 then
+      add(explosions, {x = x + h + rnd(2) - 1, y = y + 2 + rnd(3), radius = 0.5, max_radius = 2, life = 3, color = 9 + flr(rnd(2))})
+    end
   end
 end
 
@@ -567,7 +578,8 @@ function player_hit()
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
-  
+  rank = max(0, rank - 1)
+
   if player.health <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
     game_over = true
@@ -605,9 +617,10 @@ function update_enemy_bullets()
 end
 
 function spawn_enemy_bullet(cx, cy, dx, dy)
+  local r = 1 + rank * 0.04
   local b = get_enemy_bullet()
   b.x, b.y = cx - 4, cy - 4
-  b.dx, b.dy = dx, dy
+  b.dx, b.dy = dx * r, dy * r
   b.width, b.height = 8, 8
   add(enemy_bullets, b)
 end
@@ -1039,6 +1052,8 @@ function check_powerup_collection()
         if score_streak >= S_STRK then
           score_multiplier += 1
           score_streak = 0
+          rank = min(10, rank + 0.3)
+          shake_amount = 2
         end
       end
       sfx(3, 2)
@@ -1152,6 +1167,7 @@ function activate_bomb()
     bomb_active = true
     bomb_timer = BMB_DUR
     player.bombs -= 1
+    rank = max(0, rank - 0.5)
     
     for i = 1, 3 do
       add(explosions, {
@@ -1270,6 +1286,7 @@ function check_bullet_enemy_collisions()
           if enemy.health <= 0 then
             add_score(S_NRM)
             enemy_kill_count += 1
+            rank = min(10, rank + 0.15)
             create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
             shake_amount = 3
             del(enemies, enemy)
@@ -1415,7 +1432,7 @@ function update_game()
   -- spawn logic
   if phase == "normal" then
     spawn_timer += 1
-    if spawn_timer >= spawn_delay then
+    if spawn_timer >= max(20, spawn_delay * (1 - rank * 0.03)) then
       spawn_timer = 0
       spawn_enemy()
     end
@@ -1505,6 +1522,7 @@ function update_game()
     if game_over_grace <= 0 and credits > 0 and btnp(4) then
       credits -= 1
       credits_used += 1
+      rank = 0
       game_over = false
       game_over_timer = 300
       game_over_grace = 30
