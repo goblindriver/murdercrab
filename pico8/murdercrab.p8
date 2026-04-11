@@ -26,19 +26,19 @@ current_music = -1
 title_timer = 0
 shoot_cd = 0
 warp_time = 0
-warp_duration = 180
+warp_duration = 360
 shake_amount = 0
 game_over = false
-game_over_timer = 300
-game_over_grace = 30
-game_complete_grace = 45
+game_over_timer = 600
+game_over_grace = 60
+game_complete_grace = 90
 boss_defeat_grace = 0
 boss_warning = 0
 bomb_active = false
 bomb_timer = 0
 bomb_effect_timer = 0
 spawn_timer = 0
-spawn_delay = 60
+spawn_delay = 120
 last_entered_initials = {"A", "C", "E"}
 current_initials = nil
 current_index = 1
@@ -47,15 +47,15 @@ rank = 0
 hitstop = 0
 
 -- player constants
-P_SPD, P_HP, P_BMBS = 2, 100, 3
-B_SPD = 6
-BMB_DUR, BMB_DMG = 30, 30
+P_SPD, P_HP, P_BMBS = 1, 100, 3
+B_SPD = 3
+BMB_DUR, BMB_DMG = 60, 30
 
 -- enemy constants
-E_SPD, E_SPD_SCL, E_SPD_MAX = 2, 0.4, 3.5
-E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 60, 4, 40
-E_B_SPD, E_B_SPREAD = 4.5, 10
-E_BURST_SPD, E_BURST_DLY = 5, 3
+E_SPD, E_SPD_SCL, E_SPD_MAX = 1, 0.2, 1.75
+E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 120, 8, 80
+E_B_SPD, E_B_SPREAD = 2.25, 10
+E_BURST_SPD, E_BURST_DLY = 2.5, 6
 
 
 
@@ -275,7 +275,7 @@ function init_starfield()
   for i = 1, count do
     add(starfield, {
       x = rnd(128), y = rnd(128),
-      speed = 0.5 + rnd(1),
+      speed = 0.25 + rnd(0.5),
       col = colors[flr(rnd(#colors)) + 1],
       size = rnd(1) < large_chance and 2 or 1
     })
@@ -357,7 +357,7 @@ end
 function draw_title()
   cls()
   draw_starfield()
-  local ph = flr(title_timer / 180) % 3
+  local ph = flr(title_timer / 360) % 3
   if ph == 0 then
     local logo_color = draw_logo(15)
     local bob = sin(time() * 0.4) * 4
@@ -465,9 +465,9 @@ function init_game()
   score_multiplier = 1
   final_score = nil
   game_over = false
-  game_over_timer = 300
-  game_over_grace = 30
-  game_complete_grace = 45
+  game_over_timer = 600
+  game_over_grace = 60
+  game_complete_grace = 90
   boss_defeat_grace = 0
   boss_warning = 0
   shake_amount = 0
@@ -505,7 +505,7 @@ end
 
 function update_spawn_delay()
   local loop_reduction = (game_loop - 1) * 5
-  spawn_delay = max(30 - loop_reduction, 55 - (current_level - 1) * 6 - loop_reduction)
+  spawn_delay = max(60 - loop_reduction * 2, 110 - (current_level - 1) * 12 - loop_reduction * 2)
 end
 
 ----------------------------------------
@@ -565,7 +565,7 @@ function player_hit()
   if player.invincible_timer > 0 or game_over then return end
   
   player.health -= 1
-  player.invincible_timer = 30
+  player.invincible_timer = 60
   sfx(7, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
@@ -629,9 +629,9 @@ function spawn_normal_enemy()
   local interval = max(E_SHT_MIN - loop_bonus * 2, E_SHT_BASE - (current_level - 1) * E_SHT_SCL - loop_bonus * 3)
   local e = {
     x = flr(rnd(120)), y = -8,
-    speed = min(E_SPD_MAX + game_loop * 0.5, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.3),
+    speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15),
     sprite = 3, width = 8, height = 8,
-    shoot_timer = interval - 20 - flr(rnd(15)),
+    shoot_timer = interval - 40 - flr(rnd(30)),
     shoot_interval = interval,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
@@ -639,8 +639,8 @@ function spawn_normal_enemy()
     dx = 0, dy = 0, state = 0,
     hover_y = 20 + rnd(15),
     dir = rnd(1) < 0.5 and -1 or 1,
-    timer = 45, paused = false,
-    anim_frame = 0, anim_timer = 0, anim_speed = 5
+    timer = 90, paused = false,
+    anim_frame = 0, anim_timer = 0, anim_speed = 10
   }
   e.dy = e.speed
   add(enemies, e)
@@ -704,8 +704,8 @@ function update_normal_enemy(enemy)
   
   if enemy.state == 0 then
     enemy.y += enemy.dy
-    enemy.x += enemy.dir * 0.5
-    
+    enemy.x += enemy.dir * 0.25
+
     if enemy.x < 0 then enemy.x = 0 enemy.dir = 1
     elseif enemy.x > 119 then enemy.x = 119 enemy.dir = -1 end
     
@@ -717,7 +717,7 @@ function update_normal_enemy(enemy)
     normal_enemy_fire(enemy)
     
   elseif enemy.state == 1 then
-    enemy.x += enemy.dir * 0.7
+    enemy.x += enemy.dir * 0.35
     if enemy.x < 0 or enemy.x > 119 then
       enemy.dir = -enemy.dir
       enemy.x = mid(0, enemy.x, 119)
@@ -735,7 +735,7 @@ function update_normal_enemy(enemy)
       enemy.dx = dx * spd
       enemy.dy = dy * spd
       enemy.sprite = 35
-      enemy.anim_speed = 3
+      enemy.anim_speed = 6
     end
     
     normal_enemy_fire(enemy)
@@ -795,11 +795,11 @@ function spawn_boss(btype)
   for i = 1, count do
     add(enemies, {
       x = 64 - 16 + spacing * (i - (count + 1) / 2), y = -32,
-      dx = is_final and 0.3 or 0.5, dy = 1, speed = 2,
+      dx = is_final and 0.15 or 0.25, dy = 0.5, speed = 1,
       width = 16, height = 16,
       health = get_boss_max_health(btype),
       type = btype,
-      shoot_timer = 0, shoot_interval = is_final and 8 or 20,
+      shoot_timer = 0, shoot_interval = is_final and 16 or 40,
       pattern = 1, rotate_counter = 0,
       cluster_count = BASE_CLUSTERS + current_level,
       sprite = 8, is_big_sprite = true,
@@ -811,15 +811,15 @@ end
 function spawn_true_last_boss()
   add(enemies, {
     x = 48, y = -32,
-    speed = 3, sprite = 10,
+    speed = 1.5, sprite = 10,
     width = 32, height = 32,
-    shoot_timer = 0, shoot_interval = 6,
+    shoot_timer = 0, shoot_interval = 12,
     health = get_boss_max_health("true_last_boss"),
     type = "true_last_boss",
     cluster_count = BASE_CLUSTERS + 4 + current_level,
     rotate_counter = 0,
     is_big_sprite = true, is_tlb = true,
-    phase = 1, dx = 0.3, dy = 0, paused = false
+    phase = 1, dx = 0.15, dy = 0, paused = false
   })
 end
 
@@ -852,7 +852,7 @@ end
 
 function update_boss_enemy(enemy)
   if enemy.y < 5 then
-    enemy.y = min(5, enemy.y + 2)
+    enemy.y = min(5, enemy.y + 1)
     return
   end
   enemy.y = mid(5, enemy.y, 25)
@@ -880,7 +880,7 @@ end
 
 function enemy_shoot_radial(e)
   local h = e.health / get_boss_max_health(e.type)
-  local s = 1.5 + (current_level - 1) * 0.15 + (1 - h) * 0.3
+  local s = 0.75 + (current_level - 1) * 0.075 + (1 - h) * 0.15
   
   if e.burst_index and e.burst_index > 0 then
     create_aimed_pattern(e, 0, s)
@@ -939,7 +939,7 @@ function create_aimed_pattern(e, count, speed)
     e.burst_index = 1
     e.burst_timer = 0
     e.burst_max = 3
-    e.burst_delay = 8
+    e.burst_delay = 16
   end
   
   if e.burst_timer <= 0 then
@@ -967,9 +967,9 @@ function spawn_powerup(x, y, ptype, value)
     x = x, y = y, type = ptype,
     value = value or 0.5,
     width = 8, height = 8,
-    speed = 4, dx = 0, dy = 0
+    speed = 2, dx = 0, dy = 0
   }
-  if ptype == "score" then p.timer = 45 end
+  if ptype == "score" then p.timer = 90 end
   add(powerups, p)
   return p
 end
@@ -981,15 +981,15 @@ function spawn_powerup_explosion(x, y)
   for i = 1, total do
     local angle = angle_inc * i
     local p = spawn_powerup(x, y, "score", 100)
-    p.dx = cos(angle) * 3
-    p.dy = sin(angle) * 3
+    p.dx = cos(angle) * 1.5
+    p.dy = sin(angle) * 1.5
   end
   
   if rnd(1) < 0.05 then
     local ptype = rnd(1) < 0.5 and "bomb" or "health"
     local p = spawn_powerup(x, y, ptype)
-    p.dx = cos(rnd(1)) * 2
-    p.dy = sin(rnd(1)) * 2
+    p.dx = cos(rnd(1)) * 1
+    p.dy = sin(rnd(1)) * 1
   end
 end
 
@@ -1007,8 +1007,8 @@ function update_powerups()
     if p.dx != 0 or p.dy != 0 then
       p.x += p.dx
       p.y += p.dy
-      p.dx *= 0.9
-      p.dy *= 0.9
+      p.dx *= 0.95
+      p.dy *= 0.95
       if abs(p.dx) < 0.1 and abs(p.dy) < 0.1 then p.dx = 0 p.dy = 0 end
     end
     
@@ -1017,7 +1017,7 @@ function update_powerups()
     local dist = sqrt(dx * dx + dy * dy)
     
     if p.attracted or dist < 48 then
-      local spd = p.attract_speed or 0.3
+      local spd = p.attract_speed or 0.15
       p.x += dx * spd
       p.y += dy * spd
       p.dx = 0
@@ -1124,7 +1124,7 @@ end
 
 function update_explosions()
   for e in all(explosions) do
-    e.radius += 0.8
+    e.radius += 0.4
     e.life -= 1
     if e.life <= 0 or e.radius >= e.max_radius then del(explosions, e) end
   end
@@ -1192,7 +1192,7 @@ function activate_bomb()
       end
     end
     
-    bomb_effect_timer = 30
+    bomb_effect_timer = 60
     shake_amount = 20
     sfx(26, 3)
   end
@@ -1200,17 +1200,17 @@ end
 
 function update_bomb_effect()
   if bomb_effect_timer > 0 then
-    if bomb_effect_timer == 15 then sfx(5, 2) end
-    if bomb_effect_timer % 10 == 0 then shake_amount = 5 end
+    if bomb_effect_timer == 30 then sfx(5, 2) end
+    if bomb_effect_timer % 20 == 0 then shake_amount = 5 end
     bomb_effect_timer -= 1
   end
 end
 
 function draw_bomb_effect()
   if bomb_effect_timer > 0 then
-    if bomb_effect_timer > 20 then rectfill(0, 0, 127, 127, 7) end
-    circ(64, 64, 64 - bomb_effect_timer * 2, 7)
-    circfill(64, 64, 5 + bomb_effect_timer % 5, 7)
+    if bomb_effect_timer > 40 then rectfill(0, 0, 127, 127, 7) end
+    circ(64, 64, 64 - bomb_effect_timer, 7)
+    circfill(64, 64, 5 + bomb_effect_timer % 10, 7)
   end
 end
 
@@ -1235,7 +1235,7 @@ function handle_boss_defeat(enemy)
     add_score(100)
     if boss_exists("final_boss") == 0 then
       phase = "level_complete"
-      boss_defeat_grace = 90
+      boss_defeat_grace = 180
       create_final_boss_defeat_explosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2)
     end
   elseif enemy.type == "true_last_boss" then
@@ -1245,7 +1245,7 @@ function handle_boss_defeat(enemy)
     enemy.health = 0
     enemy.paused = true
     phase = "victory_lap"
-    game_complete_grace = 120
+    game_complete_grace = 240
     final_score = sc(calc_bonus())
   end
 end
@@ -1287,7 +1287,7 @@ function check_bullet_enemy_collisions()
             if rank >= 2 and rnd(10) < rank then spawn_powerup(enemy.x, enemy.y, "score", 50) end
           else
             create_hit_feedback(bullet.x, bullet.y)
-            enemy.y -= 3
+            enemy.y -= 1.5
           end
           break
         else
@@ -1299,8 +1299,8 @@ function check_bullet_enemy_collisions()
                               mid(enemy.y, bullet.y + 4, enemy.y + enemy.height))
           if rnd(1) < 0.4 then
             local p = spawn_powerup(bullet.x, bullet.y, "score", 50)
-            p.dx = rnd(4) - 2
-            p.dy = rnd(4) - 2
+            p.dx = rnd(2) - 1
+            p.dy = rnd(2) - 1
           end
           
           if enemy.health <= 0 then
@@ -1429,7 +1429,7 @@ function update_game()
   -- spawn logic
   if phase == "normal" then
     spawn_timer += 1
-    if spawn_timer >= max(20, spawn_delay * (1 - rank * 0.03)) then
+    if spawn_timer >= max(40, spawn_delay * (1 - rank * 0.03)) then
       spawn_timer = 0
       spawn_enemy()
     end
@@ -1446,10 +1446,10 @@ function update_game()
         end
       end
     elseif phase_state == "pre_mini_boss" and enemy_kill_count >= mini_threshold() and boss_exists("mini_boss") == 0 then
-      boss_warning = 90
+      boss_warning = 180
       sfx(5, 2)
     elseif phase_state == "post_mini_boss" and enemy_kill_count >= final_threshold() and boss_exists("final_boss") == 0 then
-      boss_warning = 90
+      boss_warning = 180
       sfx(5, 2)
     end
   elseif phase == "mini_boss" then
@@ -1457,20 +1457,20 @@ function update_game()
   elseif phase == "final_boss" then
     if boss_exists("final_boss") == 0 then
       phase = "level_complete"
-      boss_defeat_grace = 90
+      boss_defeat_grace = 180
       create_final_boss_defeat_explosion(64, 48)
       update_music("fade")
     end
   elseif phase == "level_complete" then
     if boss_defeat_grace > 0 then
       boss_defeat_grace -= 1
-      if boss_defeat_grace > 0 and boss_defeat_grace % 10 == 0 then create_explosion(64 + rnd(60) - 30, 64 + rnd(60) - 30, 1) end
-      if boss_defeat_grace > 0 and boss_defeat_grace % 30 == 0 then create_explosion(64 + rnd(40) - 20, 40 + rnd(20) - 10, 2) shake_amount = 8 end
-      if boss_defeat_grace == 20 then sfx(19, 3) end
+      if boss_defeat_grace > 0 and boss_defeat_grace % 20 == 0 then create_explosion(64 + rnd(60) - 30, 64 + rnd(60) - 30, 1) end
+      if boss_defeat_grace > 0 and boss_defeat_grace % 60 == 0 then create_explosion(64 + rnd(40) - 20, 40 + rnd(20) - 10, 2) shake_amount = 8 end
+      if boss_defeat_grace == 40 then sfx(19, 3) end
     else
       if current_level == max_level and credits_used >= 1 then
         phase = "victory_lap"
-        game_complete_grace = 120
+        game_complete_grace = 240
       elseif current_level < max_level and #explosions > 0 then
         boss_defeat_grace = 1
       else
@@ -1486,7 +1486,7 @@ function update_game()
       game_complete_grace -= 1
     else
       game_state = "game_complete"
-      game_complete_grace = 45
+      game_complete_grace = 90
       warp_time = 0
       current_level = min(current_level, max_level)
       init_starfield()
@@ -1498,7 +1498,7 @@ function update_game()
     game_over_timer -= 1
     if game_over_grace > 0 then game_over_grace -= 1 end
     
-    if game_over_timer == 299 then
+    if game_over_timer == 599 then
       final_score = sc(calc_bonus())
       update_high_scores(final_score, get_initials())
     end
@@ -1520,8 +1520,8 @@ function update_game()
       credits -= 1
       credits_used += 1
       game_over = false
-      game_over_timer = 300
-      game_over_grace = 30
+      game_over_timer = 600
+      game_over_grace = 60
       player.health = 3
       score_streak = 0
       score_multiplier = 1
@@ -1555,7 +1555,7 @@ function update_game()
   end
   
   if shoot_cd > 0 then shoot_cd -= 1 end
-  if btn(4) and shoot_cd <= 0 then player_shoot() shoot_cd = 4 end
+  if btn(4) and shoot_cd <= 0 then player_shoot() shoot_cd = 8 end
   
   -- collision checks
   check_enemy_bullet_collisions()
@@ -1600,7 +1600,7 @@ function draw_game()
     elseif p.type == "health" then
       spr(6, p.x, p.y)
     elseif p.type == "score" then
-      if p.timer and p.timer < 15 and (time() * 10) % 2 < 1 then pal(8, 7) end
+      if p.timer and p.timer < 30 and (time() * 10) % 2 < 1 then pal(8, 7) end
       spr(7, p.x, p.y)
       pal()
     end
@@ -1673,12 +1673,12 @@ function draw_game()
     end
     center_text("x: quit", 80, 7)
     center_text("credits "..credits, 88, 6)
-    center_text(flr(game_over_timer / 30) .. "s", 96, 5)
+    center_text(flr(game_over_timer / 60) .. "s", 96, 5)
   end
   
   -- boss warning
-  if boss_warning > 0 and boss_warning % 10 < 5 then
-    local warn_col = boss_warning % 20 < 10 and 8 or 10
+  if boss_warning > 0 and boss_warning % 20 < 10 then
+    local warn_col = boss_warning % 40 < 20 and 8 or 10
     shadow_text("! warning !", 55, warn_col)
   end
 
@@ -1737,7 +1737,7 @@ function _init()
   update_music("title")
 end
 
-function _update()
+function _update60()
   update_starfield()
   if game_state == "title" then
     update_title()
