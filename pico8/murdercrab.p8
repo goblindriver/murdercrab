@@ -965,20 +965,20 @@ function spawn_powerup(x, y, ptype, value)
     width = 8, height = 8,
     speed = 4, dx = 0, dy = 0
   }
-  if ptype == "score" then p.timer = 30 end
+  if ptype == "score" then p.timer = 45 end
   add(powerups, p)
   return p
 end
 
 function spawn_powerup_explosion(x, y)
-  local total = flr(rnd(3)) + 2
+  local total = flr(rnd(5)) + 4
   local angle_inc = 1 / total
-  
+
   for i = 1, total do
     local angle = angle_inc * i
     local p = spawn_powerup(x, y, "score", 100)
-    p.dx = cos(angle) * 2
-    p.dy = sin(angle) * 2
+    p.dx = cos(angle) * 3
+    p.dy = sin(angle) * 3
   end
   
   if rnd(1) < 0.05 then
@@ -1083,8 +1083,8 @@ function create_explosion_chain(x, y, count, spread, is_tlb)
 end
 
 function create_hit_feedback(x, y)
-  add(explosions, {x = x, y = y, radius = 1, max_radius = 4, life = 5, color = 10})
-  shake_amount = 1
+  add(explosions, {x = x, y = y, radius = 1, max_radius = 4 + rnd(4), life = 5, color = 8 + flr(rnd(3))})
+  shake_amount = 1 + flr(rnd(2))
   sfx(6, 3)
 end
 
@@ -1279,6 +1279,11 @@ function check_bullet_enemy_collisions()
           shake_amount = 3
           create_hit_feedback(mid(enemy.x, bullet.x + 4, enemy.x + enemy.width),
                               mid(enemy.y, bullet.y + 4, enemy.y + enemy.height))
+          if rnd(1) < 0.4 then
+            local p = spawn_powerup(bullet.x, bullet.y, "score", 50)
+            p.dx = rnd(4) - 2
+            p.dy = rnd(4) - 2
+          end
           
           if enemy.health <= 0 then
             create_explosion(enemy.x, enemy.y, 2)
