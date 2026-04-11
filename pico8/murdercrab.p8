@@ -22,9 +22,8 @@ score_streak = 0
 score_multiplier = 1
 enemy_kill_count = 0
 current_music = -1
-menu_selection = 1
-menu_options = 4
 title_timer = 0
+shoot_cd = 0
 warp_time = 0
 warp_duration = 180
 shake_amount = 0
@@ -43,8 +42,6 @@ last_entered_initials = {"A", "C", "E"}
 current_initials = nil
 current_index = 1
 high_scores = {}
-hold_up, hold_down, hold_left, hold_right = 0, 0, 0, 0
-menu_grace_period = 0
 
 -- player constants
 P_SPD, P_HP, P_BMBS = 2, 100, 3
@@ -336,157 +333,49 @@ function draw_starfield()
 end
 
 ----------------------------------------
--- menu input handler
-----------------------------------------
-function handle_menu_input(actions, auto_repeat)
-  if actions.navigate then
-    if auto_repeat then
-      if btn(2) then
-        hold_up += 1
-        if btnp(2) or (hold_up > 12 and hold_up % 2 == 0) then
-          actions.navigate(-1)
-          sfx(2, 1)
-        end
-      else hold_up = 0 end
-      
-      if btn(3) then
-        hold_down += 1
-        if btnp(3) or (hold_down > 12 and hold_down % 2 == 0) then
-          actions.navigate(1)
-          sfx(2, 1)
-        end
-      else hold_down = 0 end
-    else
-      if btnp(2) then actions.navigate(-1) sfx(2, 1) end
-      if btnp(3) then actions.navigate(1) sfx(2, 1) end
-    end
-  end
-  
-  if actions.horizontal then
-    if auto_repeat then
-      if btn(0) then
-        hold_left += 1
-        if btnp(0) or (hold_left > 12 and hold_left % 2 == 0) then
-          actions.horizontal(-1)
-          sfx(2, 1)
-        end
-      else hold_left = 0 end
-      
-      if btn(1) then
-        hold_right += 1
-        if btnp(1) or (hold_right > 12 and hold_right % 2 == 0) then
-          actions.horizontal(1)
-          sfx(2, 1)
-        end
-      else hold_right = 0 end
-    else
-      if btnp(0) then actions.horizontal(-1) sfx(2, 1) end
-      if btnp(1) then actions.horizontal(1) sfx(2, 1) end
-    end
-  end
-  
-  if actions.select and btnp(4) then actions.select() sfx(3, 2) end
-  if actions.back and btnp(5) then actions.back() sfx(4, 3) end
-end
-
-----------------------------------------
--- title screen
+-- attract / title screen
 ----------------------------------------
 function update_title()
   title_timer += 1
   credits = 3
-  
-  handle_menu_input({
-    select = function() game_state = "menu" end,
-    back = function() game_state = "menu" end,
-    horizontal = function() game_state = "menu" sfx(3) end
-  })
+  if btnp(0) or btnp(1) or btnp(2) or btnp(3) or btnp(4) or btnp(5) then
+    start_game()
+  end
 end
 
 function draw_title()
   cls()
   draw_starfield()
-  local logo_color = draw_logo(15)
-  
-  -- draw boss
-  local bob = sin(time() * 0.4) * 4
-  fillp(░)
-  circfill(64, 56, 26 + sin(time() * 0.6) * 2, 1)
-  fillp()
-  spr(10, 48, 40 + bob, 4, 4)
-  
-  if title_timer % 30 < 20 then
-    shadow_text("- press any button -", 100, logo_color)
+  local ph = flr(title_timer / 180) % 3
+  if ph == 0 then
+    local logo_color = draw_logo(15)
+    local bob = sin(time() * 0.4) * 4
+    fillp(░)
+    circfill(64, 56, 26 + sin(time() * 0.6) * 2, 1)
+    fillp()
+    spr(10, 48, 40 + bob, 4, 4)
+    if title_timer % 30 < 20 then shadow_text("- press any button -", 100, logo_color) end
+    spr(1, 60, 115)
+  elseif ph == 1 then
+    shadow_text("high scores", 10, 8)
+    local y = 30
+    for i = 1, 3 do
+      local e = high_scores[i]
+      shadow_text(i .. ". " .. e.initials .. " " .. score_fmt(e.score), y, 8)
+      y += 14
+    end
+  else
+    shadow_text("instructions", 10, 8)
+    shadow_text("movement: arrow keys", 24, 8)
+    shadow_text("shoot: z (hold=rapid)", 34, 8)
+    shadow_text("bomb: x button", 44, 8)
+    shadow_text("collect powerups", 58, 8)
+    local hx = 64 - (#"extra health" * 4) / 2
+    shadow_text("extra health", 70, 8) spr(6, hx - 12, 68)
+    shadow_text("extra bomb", 80, 8) spr(5, hx - 12, 78)
+    shadow_text("increase score", 90, 8) spr(7, hx - 12, 88)
+    shadow_text("10 cherries = +1x", 100, 8)
   end
-  
-  spr(1, 60, 115)
-end
-
-----------------------------------------
--- main menu
-----------------------------------------
-function update_menu()
-  if menu_grace_period and menu_grace_period > 0 then
-    menu_grace_period -= 1
-    return
-  end
-  
-  handle_menu_input({
-    navigate = function(dir)
-      menu_selection = (menu_selection + dir - 1) % menu_options + 1
-    end,
-    select = function()
-      if menu_selection == 1 then
-        start_game()
-      elseif menu_selection == 2 then
-        final_score = 0
-        current_initials = nil
-        game_state = "enter_initials"
-      elseif menu_selection == 3 then
-        game_state = "instructions"
-      elseif menu_selection == 4 then
-        game_state = "highscores"
-      end
-    end,
-    back = function() game_state = "title" end
-  }, true)
-end
-
-function draw_menu()
-  cls()
-  draw_starfield()
-  local logo_color = draw_logo(20)
-  
-  local options = {"start game", "enter initials", "instructions", "high scores"}
-  for i = 1, 4 do
-    local color = i == menu_selection and 8 or 1
-    local text = i == menu_selection and "> " .. options[i] or "  " .. options[i]
-    center_text(text, 35 + i * 10, color)
-  end
-  
-  center_text("credits: " .. credits, 115, logo_color)
-end
-
-----------------------------------------
--- high scores screen
-----------------------------------------
-function update_highscores()
-  handle_menu_input({back = function() game_state = "menu" end})
-end
-
-function draw_highscores()
-  cls()
-  draw_starfield()
-  shadow_text("high scores", 10, 8)
-  
-  local y = 30
-  for i = 1, 3 do
-    local e = high_scores[i]
-    shadow_text(i .. ". " .. e.initials .. " " .. score_fmt(e.score), y, 8)
-    y += 14
-  end
-  
-  shadow_text("press x to return to menu", 115, 8)
 end
 
 ----------------------------------------
@@ -499,92 +388,46 @@ function update_enter_initials()
     for i = 1, 3 do current_initials[i] = sub(def, i, i) end
     current_index = 1
   end
-  
-  handle_menu_input({
-    navigate = function(dir)
-      local cur = ord(current_initials[current_index])
-      cur = ((cur - 33 + dir + 94) % 94) + 33
-      current_initials[current_index] = chr(cur)
-    end,
-    horizontal = function(dir)
-      current_index = ((current_index - 1 + dir + 3) % 3) + 1
-    end,
-    select = function()
-      local str = current_initials[1] .. current_initials[2] .. current_initials[3]
-      last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
-      
-      ensure_cartdata()
-      dset(18, ord(current_initials[1]) or 65)
-      dset(19, ord(current_initials[2]) or 67)
-      dset(20, ord(current_initials[3]) or 69)
-      
-      if final_score > 0 then
-        update_high_scores(final_score, str)
-        final_score = 0
-      end
-      
-      current_initials = nil
-      game_state = "menu"
-    end,
-    back = function()
-      current_initials = nil
-      game_state = "menu"
-    end
-  }, true)
+  if btnp(2) then
+    local cur = ord(current_initials[current_index])
+    cur = ((cur - 33 + 1 + 94) % 94) + 33
+    current_initials[current_index] = chr(cur)
+  end
+  if btnp(3) then
+    local cur = ord(current_initials[current_index])
+    cur = ((cur - 33 - 1 + 94) % 94) + 33
+    current_initials[current_index] = chr(cur)
+  end
+  if btnp(0) then current_index = ((current_index - 2) % 3) + 1 end
+  if btnp(1) then current_index = (current_index % 3) + 1 end
+  if btnp(4) then
+    local str = current_initials[1] .. current_initials[2] .. current_initials[3]
+    last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
+    ensure_cartdata()
+    dset(18, ord(current_initials[1]) or 65)
+    dset(19, ord(current_initials[2]) or 67)
+    dset(20, ord(current_initials[3]) or 69)
+    if final_score > 0 then update_high_scores(final_score, str) final_score = 0 end
+    current_initials = nil
+    game_state = "title"
+    title_timer = 0
+  end
+  if btnp(5) then current_initials = nil game_state = "title" title_timer = 0 end
 end
 
 function draw_enter_initials()
   cls()
   draw_starfield()
   shadow_text("enter initials:", 30, 8)
-  
   if current_initials then
     local x = 56
     for i = 1, 3 do
       print(current_initials[i], x + (i - 1) * 8, 60, i == current_index and 8 or 1)
     end
-    
-    if (time() * 10) % 2 < 1 then
-      line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8)
-    end
-  else
-    center_text("---", 60, 1)
+    if (time() * 10) % 2 < 1 then line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8) end
   end
-  
-  shadow_text("up/down: letter", 80, 8)
-  shadow_text("left/right: position", 90, 8)
-  shadow_text("z: confirm  x: cancel", 100, 8)
-end
-
-----------------------------------------
--- instructions screen
-----------------------------------------
-function update_instructions()
-  handle_menu_input({back = function() game_state = "menu" end})
-end
-
-function draw_instructions()
-  cls()
-  draw_starfield()
-  
-  shadow_text("instructions", 10, 8)
-  shadow_text("movement: arrow keys", 24, 8)
-  shadow_text("shoot: z (hold=rapid)", 34, 8)
-  shadow_text("bomb: x button", 44, 8)
-  shadow_text("collect powerups", 58, 8)
-  
-  local hx = 64 - (#"extra health" * 4) / 2
-  shadow_text("extra health", 70, 8)
-  spr(6, hx - 12, 68)
-  
-  shadow_text("extra bomb", 80, 8)
-  spr(5, hx - 12, 78)
-  
-  shadow_text("increase score", 90, 8)
-  spr(7, hx - 12, 88)
-  
-  shadow_text("10 cherries raise multiplier", 100, 8)
-  shadow_text("press x to return to menu", 120, 8)
+  shadow_text("up/down: letter  left/right: position", 80, 8)
+  shadow_text("z: confirm  x: cancel", 90, 8)
 end
 
 ----------------------------------------
@@ -622,6 +465,7 @@ function init_game()
   bomb_timer = 0
   bomb_effect_timer = 0
   spawn_timer = 0
+  shoot_cd = 0
   update_spawn_delay()
   
   player = {
@@ -819,9 +663,9 @@ function normal_enemy_fire(enemy)
     if enemy.weapon == "shotgun" then
       -- shotgun: 3 bullets at once, spread
       for i = -1, 1 do
-        local offset = i * E_B_SPREAD / 360
-        local c, s = cos(offset), -sin(offset)
-        local rx, ry = ndx * c - ndy * s, ndx * s + ndy * c
+        local _o = i * E_B_SPREAD / 360
+        local _c, _s = cos(_o), -sin(_o)
+        local rx, ry = ndx * _c - ndy * _s, ndx * _s + ndy * _c
         spawn_enemy_bullet(x, y, E_B_SPD * rx, E_B_SPD * ry)
       end
       sfx(6, 3)
@@ -1623,24 +1467,28 @@ function update_game()
       update_high_scores(final_score, get_initials())
     end
     
-    if game_over_timer <= 0 then
-      game_state = "menu"
+    if game_over_timer <= 0 or (game_over_grace <= 0 and btnp(5)) then
+      final_score = score + calc_bonus()
+      if score_gt(final_score, high_scores[3].score) then
+        current_initials = nil
+        game_state = "enter_initials"
+      else
+        game_state = "title"
+        title_timer = 0
+      end
+      update_music("title")
       return
     end
-    
-    if game_over_grace <= 0 then
-      if credits > 0 and btnp(4) then
-        credits -= 1
-        credits_used += 1
-        game_over = false
-        game_over_timer = 300
-        game_over_grace = 30
-        player.health = 3
-        score_streak = 0
-        score_multiplier = 1
-      elseif btnp(5) then
-        game_state = "menu"
-      end
+
+    if game_over_grace <= 0 and credits > 0 and btnp(4) then
+      credits -= 1
+      credits_used += 1
+      game_over = false
+      game_over_timer = 300
+      game_over_grace = 30
+      player.health = 3
+      score_streak = 0
+      score_multiplier = 1
     end
     return
   end
@@ -1670,7 +1518,8 @@ function update_game()
     player.y += player.speed
   end
   
-  if btnp(4) then player_shoot() end
+  if shoot_cd > 0 then shoot_cd -= 1 end
+  if btn(4) and shoot_cd <= 0 then player_shoot() shoot_cd = 4 end
   
   -- collision checks
   check_enemy_bullet_collisions()
@@ -1796,7 +1645,7 @@ function draw_game()
     if credits > 0 then
       center_text("z: continue", 72, 7)
     end
-    center_text("x: menu", 80, 7)
+    center_text("x: quit", 80, 7)
     center_text("credits "..credits, 88, 6)
     center_text(flr(game_over_timer / 30) .. "s", 96, 5)
   end
@@ -1859,15 +1708,8 @@ end
 
 function _update()
   update_starfield()
-  
   if game_state == "title" then
     update_title()
-  elseif game_state == "menu" then
-    update_menu()
-  elseif game_state == "instructions" then
-    update_instructions()
-  elseif game_state == "highscores" then
-    update_highscores()
   elseif game_state == "enter_initials" then
     update_enter_initials()
   elseif game_state == "starting" then
@@ -1883,7 +1725,6 @@ function _update()
     if game_complete_grace > 0 then
       game_complete_grace -= 1
     elseif btnp(4) then
-      -- start next loop!
       game_loop += 1
       credits = 3
       credits_used = 0
@@ -1906,7 +1747,8 @@ function _update()
       update_music("silent")
     elseif btnp(5) then
       game_loop = 1
-      game_state = "menu"
+      game_state = "title"
+      title_timer = 0
       update_music("title")
     end
   end
@@ -1915,12 +1757,6 @@ end
 function _draw()
   if game_state == "title" then
     draw_title()
-  elseif game_state == "menu" then
-    draw_menu()
-  elseif game_state == "instructions" then
-    draw_instructions()
-  elseif game_state == "highscores" then
-    draw_highscores()
   elseif game_state == "enter_initials" then
     draw_enter_initials()
   elseif game_state == "starting" then
