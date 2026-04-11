@@ -318,15 +318,16 @@ function draw_starfield()
   else
     -- background colors per level
     local bg_colors = {0, 1, 3, 2, 4}
-    local bg = bg_colors[current_level] or (sin(time() * 0.5) > 0 and 1 or 2)
+    local cl = min(current_level, max_level)
+    local bg = bg_colors[cl] or 0
     if bg > 0 then rectfill(0, 0, 127, 127, bg) end
-    
+
     for star in all(starfield) do
       local twinkle = 0
-      if current_level >= 2 then
-        local chance = current_level * 2
+      if cl >= 2 then
+        local chance = cl * 2
         if rnd(100) < chance then
-          twinkle = sin(time() * (4 + current_level * 2) + star.x / (14 - current_level * 2)) > (0.8 - current_level * 0.2) and 1 or 0
+          twinkle = sin(time() * (4 + cl * 2) + star.x / (14 - cl * 2)) > (0.8 - cl * 0.2) and 1 or 0
         end
       end
       
@@ -501,7 +502,7 @@ end
 
 function update_spawn_delay()
   local loop_reduction = (game_loop - 1) * 5
-  spawn_delay = max(45 - loop_reduction, 75 - (current_level - 1) * 6 - loop_reduction)
+  spawn_delay = max(30 - loop_reduction, 55 - (current_level - 1) * 6 - loop_reduction)
 end
 
 ----------------------------------------
@@ -630,7 +631,7 @@ function spawn_normal_enemy()
     shoot_interval = interval,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
-    type = "normal", health = current_level + game_loop - 1,
+    type = "normal", health = min(4, current_level + game_loop - 1),
     dx = 0, dy = 0, state = 0,
     hover_y = 20 + rnd(15),
     dir = rnd(1) < 0.5 and -1 or 1,
@@ -1275,6 +1276,7 @@ function check_bullet_enemy_collisions()
             if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
           else
             create_hit_feedback(bullet.x, bullet.y)
+            enemy.y -= 3
           end
           break
         else
@@ -1472,6 +1474,8 @@ function update_game()
       game_state = "game_complete"
       game_complete_grace = 45
       warp_time = 0
+      current_level = min(current_level, max_level)
+      init_starfield()
     end
   end
   
