@@ -476,7 +476,6 @@ function init_game()
   bomb_effect_timer = 0
   spawn_timer = 0
   shoot_cd = 0
-  rank = 0
   update_spawn_delay()
   
   player = {
@@ -533,12 +532,13 @@ end
 function draw_player()
   if player.invincible_timer > 0 and time() % 0.2 < 0.1 then return end
 
-  -- rank aura
+  -- rank glow: sprite palette tint
   if rank >= 3 then
-    circfill(player.x + 4, player.y + 4, 5 + sin(time() * 4) * rank * 0.3, rank >= 7 and 8 or 12)
+    pal(11, rank >= 7 and 8 or 10)
+    pal(3, rank >= 7 and 9 or 11)
   end
-
   spr(player.sprite, player.x, player.y)
+  pal()
 
   if player.thrust_frame > 0 then
     local x, y = player.x + 4, player.y + 8
@@ -547,10 +547,6 @@ function draw_player()
     pset(x + h, y + 1 + f, 8 + f)
     pset(x + h + (f - 1), y + 2, 9)
     if rnd(1) < 0.7 then pset(x + h, y + 2 + f, 8) end
-    -- engine trail sparks
-    if rnd(1) < 0.5 then
-      add(explosions, {x = x + h + rnd(2) - 1, y = y + 2 + rnd(3), radius = 0.5, max_radius = 2, life = 3, color = 9 + flr(rnd(2))})
-    end
   end
 end
 
@@ -578,7 +574,6 @@ function player_hit()
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
-  rank = max(0, rank - 1)
 
   if player.health <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
@@ -644,7 +639,7 @@ function spawn_normal_enemy()
     shoot_interval = interval,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
-    type = "normal", health = min(4, current_level + game_loop - 1),
+    type = "normal", health = min(3, current_level + game_loop - 1),
     dx = 0, dy = 0, state = 0,
     hover_y = 20 + rnd(15),
     dir = rnd(1) < 0.5 and -1 or 1,
@@ -1052,7 +1047,6 @@ function check_powerup_collection()
         if score_streak >= S_STRK then
           score_multiplier += 1
           score_streak = 0
-          rank = min(10, rank + 0.3)
           shake_amount = 2
         end
       end
@@ -1098,8 +1092,11 @@ function create_explosion_chain(x, y, count, spread, is_tlb)
 end
 
 function create_hit_feedback(x, y)
-  add(explosions, {x = x, y = y, radius = 1, max_radius = 4 + rnd(4), life = 5, color = 8 + flr(rnd(3))})
-  shake_amount = 1 + flr(rnd(2))
+  add(explosions, {x = x, y = y, radius = 1, max_radius = 6 + rnd(4), life = 6, color = 8 + flr(rnd(3))})
+  for i = 1, 2 do
+    add(explosions, {x = x + rnd(8) - 4, y = y + rnd(8) - 4, radius = 0.5, max_radius = 3, life = 4, color = 9 + flr(rnd(2))})
+  end
+  shake_amount = 2 + flr(rnd(2))
   sfx(6, 3)
 end
 
@@ -1139,9 +1136,10 @@ end
 
 function draw_explosions()
   for e in all(explosions) do
+    if e.radius < 2 then circfill(e.x, e.y, e.radius + 2, 7) end
     circfill(e.x, e.y, e.radius, e.color)
     circfill(e.x, e.y, e.radius * 0.7, 10)
-    circfill(e.x, e.y, e.radius * 0.4, 9)
+    circfill(e.x, e.y, e.radius * 0.4, 7)
     
     if e.radius < e.max_radius - 2 then
       for i = 1, 5 do
@@ -1167,8 +1165,7 @@ function activate_bomb()
     bomb_active = true
     bomb_timer = BMB_DUR
     player.bombs -= 1
-    rank = max(0, rank - 0.5)
-    
+
     for i = 1, 3 do
       add(explosions, {
         x = player.x + 4, y = player.y + 4,
@@ -1286,11 +1283,11 @@ function check_bullet_enemy_collisions()
           if enemy.health <= 0 then
             add_score(S_NRM)
             enemy_kill_count += 1
-            rank = min(10, rank + 0.15)
             create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
             shake_amount = 3
             del(enemies, enemy)
             if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
+            if rank >= 2 and rnd(10) < rank then spawn_powerup(enemy.x, enemy.y, "score", 50) end
           else
             create_hit_feedback(bullet.x, bullet.y)
             enemy.y -= 3
@@ -1411,6 +1408,7 @@ end
 -- main game update
 ----------------------------------------
 function update_game()
+  rank = min(10, score_multiplier - 1)
   update_explosions()
   update_bomb_effect()
   update_powerups()
@@ -1522,7 +1520,6 @@ function update_game()
     if game_over_grace <= 0 and credits > 0 and btnp(4) then
       credits -= 1
       credits_used += 1
-      rank = 0
       game_over = false
       game_over_timer = 300
       game_over_grace = 30
