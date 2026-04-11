@@ -1634,22 +1634,12 @@ function draw_game()
   
   -- draw HUD
   local hiscore = high_scores[1].score
-  local hi_text = score_fmt(hiscore)
-  local sc_text = score_fmt(sc())
-
   local hi_col = score_gt(sc(), hiscore) and (time() * 8 % 2 < 1 and 10 or 9) or 7
-  print("hi:", 70, 1, hi_col)
-  print(hi_text, 82, 1, hi_col)
-  print("score:", 1, 1, 7)
-  print(sc_text, 28, 1, 7)
-  
-  -- health (flash red when low)
-  local hp_col = player.health <= 2 and (time() * 6 % 2 < 1 and 8 or 7) or 7
-  print("health: " .. player.health, 1, 8, hp_col)
-  print("bombs: " .. player.bombs, 1, 16, 7)
-  local lvl_txt = game_loop > 1 and current_level .. "-" .. game_loop or "" .. current_level
-  print("level: " .. lvl_txt, 1, 24, game_loop > 1 and 11 or 7)
-  print("x" .. score_multiplier .. " (" .. score_streak .. "/" .. S_STRK .. ")", 1, 32, 7)
+  print(score_fmt(sc()), 1, 1, 7)
+  print(score_fmt(hiscore), 128 - #score_fmt(hiscore) * 4, 1, hi_col)
+  for i = 1, min(player.health, 10) do spr(1, (i - 1) * 9, 120) end
+  for i = 1, player.bombs do spr(5, 128 - i * 9, 120) end
+  spr(7, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
   
   if game_over and game_over_grace <= 0 then
     local y_off = sin(time()) * 2
