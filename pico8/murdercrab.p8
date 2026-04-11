@@ -103,7 +103,7 @@ end
 -- save system
 ----------------------------------------
 function init_save_system()
-  cartdata("murdercrab_v1")
+  cartdata("murdercrab_v2")
 end
 
 function ensure_cartdata()
