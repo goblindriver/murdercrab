@@ -478,6 +478,7 @@ function init_game()
   spawn_timer = 0
   shoot_cd = 0
   hitstop = 0
+  rank = 0
   update_spawn_delay()
   
   player = {
@@ -534,7 +535,12 @@ end
 function draw_player()
   if player.invincible_timer > 0 and time() % 0.2 < 0.1 then return end
 
+  if rank >= 2 then
+    pal(11, rank >= 7 and 8 or (rank >= 4 and 10 or 11))
+    pal(12, rank >= 7 and 9 or (rank >= 4 and 8 or 12))
+  end
   spr(player.sprite, player.x, player.y)
+  pal()
 
   if player.thrust_frame > 0 then
     local x, y = player.x + 4, player.y + 8
@@ -570,6 +576,7 @@ function player_hit()
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
+  rank = max(0, rank - 1)
 
   if player.health <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
@@ -1406,7 +1413,7 @@ end
 -- main game update
 ----------------------------------------
 function update_game()
-  rank = min(10, score_multiplier - 1)
+  rank = min(10, max(rank, score_multiplier - 1))
   if hitstop > 0 then hitstop -= 1 return end
   update_explosions()
   update_bomb_effect()
@@ -1681,9 +1688,6 @@ function draw_game()
     local warn_col = boss_warning % 40 < 20 and 8 or 10
     shadow_text("! warning !", 55, warn_col)
   end
-
-  -- impact flash
-  if hitstop > 0 then fillp(▒) rectfill(0, 0, 127, 127, 7) fillp() end
   camera(0, 0)
 end
 
