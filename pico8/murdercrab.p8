@@ -17,7 +17,8 @@ game_loop = 1
 credits = 3
 credits_used = 0
 score = 0
-final_score = 0
+score_hi = 0
+final_score = nil
 score_streak = 0
 score_multiplier = 1
 enemy_kill_count = 0
@@ -199,10 +200,17 @@ end
 
 function add_score(points)
   score += points * score_multiplier
+  score_hi += flr(score / 1000)
+  score %= 1000
 end
 
 function calc_bonus()
   return player.bombs * S_BMB + player.health * S_HP
+end
+
+function sc(b)
+  b = score + (b or 0)
+  return {m=0, k=score_hi + flr(b / 1000), u=b % 1000}
 end
 
 function get_initials()
@@ -407,7 +415,7 @@ function update_enter_initials()
     dset(18, ord(current_initials[1]) or 65)
     dset(19, ord(current_initials[2]) or 67)
     dset(20, ord(current_initials[3]) or 69)
-    if final_score > 0 then update_high_scores(final_score, str) final_score = 0 end
+    if final_score then update_high_scores(final_score, str) final_score = nil end
     current_initials = nil
     game_state = "title"
     title_timer = 0
@@ -450,9 +458,10 @@ function init_game()
   current_level = 1
   enemy_kill_count = 0
   score = 0
+  score_hi = 0
   score_streak = 0
   score_multiplier = 1
-  final_score = 0
+  final_score = nil
   game_over = false
   game_over_timer = 300
   game_over_grace = 30
@@ -622,7 +631,7 @@ function spawn_normal_enemy()
     shoot_interval = interval,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
-    type = "normal", health = game_loop,
+    type = "normal", health = current_level + game_loop - 1,
     dx = 0, dy = 0, state = 0,
     hover_y = 20 + rnd(15),
     dir = rnd(1) < 0.5 and -1 or 1,
@@ -786,7 +795,7 @@ function spawn_boss(btype)
       width = 16, height = 16,
       health = get_boss_max_health(btype),
       type = btype,
-      shoot_timer = 0, shoot_interval = is_final and 12 or 30,
+      shoot_timer = 0, shoot_interval = is_final and 8 or 20,
       pattern = 1, rotate_counter = 0,
       cluster_count = BASE_CLUSTERS + current_level,
       sprite = 8, is_big_sprite = true,
@@ -800,10 +809,10 @@ function spawn_true_last_boss()
     x = 48, y = -32,
     speed = 3, sprite = 10,
     width = 32, height = 32,
-    shoot_timer = 0, shoot_interval = 10,
+    shoot_timer = 0, shoot_interval = 6,
     health = get_boss_max_health("true_last_boss"),
     type = "true_last_boss",
-    cluster_count = BASE_CLUSTERS + 2 + current_level,
+    cluster_count = BASE_CLUSTERS + 4 + current_level,
     rotate_counter = 0,
     is_big_sprite = true, is_tlb = true,
     phase = 1, dx = 0.3, dy = 0, paused = false
@@ -1025,7 +1034,7 @@ function check_powerup_collection()
       elseif p.type == "health" then
         player.health += 1
       elseif p.type == "score" then
-        score += p.value * score_multiplier
+        add_score(p.value)
         score_streak += 1
         if score_streak >= S_STRK then
           score_multiplier += 1
@@ -1228,8 +1237,7 @@ function handle_boss_defeat(enemy)
     enemy.paused = true
     phase = "victory_lap"
     game_complete_grace = 120
-    final_score = score + calc_bonus()
-    update_high_scores(final_score, get_initials())
+    final_score = sc(calc_bonus())
   end
 end
 
@@ -1463,12 +1471,12 @@ function update_game()
     if game_over_grace > 0 then game_over_grace -= 1 end
     
     if game_over_timer == 299 then
-      final_score = score + calc_bonus()
+      final_score = sc(calc_bonus())
       update_high_scores(final_score, get_initials())
     end
-    
+
     if game_over_timer <= 0 or (game_over_grace <= 0 and btnp(5)) then
-      final_score = score + calc_bonus()
+      final_score = sc(calc_bonus())
       if score_gt(final_score, high_scores[3].score) then
         current_initials = nil
         game_state = "enter_initials"
@@ -1622,10 +1630,9 @@ function draw_game()
   -- draw HUD
   local hiscore = high_scores[1].score
   local hi_text = score_fmt(hiscore)
-  local sc_text = score_fmt(score)
-  
-  -- high score (flash if beating it!)
-  local hi_col = score_gt(score, hiscore) and (time() * 8 % 2 < 1 and 10 or 9) or 7
+  local sc_text = score_fmt(sc())
+
+  local hi_col = score_gt(sc(), hiscore) and (time() * 8 % 2 < 1 and 10 or 9) or 7
   print("hi:", 70, 1, hi_col)
   print(hi_text, 82, 1, hi_col)
   print("score:", 1, 1, 7)
@@ -1681,9 +1688,9 @@ function draw_game_complete()
       center_text("loop " .. game_loop .. " clear!", 38, 11)
     end
     center_text("pilot: " .. get_initials(), 48, 9)
-    center_text("score: " .. score_fmt(score), 58, 7)
+    center_text("score: " .. score_fmt(sc()), 58, 7)
     center_text("bonus: " .. calc_bonus(), 68, 8)
-    center_text("final: " .. score_fmt(score + calc_bonus()), 78, 7)
+    center_text("final: " .. score_fmt(sc(calc_bonus())), 78, 7)
     
     if game_complete_grace > 0 then
       center_text("calculating...", 90, 7)
@@ -1747,8 +1754,9 @@ function _update()
       update_music("silent")
     elseif btnp(5) then
       game_loop = 1
-      game_state = "title"
-      title_timer = 0
+      warp_time = 0
+      current_initials = nil
+      game_state = "enter_initials"
       update_music("title")
     end
   end
