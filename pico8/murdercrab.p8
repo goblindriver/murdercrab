@@ -1279,8 +1279,9 @@ function check_bullet_enemy_collisions()
   for bullet in all(bullets) do
     for enemy in all(enemies) do
       if collides(enemy, bullet) then
+        local dmg = min(3, 1 + flr(rank / 3))
         if not enemy.type or enemy.type == "normal" then
-          enemy.health -= 1
+          enemy.health -= dmg
           del(bullets, bullet)
           release_bullet(bullet)
           if enemy.health <= 0 then
@@ -1298,7 +1299,7 @@ function check_bullet_enemy_collisions()
           end
           break
         else
-          enemy.health -= 1
+          enemy.health -= dmg
           sfx(7, 2)
           shake_amount = 3
           hitstop = 1
@@ -1623,8 +1624,12 @@ function draw_game()
     elseif b.anim_frame == 3 then sprite = 50
     elseif b.anim_frame == 4 then sprite = 34
     end
-    if rank >= 3 then line(b.x + 4, b.y + 8, b.x + 4, b.y + 8 + rank, rank >= 7 and 8 or 10) end
+    if rank >= 3 then
+      line(b.x + 4, b.y + 8, b.x + 4, b.y + 8 + rank, rank >= 7 and 8 or 10)
+      pal(11, rank >= 7 and 8 or 10) pal(9, rank >= 7 and 9 or 8)
+    end
     spr(sprite, b.x, b.y)
+    pal()
   end
 
   -- draw enemies
