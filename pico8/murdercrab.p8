@@ -44,6 +44,7 @@ current_initials = nil
 current_index = 1
 high_scores = {}
 rank = 0
+hitstop = 0
 
 -- player constants
 P_SPD, P_HP, P_BMBS = 2, 100, 3
@@ -476,6 +477,7 @@ function init_game()
   bomb_effect_timer = 0
   spawn_timer = 0
   shoot_cd = 0
+  hitstop = 0
   update_spawn_delay()
   
   player = {
@@ -532,13 +534,7 @@ end
 function draw_player()
   if player.invincible_timer > 0 and time() % 0.2 < 0.1 then return end
 
-  -- rank glow: sprite palette tint
-  if rank >= 3 then
-    pal(11, rank >= 7 and 8 or 10)
-    pal(3, rank >= 7 and 9 or 11)
-  end
   spr(player.sprite, player.x, player.y)
-  pal()
 
   if player.thrust_frame > 0 then
     local x, y = player.x + 4, player.y + 8
@@ -1285,6 +1281,7 @@ function check_bullet_enemy_collisions()
             enemy_kill_count += 1
             create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
             shake_amount = 3
+            hitstop = 2
             del(enemies, enemy)
             if rnd(1) < 0.9 then spawn_powerup_explosion(enemy.x, enemy.y) end
             if rank >= 2 and rnd(10) < rank then spawn_powerup(enemy.x, enemy.y, "score", 50) end
@@ -1297,6 +1294,7 @@ function check_bullet_enemy_collisions()
           enemy.health -= 1
           sfx(7, 2)
           shake_amount = 3
+          hitstop = 1
           create_hit_feedback(mid(enemy.x, bullet.x + 4, enemy.x + enemy.width),
                               mid(enemy.y, bullet.y + 4, enemy.y + enemy.height))
           if rnd(1) < 0.4 then
@@ -1409,6 +1407,7 @@ end
 ----------------------------------------
 function update_game()
   rank = min(10, score_multiplier - 1)
+  if hitstop > 0 then hitstop -= 1 return end
   update_explosions()
   update_bomb_effect()
   update_powerups()
@@ -1617,9 +1616,10 @@ function draw_game()
     elseif b.anim_frame == 3 then sprite = 50
     elseif b.anim_frame == 4 then sprite = 34
     end
+    if rank >= 3 then line(b.x + 4, b.y + 8, b.x + 4, b.y + 8 + rank, rank >= 7 and 8 or 10) end
     spr(sprite, b.x, b.y)
   end
-  
+
   -- draw enemies
   for enemy in all(enemies) do
     if enemy.is_big_sprite then
@@ -1681,6 +1681,10 @@ function draw_game()
     local warn_col = boss_warning % 20 < 10 and 8 or 10
     shadow_text("! warning !", 55, warn_col)
   end
+
+  -- impact flash
+  if hitstop > 0 then fillp(▒) rectfill(0, 0, 127, 127, 7) fillp() end
+  camera(0, 0)
 end
 
 ----------------------------------------
