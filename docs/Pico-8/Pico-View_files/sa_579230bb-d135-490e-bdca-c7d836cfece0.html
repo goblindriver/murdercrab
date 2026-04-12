@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta charset="UTF-8">
+    <title>Goal Overlay for nerdyteachers</title>
+    <link href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/css2.html" rel="stylesheet">
+    <link href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/css_002.css" rel="stylesheet">
+    <link async="" href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/css_003.css" rel="stylesheet">
+    <link rel="stylesheet" href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/css.css">
+    <link href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/stream-alerts.css" rel="stylesheet" type="text/css">
+    <link href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/active-style.css" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        .text-black-stroke-white {
+            color: black;
+            text-shadow: -1px -1px 0 #fff, 0 -1px 0 #fff, 1px -1px 0 #fff, 1px 0 0 #fff, 1px 1px 0 #fff, 0 1px 0 #fff, -1px 1px 0 #fff, -1px 0 0 #fff;
+        }
+
+        .progress {
+            height: 55px;
+            background: #ffffffad;
+            border-radius: 14px;
+            position: relative;
+            border: 4px solid #000000;
+        }
+
+        .progress-bar {
+            background-color: #42afd6;
+            color: transparent;
+            height: 55px;
+            -o-transition: width 1s ease;
+            -webkit-transition: width 1s ease;
+            font-size: 16px;
+            transition: width 1s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .goal-info-wrapper {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 8px;
+            z-index: 1;
+        }
+
+        .goal-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            line-height: 22px;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+        }
+
+        .width-fit-content {
+            width: -webkit-fill-available;
+            line-height: 22px;
+            overflow-wrap: unset;
+            white-space: nowrap;
+        }
+    </style>
+<script type="text/javascript">var appInsights=window.appInsights||function(config){function t(config){i[config]=function(){var t=arguments;i.queue.push(function(){i[config].apply(i,t)})}}var i={config:config},u=document,e=window,o="script",s="AuthenticatedUserContext",h="start",c="stop",l="Track",a=l+"Event",v=l+"Page",r,f;setTimeout(function(){var t=u.createElement(o);t.src=config.url||"https://js.monitor.azure.com/scripts/a/ai.0.js";u.getElementsByTagName(o)[0].parentNode.appendChild(t)});try{i.cookie=u.cookie}catch(y){}for(i.queue=[],r=["Event","Exception","Metric","PageView","Trace","Dependency"];r.length;)t("track"+r.pop());return t("set"+s),t("clear"+s),t(h+a),t(c+a),t(h+v),t(c+v),t("flush"),config.disableExceptionTracking||(r="onerror",t("_"+r),f=e[r],e[r]=function(config,t,u,e,o){var s=f&&f(config,t,u,e,o);return s!==!0&&i["_"+r](config,t,u,e,o),s}),i}({instrumentationKey:"efbb8cb4-8fdb-4dcb-8b6e-0ca1fc6c9b01",sdkExtension:"a"});window.appInsights=appInsights;appInsights.queue&&appInsights.queue.length===0&&appInsights.trackPageView();</script><script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/ai.0.js"></script><style type="text/css"> .color-wrapper[data-v-370b8428] { margin: 0; padding: 0; } .color-wrapper[data-v-370b8428], .color-wrapper *[data-v-370b8428] { box-sizing: content-box; text-align: left; line-height: 1; font-size: 0; } .color[data-v-370b8428], .back-icon[data-v-370b8428] { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; -webkit-touch-callout: none; tap-highlight-color: transparent; user-select: none; outline-style: none; cursor: pointer; } .color[data-v-370b8428] { display: inline-block; border-radius: 100%; position: relative; } .back-icon[data-v-370b8428] { display: inline-block; text-align: center; float: left; border-radius: 100%; position: relative; } .back-icon[data-v-370b8428]:hover { background: rgba(0, 0, 0, 0.19); } .outer-circle[data-v-370b8428] { position: absolute; border: 4px solid rgba(0, 0, 0, 0.0); border-radius: 100%; margin: 0; transition: all 0.45s; } .inner-circle[data-v-370b8428] { position: absolute; border: 4px solid rgba(0, 0, 0, 0.0); border-radius: 100%; margin: 7px; transition: all 0.45s; } .visible .inner-circle[data-v-370b8428] { border: 4px solid rgba(255, 255, 255, 1); transition: all 1s; } .visible .outer-circle[data-v-370b8428] { border: 4px solid rgba(0, 0, 0, 0.17); transition: all 1s; } .visible.is-light .inner-circle[data-v-370b8428] { border-color: #555555; transition: all 1s; } </style></head>
+<body style="">
+    <input id="kofi-user-key" name="kofi-user-key" type="hidden" value="kK-pl-256uc6Vgc-pl-eLiGHIQ0Au-s-vc5hiTI33ur6pe-pl-ydLpzZr-pl-Foga3h2BjM0dwbKYR">
+    <div id="goal-overlay-app" class="kfds-lyt-width-100"><div class="progress" style="height: 55px;"><div class="kfds-lyt-between kfds-lyt-width-100 goal-info-wrapper"><div class="kfds-lyt-row-f-start-center kfds-lyt-width-100" style="align-items: center;"><img src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/logomarkLogo.webp" id="animatedcup-1638508358890" height="20" class="kfds-right-mrgn-8"> <div class="kfds-font-size-22 kfds-font-bold text-black-stroke-white"><div id="goal-title" class="goal-title">Player Movement Reference</div></div></div> <div class="kfds-lyt-row-end text-black-stroke-white kfds-font-size-20 kfds-font-bold width-fit-content text-right"><div id="goal-content">
+                        100% of $500 Goal
+                    </div></div></div> <div role="progressbar" aria-valuenow="0" id="spanPreview" aria-valuemin="80" aria-valuemax="100" class="progress-bar" style="width: 100%;"></div></div></div>
+
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/41bdf753bc6bcba3d6c8aae9171404e6.min.js" crossorigin="anonymous"></script>
+    <script>
+        Sentry.init({
+            dsn: `https://41bdf753bc6bcba3d6c8aae9171404e6@o4508692534394880.ingest.de.sentry.io/4508692633354320`,
+            release: `alert-overlays.401jvdv`,
+            integrations: [
+                //Sentry.browserTracingIntegration(),
+                //Sentry.replayIntegration(),
+            ],
+            tracesSampleRate: 1.0,
+            initialScope: {
+                tags: { "overlay": "goaloverlay" },
+                user: {
+                    pageId: "E1E0N0SA",
+                    userKey: "sa_579230bb-d135-490e-bdca-c7d836cfece0",
+                    handle: "nerdyteachers"
+                }
+            },
+            replaysSessionSampleRate: 0.1, //10% of all normal
+            replaysOnErrorSampleRate: 1.0, //100% of errors
+        });
+    </script>
+
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/jquery-2.0.0.min.js"></script>
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/signalr.3.1.7.min.js" integrity="sha512-X8/PQD40KFO0rs4tPiGaEyWVP5V8cDUTIjN/ihsIGwZyolDGDhgZg/yNJsFvMQzSuTonOxAw66dBYJHu+Fl4Jw==" crossorigin="anonymous"></script>
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/axios.0.20.0.min.js" integrity="sha512-dCn82lkjnNACtKUfSDrePGLu/1zSDB5cSoUSAcahbbp4tkEwx0TFtWHrBYBVJ54tNi7QWAE1hBcsD/gi4qzimQ==" crossorigin="anonymous"></script>
+        <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/vue.2.6.11.min.js"></script>
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/materialColorPicker.js"></script>
+    <link href="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/jquery.minicolors.css" rel="stylesheet">
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/jquery.minicolors.min.js"></script>
+    <script src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/setHandle.js"></script>
+
+
+
+<script type="text/javascript">
+
+
+        var App = new Vue({
+            el: "#goal-overlay-app",
+            data: {
+                title: 'Player Movement Reference',
+                percentage: '100',
+                currency: '$',
+                amount: '500',
+                showGoal: 'True',
+                goalInfo: ''
+            },
+            methods: {
+
+                handleUpdate: function(message) {
+                    try {
+                        var model = JSON.parse(message);
+
+                        //Config reset logic
+                        if (model.Title.indexOf("configreset_sa_579230bb-d135-490e-bdca-c7d836cfece0") != -1) {
+                            location.reload();
+                            return;
+                        }
+
+                        if (model.GoalAmount == null){
+                            this.goalInfo = '';
+                            this.percentage = 0;
+                            this.title = 'No goal set :(';
+                        }
+                        else{
+                            if (model.ShowGoal){
+                                this.goalInfo = model.ProgressPercentage + '% of ' + model.Currency + model.GoalAmount + ' Goal';
+                            }
+                            else {
+                                this.goalInfo = model.ProgressPercentage + '% of Goal';
+                            }
+
+                            this.percentage = model.ProgressPercentage;
+                            this.title = model.Title;
+
+                            if (!model.Title || model.Title.length == 0){
+                                this.title = 'Ko-fi Goal'
+                            }
+                        };
+
+                        console.log('Goal updated!');
+
+                        this.trackAlert(false, null);
+                    }
+                    catch (err) {
+                        this.trackAlert(true, err);
+                    }
+
+                },
+
+                getAxiosConfig: function () {
+                    const config = {
+                        headers: {'x-ms-signalr-userid': 'kK-pl-256uc6Vgc-pl-eLiGHIQ0Au-s-vc5hiTI33ur6pe-pl-ydLpzZr-pl-Foga3h2BjM0dwbKYR'}
+                    };
+                    return config;
+                },
+
+                trackAlert: function(isError, message) {
+                    try {
+                        $.get(`/streamalerts/TrackGoalOverlayUpdate?key=sa_579230bb-d135-490e-bdca-c7d836cfece0&message=${message}&isError=${isError}`, function (data) {
+                            console.log("T:1");
+                        });
+                    }
+                    catch (err) {
+                        console.log("T:0");}
+                },
+
+                getConnectionInfo: function() {
+
+                    var ref = this;
+
+                    $.ajax({
+                        url: "/api/streamalerts/negotiation-token?userKey=sa_579230bb-d135-490e-bdca-c7d836cfece0", success: function (response) {
+                            axios.post(`https://sa-functions.ko-fi.com/api/negotiate?negotiationToken=${response.token}&pageId=E1E0N0SA&timestamp=2026_4_11_23_11_50_498`, null, ref.getAxiosConfig())
+                            .then(resp => resp.data)
+                            .then(info => {
+                                // make compatible with old and new SignalRConnectionInfo
+                                info.accessToken = info.accessToken || info.accessKey;
+                                info.url = info.url || info.endpoint;
+
+                                const options = {
+                                    accessTokenFactory: () => info.accessToken
+                                };
+
+                                const connection = new signalR.HubConnectionBuilder()
+                                    .withUrl(info.url, options)
+                                    .configureLogging(signalR.LogLevel.Information)
+                                    .configureLogging(signalR.LogLevel.Error)
+                                    .withAutomaticReconnect()
+                                    .build();
+
+                                window.realtimeConnection = connection;
+
+                                connection.on('updateGoalOverlay', ref.handleUpdate);
+                                connection.onreconnecting(error => {
+                                    console.log('Reconnecting...');
+                                    ref.trackAlert(true, error);
+                                });
+
+                                connection.onreconnected(connectionId => {
+                                    console.log('Reconnected.');
+                                });
+
+                                connection.onclose(error => {
+                                    console.log('Could not reconnect');
+                                    location.reload();
+                                });
+
+                                console.log('connecting...');
+                                connection.start()
+                                    .then(() => {
+                                        console.log('Connected!');
+                                    })
+                                    .catch(console.error);
+                            })
+                            .catch(function (e) {
+                                console.log(`Could not connect: ${e}`);
+                                ref.trackAlert(true, e);
+                            })
+                        }, cache: false
+                    });
+
+                }
+            },
+            mounted() {
+                console.log('started ' + Date().toLocaleString());
+
+                if (this.amount == null){
+                    this.goalInfo = '';
+                    this.percentage = 0;
+                    this.title = 'No goal set :(';
+                }
+                else {
+                    if (this.showGoal == "True") {
+                        this.goalInfo = this.percentage + '% of ' + this.currency + this.amount + ' Goal';
+                    }
+                    else {
+                        this.goalInfo = this.percentage + '% of Goal';
+                    }
+
+                    if (!this.title || this.title.length == 0){
+                        this.title = 'Ko-fi Goal'
+                    }
+                };
+
+                this.getConnectionInfo();
+            }
+        });
+</script>
+
+<script defer="defer" src="sa_579230bb-d135-490e-bdca-c7d836cfece0_data/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;9619e1070d3d4f9c95d9aa5acc908f1d&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+</body></html>

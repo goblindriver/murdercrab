@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="img/icon.png" rel="icon">
+		<title>PICO-8 API</title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" media="screen" title="bootstrap" charset="utf-8">
+		<link rel="stylesheet" href="css/highlight/pico8.css">
+		<!-- <link rel="stylesheet" href="css/hljs/p8-default.css"> -->
+		<link rel="stylesheet" href="css/newstyle.css">
+		<!-- Fira Code -->
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+		<!-- IMAGE STYLE -->
+		<style type="text/css">
+			.imgrow {
+				display: flex;
+				flex-wrap: wrap;
+				padding: 0 4px;
+			}
+
+				/* Create two equal columns that sits next to each other */
+			.imgcolumn {
+				flex: 50%;
+				padding: 0 4px;
+			}
+
+			.imgcolumn img {
+				padding-left: 25%;
+				margin-top: 8px;
+				vertical-align: middle;
+			}
+				</style>
+		<!-- BASE STYLE -->
+		<style type="text/css">
+			@font-face {
+				font-family: "Pico8";
+				src: url("css/pico-8.woff");
+			}
+
+
+
+			body {
+				background-image: url("img/bg.png");
+				background-repeat: repeat;
+			}
+			.nav-pills > li > a {
+				border-radius: 4px 4px 0 0;
+			}
+			.tab-content {
+				color: #FFF1E8;
+				background-color: #337ab7;
+				padding: 15px 15px 5px 15px;
+				border-radius: 15px;
+				border-color: #83769C;
+			}
+			div.tab-pane ul {
+				padding-left: 1.7rem;
+				padding-bottom: 1.7rem;
+			}
+			.api {
+				background-color: #FFF1E8;
+				border-radius: 5px;
+				border-color: #FF004D;
+				margin-top: 20px;
+				margin-bottom: 20px;
+			}
+			.footer {
+				background-color: #FFF1E8;
+				margin-top: 20px;
+				margin-bottom: 10px;
+				border-radius: 5px;
+			}
+
+			.sub-heading {
+				font-family: "Pico8";
+				background-color:  #FF004D;
+				background-size: min-content;
+				/*color:#FF77A8;*/
+				color:#FFF1E8;
+				border-top: 10px solid #7E2553;
+				border-left: 10px solid #7E2553;
+				border-right: 10px solid #7E2553;
+				border-bottom: 0px solid #7E2553;
+				border-top-left-radius: 15px;
+				border-top-right-radius: 15px;
+				border-bottom-left-radius: 0px;
+				border-bottom-right-radius: 0px;
+				padding: 4px 5px 4px 10px;
+				margin-bottom: -1px;
+			}
+
+			/*.sh-link {
+				color:#FF77A8;
+			}			*/
+
+			h6 a {
+				color:#FF77A8;
+			}
+
+			code {
+				font-family: 'Fira Code', monospace;
+				font-size: 10px;
+			}
+			pre {
+				font-family: 'Fira Code', monospace;
+				font-size: 11px;
+				background: #7E2553;
+				border-color: #7E2553;
+				border-top-width: 0px;
+				border-top-left-radius: 0px;
+				border-top-right-radius: 0px;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+
+			/* Tab Paragraph */
+			.note {
+				display: block;
+				font-size: 14px;
+				border-color: #FF77A8;
+			  background:  #1D2B53;
+			  color: #fff1e8;
+			  padding: 0.5em;
+			  border: 20px solid #7E2553;
+				border-radius: 12%;
+				border: 25%;
+			}
+
+			.note code {background: #1D2B53; color: #FFF1E8; font-size:16px;}
+
+		</style>
+		<script src="https://use.fontawesome.com/1452dd4c19.js"></script>
+	</head>
+	<body>
+
+		<!-- TABLE OF CONTENTS
+			[ TOC ]
+			=======
+
+			0x00. HEADER
+			0x01. NAVBAR
+			0x02. HOME
+			0x03. AUDIO
+			0x04. CART DATA
+			0x05. COROUTINES
+			0x06. FLOW CONTROL
+			0x07. GRAPHICS
+			0x08. INPUT
+			0x09. MAP
+			0x0A. MATH
+			0x0B. MEMORY
+			0x0C. OPERATORS
+			0x0D. PEEK / POKE
+			0x0E. PICO-8
+			0x0F. STAT
+			0x10. STRINGS
+			0x11. TABLES
+			0x12. KEYS
+				0x00. KEYS_0
+				0x01. KEYS_1
+			0x13. P8SCII
+			0x14. LUA
+		-->
+
+		<div id="content" class="container api">
+			<!-- HEADER -->
+			<div class="page-header">
+				<h1 style="font-family: Pico8; font-weight: bold; text-align: center;">Pico-8 API Cheatsheet</h1>
+			</div>
+
+			<!-- NAVBAR -->
+			<ul class="nav nav-pills">
+				<!-- class="active" in li -->
+				<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab"><img src="img/icon.png" height="12em" alt="Welcome"></a></li>
+				<li role="presentation"><a href="#audio" aria-controls="audio" role="tab" data-toggle="tab">Audio</a></li>
+				<li role="presentation"><a href="#cartdata" aria-controls="data" role="tab" data-toggle="tab">Cart Data</a></li>
+				<li role="presentation"><a href="#coroutines" aria-controls="coroutines" role="tab" data-toggle="tab">Coroutines</a></li>
+				<li role="presentation"><a href="#flow" aria-controls="flow" role="tab" data-toggle="tab">Flow Control</a></li>
+				<li role="presentation"><a href="#graphics" aria-controls="graphics" role="tab" data-toggle="tab">Graphics</a></li>
+				<li role="presentation"><a href="#input" aria-controls="input" role="tab" data-toggle="tab">Input</a></li>
+				<li role="presentation"><a href="#map" aria-controls="map" role="tab" data-toggle="tab">Map</a></li>
+				<li role="presentation"><a href="#math" aria-controls="math" role="tab" data-toggle="tab">Math</a></li>
+				<li role="presentation"><a href="#memory" aria-controls="memory" role="tab" data-toggle="tab">Memory</a></li>
+				<li role="presentation"><a href="#operators" aria-controls="memory" role="tab" data-toggle="tab">Operators</a></li>
+				<!-- <li role="presentation"><a href="#peekpoke" aria-controls="peekpoke" role="tab" data-toggle="tab">Peek / Poke</a></li> -->
+				<li role="presentation"><a href="#pico8" aria-controls="picocli" role="tab" data-toggle="tab">PICO-8</a></li>
+				<li role="presentation"><a href="#stat" aria-controls="stat" role="tab" data-toggle="tab">Stat</a></li>
+				<li role="presentation"><a href="#strings" aria-controls="strings" role="tab" data-toggle="tab">Strings</a></li>
+				<li role="presentation"><a href="#p8scii" aria-controls="p8scii" role="tab" data-toggle="tab">P8SCII</a></li>
+				<li role="presentation"><a href="#lua" aria-controls="lua" role="tab" data-toggle="tab">Lua</a></li>
+				<li role="presentation"><a href="#tables" aria-controls="tables" role="tab" data-toggle="tab">Tables</a></li>
+				<li role="presentation"><a href="#keys" aria-controls="keys" role="tab" data-toggle="tab">Keyboard Shortcuts</a></li>
+			</ul>
+
+			<div class="tab-content clearfix">
+				<!-- HOME -->
+				<div role="tabpanel" class="tab-pane active" id="home">
+					<p><center><img src="img/icon.png" alt="" class="img-responsive"></center></p>
+
+					
+					<p class="note">Version <code>0.2.3</code> <br>
+					<!-- <i>Added <b>P8SCII</b> tab, Secret Palette.</i></p> -->
+					<i>Added <code>config</code> section.<br>More to come.</i></p>
+					<h6 class="sub-heading">Commandline Arguments</h6>
+					<style>.a{font-style: italic; color: #fdcc59; font-weight: 900;}</style>
+					<pre><code class="gml">--  Run Pico-8 from Terminal
+pico-8 [switches] cart.p8
+
+-splore                       -- boot in splore mode
+-width                  <span class="a">n</span>     -- set the window width
+-height                 <span class="a">n</span>     -- set the window height
+-windowed               <span class="a">n</span>     -- set windowed mode off (0) or on (1)
+-frameless              <span class="a">n</span>     -- run pico-8 in borderless window mode w/ (1); normally w/ (0)
+-volume                 <span class="a">n</span>     -- set all audio volume [0..256]
+-sound                  <span class="a">n</span>     -- set only sfx volume [0..256]
+-music                  <span class="a">n</span>     -- set only music volume [0..256]
+-joystick               <span class="a">n</span>     -- joystick controls starts at player n (0..7)
+-pixel_perfect          <span class="a">n</span>     -- 1 for unfiltered screen stretching at integer scales
+-preblit_scale          <span class="a">n</span>     -- scale the display by n before blitting to screen
+-draw_rect              <span class="a">xywh</span>  -- absolute window coordinates and size to draw the p8 screen
+-run                    <span class="a">cart</span>  -- load and run a cartridge
+-x                      <span class="a">cart</span>  -- execute a PICO-8 cart headless and then quit (experimental!)
+-export                 <span class="a">args</span>  -- run EXPORT command in headless mode and exit
+-p                      <span class="a">args</span>  -- pass a parameter string to the specified cartridge
+-home_path              <span class="a">path</span>  -- set the path to store config.txt and other user data files
+-root_path              <span class="a">path</span>  -- set the path to store cartridge files
+-desktop                <span class="a">path</span>  -- set a location for screenshots and gifs to be saved
+-gif_scale              <span class="a">n</span>     -- scale of gif captures. default: 2 (256x256 pixels)
+-gif_len                <span class="a">n</span>     -- set the maximum gif length in seconds (1..120)
+-gui_theme              <span class="a">n</span>     -- use 1 for a grey, higher contrast editor color scheme (0: blue)
+-timeout                <span class="a">n</span>     -- how many seconds to wait for splore downloads timeout (d: 30)
+-software_blit          <span class="a">n</span>     -- use software blitting mode off (0) or on (1)
+-screenshot_scale       <span class="a">n</span>     -- scale of screenshots.  default: 3 (368x368 pixels)
+-foreground_sleep_ms    <span class="a">n</span>     -- how many milliseconds to sleep between frames.
+-background_sleep_ms    <span class="a">n</span>     -- how many milliseconds to sleep between frames in bg
+-accept_future          <span class="a">n</span>     -- use (1) to allow loading cartridges made w/ newer P8 versions
+-global_api             <span class="a">n</span>     -- use (1) to leave api functions in global scope (debugging)
+-show_fps               <span class="a">n</span>     -- displays fps counter (1) on, (0) off
+</code></pre>
+
+<hr>
+					<blockquote style="font-size: 12px;">In 0.2.3, Pico-8 granted us more configuration options with the new <code style="color:  #fff1e8;background-color: #1d2b53">config <i>[option]</i></code> function, allowing for interactive customization while Pico-8 is running.</blockquote>
+					<h6 class="sub-heading">Configuration</h6>
+					<pre><code class="markdown"># sets the volume, minimum of 8, max of 256.
+> <span class="hljs-built_in">config</span> volume [<span class="a">8 - 256</span>]
+# set the theme of the pico-8 IDE. choices are 
+> <span class="hljs-built_in">config</span> theme [<span class="a"><em>auto</em>, <em>blue</em>, <em>classic</em></span>]
+# set the length of saved gifs. defaults to 8, max is 120.
+> <span class="hljs-built_in">config</span> gif_len [<span class="a">1 - 120</span>]
+# post-gif-recording behavior. 0: <b>no reset</b>, 1: <b>reset</b>
+> <span class="hljs-built_in">config</span> gif_reset_mode [<span class="a">0 - 1</span>]
+# gif scaling
+> <span class="hljs-built_in">config</span> gif_scale [<span class="a">1 - 8</span>]
+# screenshot scaling
+> <span class="hljs-built_in">config</span> screenshot_scale [<span class="a">1 - 8</span>]
+# splore filtering. 
+# when enabled, any carts marked <b>mature</b> will not be downloaded.
+> <span class="hljs-built_in">config</span> splore_filter [<span class="a">on, off</span>]
+# tab width size
+> <span class="hljs-built_in">config</span> tab_width [<span class="a">1 - 8</span>]
+</code></pre>
+
+<hr>
+					<h6 class="sub-heading">PICO-8 Specs</h6>
+					<pre><code class="markdown">- display: 128x128, fixed 16 colour palette
+- input: 6 buttons
+- cartridge size: 32k
+- sound: 4 channel, 64 definable chip blerps
+- code: lua, max 8192 tokens of code
+- sprites: single bank of 128 8x8 sprites + 128 shared
+- map: 128x32 8-bit cels + 128x32 shared</code></pre>
+
+				</div>
+
+				<!-- AUDIO -->
+				<div role="tabpanel" class="tab-pane fade" id="audio">
+					<p><center><img src="img/keyboard.png" alt="" class="img-responsive"></center></p>
+
+					<h6 class="sub-heading">Audio Manipulation</h6>
+					<pre><code class="lua"><span class="hljs-built_in">music</span>([n, [fade_len, [channel_mask]]]) -- play music; n = -1: stop
+<span class="hljs-built_in">sfx</span>(n, [channel, [offset]]) -- play sfx; n = -1: stop in channel; n = -2: release loop in channel</code></pre>
+				</div>
+
+				<!-- CART DATA -->
+				<div role="tabpanel" class="tab-pane fade" id="cartdata">
+					<h6 class="sub-heading">Cart Data Manipulation</h6>
+					<pre><code class="lua"><span class="hljs-built_in">cartdata</span>(id) -- permanent data storage in slot [id]; once/execution
+<span class="hljs-built_in">dget</span>(idx) -- get number at index
+<span class="hljs-built_in">dset</span>(idx, val) -- set number at index to value</code></pre>
+				</div>
+
+				<!-- COROUTINES -->
+				<div role="tabpanel" class="tab-pane fade" id="coroutines">
+					<h6 class="sub-heading">Coroutines::<u><a href="http://www.lexaloffle.com/bbs/?tid=3458" target="_blank" style="color: white;">view coroutines thread</a></u></h6>
+					<pre><code class="lua"><span class="hljs-built_in">cocreate</span>(f) -- returns a coroutine that executes f
+<span class="hljs-built_in">coresume</span>(c) -- resume coroutine c execution
+<span class="hljs-built_in">costatus</span>(c) -- returns true if c is still executing, false otherwise
+<span class="hljs-built_in">yield</span>() -- use inside a coroutine; makes a coroutine pause execution until next resume</code></pre>
+					<p><center></center></p>
+				</div>
+
+
+				<!-- FLOW CONTROL -->
+				<div role="tabpanel" class="tab-pane fade" id="flow">
+
+					<h6 class="sub-heading">Execution Flow</h6>
+					<pre><code class="lua">_draw()		-- called once per visible frame
+_init()		-- called once on program startup
+_update()	-- called once per update at 30fps
+_update60()	-- called once per update at 60fps</code></pre>
+
+					<h6 class="sub-heading">Flow Control</h6>
+					<pre><code class="lua">::label:: -- label
+goto label -- jump
+
+if (&lt;condition&gt;) -- inline if
+
+if &lt;condition&gt; then
+ -- if block
+elseif &lt;condition&gt; then
+ -- elseif block
+else
+ -- else block
+end
+
+while &lt;condition&gt; do
+ -- while block
+end
+
+repeat
+ -- repeat block
+until &lt;condition&gt;
+
+for &lt;var&gt; = &lt;first&gt;, &lt;last&gt;, &lt;step&gt; do
+ -- for block
+end
+
+for &lt;var&gt; in all(&lt;table&gt;) do
+ -- for block
+end
+
+for &lt;key&gt;, &lt;value&gt; in pairs(&lt;table&gt;) do
+ -- for block
+end</code></pre>
+				</div>
+
+				<!-- GRAPHICS -->
+				<div role="tabpanel" class="tab-pane fade" id="graphics">
+
+
+					<h6 class="sub-heading">PALETTES</h6>
+						<pre><code class='lua'>
+						<!-- <p><center><img style="border-radius: 5px;" src="img/colors.png" alt="" class="img-responsive"></center></p> -->
+						<div class="imgrow">
+
+								<div class='imgcolumn'><img src="img/normal_palette.png" alt="Normal Palette" ></div>
+								<div class='imgcolumn'><img src="img/secret_palette.png" alt="Secret Palette" ></div>
+						</div>
+					</code></pre>
+
+
+					<h6 class="sub-heading">Graphics Manipulation</h6>
+					<pre><code class="lua"><span class="hljs-built_in">camera</span>([x, y]) -- set camera position
+<span class="hljs-built_in">circ</span>(x, y, r, [col]) -- draw circle
+<span class="hljs-built_in">circfill</span>(x, y, r, [col]) -- draw filled circle
+<span class="hljs-built_in">clip</span>([x, y, w, h]) -- set screen clipping region
+<span class="hljs-built_in">cls</span>([col]) -- clear screen; col = clear color
+<span class="hljs-built_in">color</span>(col) -- set default color
+<span class="hljs-built_in">cursor</span>(x, y) -- set cursor and CR/LF margin position
+<span class="hljs-built_in">fget</span>(n, [f]) -- get values of sprite flags
+<span class="hljs-built_in">fillp</span>(mask) -- set fill pattern for circ, circfill, rect, rectfill, pset, and line
+<span class="hljs-built_in">flip</span>() -- flip screen back buffer (30fps)
+<span class="hljs-built_in">fset</span>(n, [f], v) -- set values of sprite flags
+<span class="hljs-built_in">line</span>(x0, y0, x1, y1, [col]) -- draw line
+<span class="hljs-built_in">oval</span>(x0, y0, x1, y1, [col]) -- draws an ellipse inside of a bounding rectangle
+<span class="hljs-built_in">ovalfill</span>(x0, y0, x1, y1, [col]) -- draws a colored ellipse
+<span class="hljs-built_in">pal</span>(c0, c1, [p]) -- swaps col 0 to col 1; p = 0 = draw palette; p = 1 = screen palette
+<span class="hljs-built_in">palt</span>(col, t) -- set transparency for colour to t (bool)
+<span class="hljs-built_in">pget</span>(x, y) -- get pixel colour
+<span class="hljs-built_in">print</span>(str, [x, y, [col]]) -- print string
+<span class="hljs-built_in">pset</span>(x, y, [col]) -- set pixel colour
+<span class="hljs-built_in">rect</span>(x0, y0, x1, y1, [col]) -- draw rectangle
+<span class="hljs-built_in">rectfill</span>(x0, y0, x1, y1, [col]) -- draw filled rectangle
+<span class="hljs-built_in">sget</span>(x, y) -- get spritesheet pixel colour
+<span class="hljs-built_in">spr</span>(n, x, y, [w, h], [flip_x], [flip_y]) -- draw sprite
+<span class="hljs-built_in">sset</span>(x, y, [col]) -- set spritesheet pixel colour
+<span class="hljs-built_in">sspr</span>(sx, sy, sw, sh, dx, dy, [dw, dh], [flip_x], [flip_y]) -- draw texture from spritesheet
+
+ -- Draws a textured line between two points, sampling the map for data
+<span class="hljs-built_in">tline</span>(x0, y0, x1, y1, mx, my, [mdx], [mdy])
+</code></pre>
+
+
+					<h6 class="sub-heading"><code>fillp()</code> mask</h6>
+					<pre><code>.-----------------------.
+|32768|16384| 8192| 4096|
+|-----|-----|-----|-----|
+| 2048| 1024| 512 | 256 |
+|-----|-----|-----|-----|
+| 128 |  64 |  32 |  16 |
+|-----|-----|-----|-----|
+|  8  |  4  |  2  |  1  |
+'-----------------------'</code></pre>
+				</div>
+
+				<!-- INPUT -->
+				<div role="tabpanel" class="tab-pane fade" id="input">
+					<p><center><img style="border-radius: 5px;" src="img/input.png" alt="" class="img-responsive"></center></p>
+
+					<h6 class="sub-heading">Input Functions</h6>
+					<pre><code class="lua"><span class="hljs-built_in">btn</span>([i, [p]]) -- get button i state for player p
+<span class="hljs-built_in">btnp</span>([i, [p]]) -- true when the button was not pressed the last frame; delays 4 frames after button held for 15 frames</code></pre>
+
+					<h6 class="sub-heading">Input::Custom Delays</h6>
+					<pre><code class="lua">-- Button check time delays; measured in frames @ 30FPS
+-- The default values of 15 and 4 will be used if a value of 0 is given for delay
+<span class="hljs-built_in">poke</span>(0x5F5C, delay) -- sets the initial delay before repeating; 255 will turn off repeat completely
+<span class="hljs-built_in">poke</span>(0x5F5D, delay) -- sets the repeating delay.
+</code></pre>
+				</div>
+
+				<!-- MAP -->
+				<div role="tabpanel" class="tab-pane fade" id="map">
+					<h6 class="sub-heading">Map Functions</h6>
+					<pre><code class="lua"><span class="hljs-built_in">map</span>(cel_x, cel_y, sx, sy, cel_w, cel_h, [layer]) -- draw map; layers from flags; sprite 0 is empty
+<span class="hljs-built_in">mget</span>(x, y) -- get map value
+<span class="hljs-built_in">mset</span>(x, y, v) -- set map value</code></pre>
+
+					<h6 class="sub-heading">Map::Deprecated</h6>
+					<pre><code class="lua">-- Functions just like map(), but is no longer used.
+<span class="hljs-built_in">mapdraw</span>(cel_x, cel_y, sx, sy, cel_w, cel_h, [layer])</code></pre>
+				</div>
+
+				<!-- MATH -->
+				<div role="tabpanel" class="tab-pane fade" id="math">
+					<h6 class="sub-heading">Mathematical Functions</h6>
+					<pre><code class="lua">-- numeric representation range
+-32768.0 .. 32767.99<br>
+<span class="hljs-built_in">abs</span>(x) -- x absolute value
+<span class="hljs-built_in">atan2</span>(x, y) -- coordinate to angle; range [0..1]
+<span class="hljs-built_in">cos</span>(x) -- cosinus; range [0..1]
+<span class="hljs-built_in">flr</span>(x) -- round down
+-<span class="hljs-built_in">flr</span>(-x) -- not a function per se, but will work as ceil(x)
+<span class="hljs-built_in">max</span>(x, y) -- x/y maximum
+<span class="hljs-built_in">mid</span>(x, y, z) -- x/y/z middle value
+<span class="hljs-built_in">min</span>(x, y) -- x/y minimum
+<span class="hljs-built_in">rnd</span>(x) -- random; 0 &lt;= n &lt; x
+<span class="hljs-built_in">sgn</span>(x) -- returns argument sign: -1 or 1; sgn(0) = 1
+<span class="hljs-built_in">sin</span>(x) -- x sine, [0..1]; inverted
+<span class="hljs-built_in">sqrt</span>(x) -- x square root
+<span class="hljs-built_in">srand</span>(x) -- set random seed</code></pre>
+				</div>
+
+
+
+				<!-- MEMORY -->
+				<div role="tabpanel" class="tab-pane fade" id="memory">
+
+					<h6 class="sub-heading">Memory Functions</h6>
+					<pre><code class="lua">-- The two following functions load from filename, and work with multi-cart export
+-- copy bytes from ram to rom
+<span class="hljs-built_in">cstore</span>(dest_addr, src_addr, len, [filename])
+-- copy bytes from rom to ram
+<span class="hljs-built_in">reload</span>(dest_addr, src_addr, len, [filename])
+
+-- copy bytes
+<span class="hljs-built_in">memcpy</span>(dest_addr, src_addr, len)
+-- set len bytes to val
+<span class="hljs-built_in">memset</span>(dest_addr, val, len)
+
+-- read byte in ram address
+<span class="hljs-built_in">peek</span>(addr)
+-- write val in ram address
+<span class="hljs-built_in">poke</span>(addr, val) 
+
+-- interface for Raspberry Pi
+<span class="hljs-built_in">serial</span>(channel, address, length) -- write val in ram address</code></pre>
+</code></pre>
+
+					<h6 class="sub-heading">Memory::Ram Layout</h6>
+					<pre><code class="lua">0x0    -- gfx
+0x1000 -- shared gfx2/map2
+0x2000 -- map
+0x3000 -- gfx flags
+0x3100 -- song
+0x3200 -- sfx
+0x4300 -- user data
+0x5e00 -- persistent cart data (256 bytes)
+0x5f00 -- draw state
+0x5f40 -- hardware state
+0x5f80 -- gpio pins (128 bytes)
+0x6000 -- screen (8k)</code></pre>
+
+					<h6 class="sub-heading">Memory::Types</h6>
+					<pre><code class="markdown">1. base ram (32kB)
+2. cart rom
+3. lua ram (1MB)</code></pre>
+
+
+
+					<h6 class="sub-heading">Memory::Keyboard/Mouse Mode</h6>
+					<pre><code class="lua">-- enable keyboard and mouse experimental mode
+<span class="hljs-built_in">poke</span>(0x5f2d, flags) -- flags are the following:
+0x1 -- enable
+0x2 -- mouse buttons trigger btn(4)..btn(6)
+0x4 -- pointer lock (use stat 38..39 to read movements)
+
+-- example init function
+function mouse_init(on,b2b,plock)
+ -- assign appropriate values
+ on = on and 0x01 or 0 -- on ……enables mouse 
+ b2b = b2b and 0x02 or 0 -- b2b……mouse btns->btn(❎🅾️◆)
+ plock = plock and 0x04 or 0 -- plock…enable pointer lock
+ -- combine into a bitfield
+ local flags = on+b2b+plock
+ -- pass the bitfield into memory
+ <span class="hljs-built_in">poke</span>(0x5f2d,flags)
+end
+
+<span class="hljs-built_in">stat</span>(30) -- read keyboard had input (bool); repeats every 4 frames after key held for 15 frames
+<span class="hljs-built_in">stat</span>(31) -- read keyboard character
+<span class="hljs-built_in">stat</span>(32) -- read x coord
+<span class="hljs-built_in">stat</span>(33) -- read y coord
+<span class="hljs-built_in">stat</span>(34) -- read button bitmask; 1 = primary, 2 = secondary, 4 = middle
+<span class="hljs-built_in">stat</span>(30) -- a boolean value representing if a keypress has occurred
+<span class="hljs-built_in">stat</span>(31) -- string name of the keypress when stat(30) is true
+<span class="hljs-built_in">stat</span>(32) -- mouse X
+<span class="hljs-built_in">stat</span>(33) -- mouse Y
+-- mouse buttons bitfield
+<span class="hljs-built_in">stat</span>(34)-- 0x1: left, 0x2: right, 0x4: middle
+<span class="hljs-built_in">stat</span>(35)-- unknown
+-- mouse wheel event
+<span class="hljs-built_in">stat</span>(36) -- 1 up, -1 down
+<span class="hljs-built_in">stat</span>(37) -- mouse acceleration delta
+-- 0x4 flag must be set for 38 and 39
+<span class="hljs-built_in">stat</span>(38) -- relative x movement in host desktop pixels
+<span class="hljs-built_in">stat</span>(39) -- relative y movement in host desktop pixels
+</code></pre>
+
+					<h6 class="sub-heading">Memory::Graphics Modes</h6>
+					<pre><code class="lua"><span class="hljs-built_in">poke</span>(0x5f2c, 0) -- standard, 128x128
+<span class="hljs-built_in">poke</span>(0x5f2c, 1) -- horizontal stretch, 64x128
+<span class="hljs-built_in">poke</span>(0x5f2c, 2) -- vertical stretch, 128x64
+<span class="hljs-built_in">poke</span>(0x5f2c, 3) -- zoomed, 64x64
+<span class="hljs-built_in">poke</span>(0x5f2c, 4) -- standard, 128x128
+<span class="hljs-built_in">poke</span>(0x5f2c, 5) -- mirror left half
+<span class="hljs-built_in">poke</span>(0x5f2c, 6) -- mirror top half
+<span class="hljs-built_in">poke</span>(0x5f2c, 7) -- mirror top-left quarter
+</code></pre>
+
+					<h6 class="sub-heading">Memory::Raspberry Pi / Pocketchip GPIO</h6>
+					<pre><code class="lua">-- run pico-8 as root ("sudo pico-8")
+-- 128 pin values in the range [0..255]
+<span class="hljs-built_in">poke</span>(0x5f80, value) -- send value to gpio0
+<span class="hljs-built_in">peek</span>(0x5f81) -- get value from gpio1
+
+--[[
+For more precise timing, the serial() command can be used. GPIO writes are buffered and 
+dispatched at the end of each frame, allowing clock cycling at higher and/or more regular 
+speeds than is possible by manually bit-banging using poke() calls
+
+  channel:
+    0x000..0x0fe    corresponds to gpio pin numbers; send 0x00 for LOW or 0xFF for HIGH
+    0x0ff           delay; length is taken to mean "duration" in microseconds (excl. overhead)
+    0x400..0x401    ws281x LED string (experimental)
+  	
+  address: The PICO-8 memory location to read from / write to.
+  length:  Number of bytes to send. 1/8ths are allowed to send partial bit strings.
+]]--
+</code></pre>
+
+				</div>
+
+				<!-- OPERATORS -->
+				<div role="tabpanel" class="tab-pane fade" id="operators">
+					<h6 class="sub-heading">Operators::Bitwise</h6>
+					<pre><code class='lua'>x & y&nbsp;&nbsp; -- both bits are set
+x | y&nbsp;&nbsp; -- either bit is set
+x ^^ y&nbsp; -- either bit is set, but not both of them
+~ x&nbsp;&nbsp;&nbsp;&nbsp; -- each bit is not set
+x << n&nbsp;&nbsp;-- shift left n bits (zeros come in from the right)
+x >> n&nbsp;&nbsp;-- arithmetic right shift (the left-most bit state is duplicated)
+x >>> n -- logical right shift (zeros comes in from the left)
+x &lt;&lt;&gt; n -- rotate all bits in x left by n places
+x >>< n -- rotate all bits in x right by n places</code></pre>
+
+					<h6 class="sub-heading">Operations::Bitwise</h6>
+					<pre><code class='lua'><span class="hljs-built_in">band</span>(x, y) -- both bits are set
+<span class="hljs-built_in">bor</span>(x, y)&nbsp; -- either bit is set
+<span class="hljs-built_in">bxor</span>(x, y) -- either bit is set, but not both of them
+<span class="hljs-built_in">bnot</span>(x)&nbsp;&nbsp;&nbsp;&nbsp;-- each bit is not set
+<span class="hljs-built_in">shl</span>(x, n)&nbsp;&nbsp;-- shift left n bits (zeros come in from the right)
+<span class="hljs-built_in">shr</span>(x, n)&nbsp;&nbsp;-- arithmetic right shift (the left-most bit state is duplicated)
+<span class="hljs-built_in">lshr</span>(x, n) -- logical right shift (zeros comes in from the left)
+<span class="hljs-built_in">rotl</span>(x, n) -- rotate all bits in x left by n places
+<span class="hljs-built_in">rotr</span>(x, n) -- rotate all bits in x right by n places</code></pre>
+
+					<h6 class="sub-heading">Operators::Assignment</h6>
+					<pre><code class="lua">a = b -- set
+a + b -- sum
+a - b -- sub
+a * b -- mul
+a / b -- div
+a \ b -- int div; ie: flr(x)/n
+a % b -- mod
+a ^ b -- pow</code></pre>
+
+
+					<h6 class="sub-heading">Operators::Augmented Assignment</h6>
+					<pre><code class="lua">a += b -- sum to
+a -= b -- sub to
+a *= b -- mul to
+a /= b -- div to
+a %= b -- mod to
+a ^= b -- pow to</code></pre>
+
+
+					<h6 class="sub-heading">Operators::Relational</h6>
+					<pre><code class="lua">a == b -- equivalent
+a ~= b -- non-equivalent
+a != b -- non-equivalent
+a &gt; b&nbsp; -- greater
+a &lt; b&nbsp; -- less
+a &gt;= b -- greater or equivalent
+a &lt;= b -- less or equivalent</code></pre>
+
+					<h6 class="sub-heading">Operators::Boolean</h6>
+					<pre><code class="lua">not a&nbsp;&nbsp; -- negation
+a and b -- conjunction
+a or b&nbsp; -- disjunction</code></pre>
+
+					<h6 class="sub-heading">Operators::Delimiters</h6>
+					<pre><code class="lua">(a)</code></pre>
+				</div>
+
+
+
+				<!-- PICO-8 -->
+				<div role="tabpanel" class="tab-pane fade" id="pico8">
+
+					<h6 class="sub-heading">Command Line Interface</h6>
+					<pre><code class="lua">assert(condition) -- verify that condition is true
+cd .. -- change to parent directory
+cd [dirname] -- change directory
+dir() -- list items
+exit() -- close pico-8 app
+export(filename.html, [cart1.p8, cart2.p8 ... cart15]) -- export game in html; up to 15 extra carts (.p8 format)
+export(filename.png) -- export spritesheet
+export(filename.wav) -- export the current sfx / music
+export(filename%d.wav) -- export all sfx as numbered files
+extcmd(cmd) -- control screenshots; "label" = cart label; "screen" = screenshot; "rec" = start gif; "video" = save gif
+folder() -- open carts folder in operating system
+help() -- show summary of system commands
+import(filename.png) -- import spritesheet. expects 128x128 png and colour-fits to the pico-8 palette
+info() -- print cart info
+install_demos() -- install demo p8 carts alongside pico-8 app
+install_games() -- install selection of bbs carts
+keyconfig() -- keyboard configuration for player buttons
+load("@clip") -- paste cart from clipboard, bbs support
+load(filename) -- load cart; works with multi-cart export
+ls() -- list items
+menuitem(index, [label, callback]) -- add an extra item to the pause menu; index in [1..5]; no label or callback removes the item
+mkdir(dirname) -- create directory
+printh(str, [filename, overwrite]) -- print str to terminal; append or overwrite to filename
+reboot() -- reboot pico8
+resume() -- resume cart execution
+run() -- boot cart
+save("@clip") -- copy cart to clipboard, bbs support
+save(filename) -- save cart
+shutdown() -- close pico-8 app
+splore() -- explore cartridges
+stat(x) -- read some execution values, read below
+time() -- returns seconds since last reboot
+type(v) -- returns type of v: number, string or table</code></pre>
+
+					<h6 class="sub-heading">Debugging</h6>
+					<pre><code class="lua">-- After running the game with <kbd>ctrl + r</kbd>, press <kbd>escape</kbd> to pause execution
+. -- Entering a '.' into the console will advance the game to the next frame
+<kbd>enter</kbd> -- Continue entering the '.' character or simply press <kbd>enter</kbd>
+print(player.x) -- Show the current, live x value of the player. Game does not cease execution, & updates each frame!
+?player.x -- '?' functions just like 'print' and can be used in place as shorthand
+resume() -- The 'resume' function will return the game to a normal running state.
+</code></pre>
+
+					<h6 class="sub-heading">Javascript</h6>
+					<pre><code class="javascript">pico8_gpio[] // read and write gpio pins
+pico8_buttons[] // bitfields for player input</code></pre>
+
+					<h6 class="sub-heading">Private Functions</h6>
+					<!-- <p>Use Carefully!</p> -->
+					<pre><code class="lua">_get_frames_skipped() -- used automatically by _mainloop()
+_get_menu_item_selected(n) -- returns true or false if the n-th menu item is selected; n in [1..5]; used automatically by _mainloop()
+_mainloop() -- main pico-8's "while true"
+_pausemenu[n].callback() -- execute the n-th menu item's callback; n in [1..5]; used automatically by _mainloop()
+_set_mainloop_exists(n) -- ?
+_update_buttons() -- used automatically by _mainloop()
+holdframe() -- used automatically by _mainloop()</code></pre>
+				</div>
+
+
+				<!-- STATS -->
+				<div role="tabpanel" class="tab-pane fade" id="stat">
+					<p>The stat() function returns information about the current runtime environment.<br>
+						Each kind of information has an <code>ID</code> (a number), described below. </p>
+
+					<h6 class="sub-heading">Stat Overview</h6>
+					<pre><code class="lua">stat(4) -- clipboard; after user pressed ctrl-v
+stat([16..19]) -- index of playing sfx on channels [0..3]
+stat([20..23]) -- note number (0..31) on channels [0..3]
+stat(30) -- keyboard key hit; see "peek / poke" tab
+stat(31) -- keyboard character; see "peek / poke" tab
+stat(32) -- mouse x coord; see "peek / poke" tab
+stat(33) -- mouse y coord; see "peek / poke" tab
+stat(34) -- mouse button bitmask; see "peek / poke" tab</code></pre>
+
+					<h6 class="sub-heading">Stat::Memory and CPU</h6>
+					<pre><code class="lua">stat(0) --[[ Memory Usage
+The number returned is a value in Kilobytes, with 1 representing 1024 bytes.
+Any decimal value returned is accurate, for example, 1.875 is equivalent to 1920 bytes.
+
+This value accounts for ANY & ALL data used in the Lua code, including variables and tables, etc.
+Thus, the maxiumum amount this can return is 2048, ie, 2 Megabytes, the total amount of memory alloted to Lua.
+
+This value does NOT include any peekable/pokeable RAM, ie, graphical/video, nor does it include the cart ROM.
+]]--
+
+stat(1) --[[ Total CPU Usage
+Initializes at <code>0</code> from the first _update call after the most recent _draw call.
+The value will increment steadily towards 1 as the next frame approaches.
+
+Ultimately, if the _update function is used, a value of 1 would represent 1/30th of a second having elapsed.
+If instead the _update60 function is used, a value of 1 would represent 1/60th of a second instead.
+
+Any time this returns a value exceeding 1 is an indication that the current cart is beyond the processing power it
+is allotted for that frame. This means that frames will likely be dropped to compensate for the slow down.
+]]--
+
+stat(2) --[[ System CPU Usage
+This value represents the the range/behavior seen in stat(1)
+
+The difference between the two is that this value will only increase when PICO-8 is processing unseen code.
+
+For example, if the screen was cleared 70 times in a step, stat(2) would return a value > 1.
+That's because the cls() function is a system call, but if the frame was spent calculating PI,
+stat(2) wouldn't rise, as such calculations are not system calls.
+]]--</code></pre>
+				</div>
+
+
+				<!-- STRINGS -->
+				<div role="tabpanel" class="tab-pane fade" id="strings">
+					<!-- Glyph Images (OUTDATED) -->
+					<!-- 					<div class="imgrow">
+												Plain Glyphs
+											<div class="imgcol"><img src="img/glyphs.png" alt="" class="img-responsive"></div>
+										ALL Glyphs
+											<div class="imgcol"><img src="img/all_glyphs.png" alt="" class="img-responsive"></div>
+										</div> -->
+				<p><center><img style="border-radius: 6px;width: 25%; height: 25%" src="img/all_glyphs.png" alt="" class="izoom"></center></p>
+
+					<h6 class="sub-heading">Strings</h6>
+					<pre><code class="lua">-- single quotes require no shift key, quicker to type!
+single = 'type faster'
+-- double quotes keep the escape sequences at bay!
+double = "type safer"
+
+-- if you need the single quote character while inside a single quoted string,
+-- you must make use of the backslash as an escape character
+escaped = 'it\'s a mad, mad, mad, mad world'
+
+-- lua and pico-8 have escape sequences that allow you to use non-text symbols in strings
+-- click <a href="https://www.lua.org/pil/2.4.html" target="_blank">here</a> for more on escape sequences in lua
+newline = "\n"
+backspace = "\b"
+
+-- multiline strings use double brackets
+-- they preserve the formatting within them allowing for a newline at their start too
+bracketed = [[
+Through me you pass into the city of woe:
+Through me you pass into eternal pain:
+Through me among the people lost for aye.
+Justice the founder of my fabric moved:
+To rear me was the task of power divine,
+Supremest wisdom, and primeval love.
+Before me things create were none, save things
+Eternal, and eternal I shall endure.
+All hope abandon, ye who enter here.
+]]</code></pre>
+
+					<h6 class="sub-heading">String:Operators</h6>
+					<pre><code class="lua">#	-- Retrieves the length of a string
+..	-- <a href="https://en.wikipedia.org/wiki/Concatenation">Concatenation</a></code></pre>
+
+
+
+					<h6 class="sub-heading">String::Functions</h6>
+					<pre><code class="lua"><span class="hljs-built_in">sub</span>(str, from, [to]) -- Get character[s] in the range [from]:[to]
+
+-- Convert val to a string; if hex is true and val is a number; Output: "0x0000.0000"
+<span class="hljs-built_in">tostr</span>(val, [hex])
+-- Cast parseable str to number; nil if str isn't a number; "0xAF" format for hex
+<span class="hljs-built_in">tonum</span>(str) or "123.45" + 0 -- alternative to tonum
+
+-- gets a string character from a value[0..255]
+<span class="hljs-built_in">chr</span>(num)
+-- gets the index [0..255] from a character
+<span class="hljs-built_in">ord</span>(str)
+
+-- ♥ : 135 
+print(chr(135).. " : ".. ord('♥'))
+
+-- split a string into a table of elements delimited by the given separator (defaults to ",").
+<span class="hljs-built_in">split</span>(str, [separator], [convert_numbers])
+
+--[[
+When convert_numbers is true, numerical tokens are stored as numbers (defaults to true).
+Empty elements are stored as empty strings.
+When the separator is "", every character is split into a separate element.
+]]--
+
+<span class="hljs-built_in">split</span>(str, [separator], [convert_numbers])
+	split("1,2,3") -- returns {1,2,3}
+	split("one:two:3",":",false) -- returns {"one","two","3"}
+	split("1,,2,") -- returns {1,"",2,""}</code></pre>
+
+
+					<h6 class="sub-heading">String::Special</h6>
+					<pre><code class="lua"> -- written on a single line, ? can be used to call print without brackets
+?"hi"
+-- when printing without [x,y] arguments, newlines are automatically added to strings
+-- this behavior can be overridden by using the <b>explicit termination command</b>
+?"quick brown fox"
+-- >> quick brown fox
+-- >> 
+?"quick brown fox\0"
+-- >> quick brown fox
+
+print("l:\x8b r:\x91 u:\x94 d:\x83 o:\x8e x:\x97")</code></pre>
+				</div>
+
+				<!-- 0x13. P8SCII-->
+				<div role="tabpanel" class="tab-pane fade" id="p8scii">
+					<p>
+						When used with <span class="hljs-built_in">print</span>(), some characters have a special meaning.<br>
+						Each possibility is detailed below.<br>
+					</p>
+
+					<h6 class="sub-heading">P8SCII</h6>
+
+
+
+					<pre><code class="lua">-- all control characters are the values in this range.
+<span class="hljs-built_in">chr</span>(0)..<span class="hljs-built_in">chr</span>(15)
+-- they can also be written with their corresponding escape sequence
+"\n" -- creates a newline
+</code></pre>
+
+					<p class="note"><code style="background: #1D2B53; color: #C2C3C7;">?</code> is pico-8 shorthand for <span class="hljs-built_in">print</span></p>
+
+					<h6 class="sub-heading">P8SCII::Parameters</h6>
+					<pre><code class="lua">-- Extended Hexadecimal
+'0'..'f' == 0..15.
+--[[
+Some of the control codes below take parameters which are written using a scheme that is
+a superset of hexidecimal format. That is, '0'..'f' also mean 0..15. But characters after
+'f' are also accepted: 'g' means 16 and so on. Such parameters are written below as P0, P1.
+]]--
+
+-- For example, to print with a blue background ("\#c") and dark gray foreground ("\f5"):
+
+<span class="hljs-built_in">print</span>("\#c\f5 blue ")
+
+-- the only side-effects on the draw state are changes in cursor position and foreground color
+-- all other attributes are reset each time print() is called
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII:Control Codes</h6>
+					<pre><code class="lua">-- Control Codes
+<span class="hljs-built_in">chr</span>(0) "\0"   -- terminate printing
+1 "\*"   -- repeat next character P0 times. ?"\*3a" --> aaa
+2 "\#"   -- draw solid background with colour P0
+3 "\-"   -- shift cursor horizontally by P0-16 pixels
+4 "\|"   -- shift cursor vertically by P0-16 pixels
+5 "\+"   -- shift cursor by P0-16, P1-16 pixels
+6 "\^"   -- special command (see P8SCII::Special Commands)
+7 "\a"   -- audio (see below)
+8 "\b"   -- backspace
+9 "\t"   -- tab
+a "\n"   -- newline
+b "\v"   -- decorate previous character (see below)
+c "\f"   -- set foreground colour
+d "\r"   -- carriage return
+e "\014" -- switch to font defined at 0x5600
+f "\015" -- switch to default font
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Special Commands</h6>
+					<pre><code class="lua">-- All of these are strings used in the print function
+1..9  -- skip 1,2,4,8,16,32..256 frames
+c -- cls to colour P0, set cursor to 0,0
+g -- set cursor position to home
+h -- set home to cursor position
+j -- jump to absolute P0*4, P1*4 (in screen pixels)
+s -- set tab stop width to P0 pixels (used by "\t")
+x -- set character width  (default: 4)
+y -- set character height (default: 6)
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Audio</h6>
+					<pre><code class="lua">?"\a"   -- single beep
+?"\a12" -- play existing data at sfx 12 (the index is written in decimal)
+
+-- If an sfx index is not specified, a non-active sfx between 60..63 is selected automatically.
+-- To fill the SFX with data before playback, the following commands can then be appended.
+
+-- 1. (optional) SFX attributes must appear once at the start as they apply to the whole sound:
+
+	s P0     set the sfx speed
+	l P0 P1  set the sfx loop start and end points
+
+-- 2. Note data:
+
+Notes are written as a..g, optionally followed by a sharp # or flat -, and octave number.
+
+	<span class="hljs-built_in">print</span> "\ace-g" -- minor triad
+
+Note attributes apply to allow following notes. Adjust with:
+
+	i P0    set the instrument (default: 5)
+	v P0    set the volume     (default: 5)
+	x P0    set the effect     (default: 0)
+	<  >   increase or decrease volume by 1
+
+-- For example, to play a fast (speed 4), staccato (effect 5) arpeggio starting at C1:
+
+	<span class="hljs-built_in">print</span> "\as4x5c1egc2egc3egc4"
+</code></pre>
+					<h6 class="sub-heading">P8SCII::Decoration Characters</h6>
+					<pre><code class="lua">-- \v
+The control character \v can be used to decorate the last printed character with another
+character at a given offset, without needing to otherwise manage the cursor position.
+After the decorating character is printed, the previous cursor position is restored.
+
+The format is \v P0 char, where P0 is a number giving the desired offset, and char
+is any character to print at that offset (relative to the previous printed character).
+
+The offset has x packed into the lowest 2 bits, and starts (-2,-8) in reading order.
+So 3 means (+1, -8), 4 means (-2, -7) and so on.
+
+For example, to write "café!", using a comma to draw the accute accent:
+
+	print"\ncafe\vb,!"
+
+In this case P0 is 'b', which is read as the number 11. So the comma is drawn at:
+	x = (11%4)-2 = 1
+	y = (11\4)-8 = -6
+</code></pre>
+
+
+					<h6 class="sub-heading">P8SCII::Custom Font</h6>
+					<pre><code class="lua">0x5600 --Custom Font Location
+ 
+A custom font can be defined at 0x5600, consisting of 8 bytes per character * 256 characters
+= 2048 bytes. Each character is an 8x8 bitfield (1 bit/pixel), where starting from the top,
+each row is a single byte starting with 0x1 on the left.
+
+The first five bytes (character 0 is never drawn) describes attributes of the font:
+
+	0x5f60 -- character width in pixels (can be more than 8, but only 8 pixels are drawn)
+	0x5f61 -- character width for character 128 and above
+	0x5f62 -- character height in pixels
+	0x5f63 -- draw offset x
+	0x5f64 -- draw offset y
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Default Attributes</h6>
+					<!-- ? == <span class="hljs-built_in">print</span> -->
+					<pre><code class="lua">-- attributes are reset every time print() is called
+-- it is possible, however to reset their values by writing to the following memory addresses
+0x5f58 .. 0x5f5b
+
+-- bitfield map
+0x5f58
+	0x1  -- when set to 0x1, bits 1..7 are observed:
+	0x2  -- padding
+	0x4  -- wide
+	0x8  -- tall
+	0x10 -- solid background
+	0x20 -- invert
+	0x40 -- dotty
+	0x80 -- use custom font
+
+-- e.g. pinball everywhere
+<span class="hljs-built_in">poke</span>(0x5f58, 0x1 | 0x2 | 0x4 | 0x8 | 0x20 | 0x40)
+
+0x5f59 --char_w   (low nibble), char_h   (high)
+0x5f5a --char_w2  (low nibble), tab_w    (high)
+0x5f5b --offset_x (low nibble), offset_y (high)
+
+-- any nibbles equal to 0 are ignored
+-- tab_w values mapped to the following range
+4..64</code></pre>
+
+				</div>
+
+				<!-- 0x14. LUA-->
+				<div role="tabpanel" class="tab-pane fade" id="lua">
+
+					<h6 class="sub-heading">Lua</h6>
+					<pre><code class="lua">
+-- returns all of the arguments after index.
+<span class="hljs-built_in">select</span>(index, ...)
+
+-- these functions provide raw access to tables
+-- if any metamethods are defined for them, they are ignored
+<span class="hljs-built_in">rawset</span>(t, key, value)
+<span class="hljs-built_in">rawget</span>(t, key)
+<span class="hljs-built_in">rawequal</span>(t1, t2)
+<span class="hljs-built_in">rawlen</span>(t)
+
+
+</code></pre>
+				</div>
+
+				<!-- TABLES -->
+				<div role="tabpanel" class="tab-pane fade" id="tables">
+					<h6 class="sub-heading">Table Functions</h6>
+					<pre><code class="lua"><span class="hljs-built_in">add</span>(t, v) -- add v to t
+<span class="hljs-built_in">all</span>(t) -- used in 'for v in all(t)' loops
+<span class="hljs-built_in">count</span>(t) -- returns number of elements in the table
+<span class="hljs-built_in">del</span>(t, v) -- delete first instance of v in t
+<span class="hljs-built_in">foreach</span>(t, f) -- call f() for each v in t
+ipairs(t) -- loops through a numerically indexed table; for _, v in ipairs(t) do end
+pairs(t) -- loops through string indexed tables; for k,v in pairs(t) do end
+<span class="hljs-built_in">pack</span>(...) -- adds any number of arguments into a table and returns the table
+unpack(t, [i], [j]) -- returns all entries in a table as arguments
+<span class="hljs-built_in">rnd</span>(t) -- returns a random value from a table
+</code></pre>
+
+					<h6 class="sub-heading">Metatables::<u><a href="http://www.lexaloffle.com/bbs/?tid=3342" target="_blank" >view metatables thread</a></u></h6>
+					<pre><code class="lua">mt = {} -- init metatable
+setmetatable(t, mt) -- set metatable mt to table t</code></pre>
+
+					<h6 class="sub-heading">Metatables::Special Keys</h6>
+					<pre><code class="lua">-- object oriented programming; invoked as 't:foo()' / 't:bar()'
+fun = {}
+function fun.foo(t) dosomething() end
+function fun.bar(t) dosomethingmore() end
+mt.__index = fun
+
+-- property assignment; invoked when calling 't[k] = v'
+function mt.__newindex(t, k, v) rawset(t, k, v) end
+
+-- weak references; keys and / or values
+mt.__mode = "k" or "v" or "kv"
+
+-- treat a table like a function; invoked when calling 't()'
+function mt.__call(t) dosomething() end
+
+-- hide metatable; returned by 'getmetatable(t)'
+public_mt = {}
+mt.__metatable = public_mt
+
+-- string casting; returned by 'tostring(t)'
+function mt.__tostring(t) return <span class="hljs-built_in">tostr</span>(t) end
+
+-- table length; returned by '#t'
+function mt.__len(t) return #t end</code></pre>
+
+					<h6 class="sub-heading">Metatables::Mathematic Operators</h6>
+					<pre><code class="lua">-- unary minus; returned by '-t'
+function mt.__unm(t) return -t end
+
+-- addition; returned by 'a + b'
+function mt.__add(a, b) return a + b end
+
+-- subtraction; returned by 'a - b'
+function mt.__sub(a, b) return a - b end
+
+-- multiplication; returned by 'a * b'
+function mt.__mul(a, b) return a * b end
+
+-- division; returned by 'a / b'
+function mt.__div(a, b) return a / b end
+
+-- modulo; returned by 'a % b'
+function mt.__mod(a, b) return a % b end
+
+-- involution; returned by 'a ^ b'
+function mt.__pow(a, b) return a ^ b end
+
+-- concatenation; returned by 'a .. b'
+function mt.__concat(a, b) return a .. b end
+
+-- stringcasting; returned by 'a .. b'
+function mt:__tostring() for k,v in pairs(self) do print(tostr(k)..": "..tostr(v)) end end</code></pre>
+
+					<h6 class="sub-heading">Metatables::Comparison Operators</h6>
+					<pre><code class="lua">-- check for equality; returned by 'a == b'
+function mt.__eq(a, b) return a == b end
+
+-- check for less-than; returned by 'a < b'
+function mt.__lt(a, b) return a < b end
+
+-- check for less-than-or-equal; returned by 'a <= b'
+function mt.__le(a, b) return a <= b end</code></pre>
+				</div>
+
+				<!-- KEYS -->
+				<div role="tabpanel" class="tab-pane fade" id="keys">
+					<div class="row">
+						<!-- KEYS_0 -->
+						<div class="col-md-6">
+							<h5><u>General</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>fullscreen</strong>:</dt> <dd><kbd>alt + enter</kbd> / <kbd>cmd + f</kbd></dd>
+								<dt><strong>quit</strong>:</dt> <dd><kbd>alt + f4</kbd> / <kbd>cmd + q</kbd></dd>
+								<dt><strong>reload and run</strong>:</dt> <dd><kbd>ctrl + r</kbd></dd>
+								<dt><strong>save</strong>:</dt> <dd><kbd>ctrl + s</kbd></dd>
+								<dt><strong>cpu graph</strong>:</dt> <dd><kbd>ctrl + p</kbd></dd>
+								<dt><strong>mute / unmute</strong>:</dt> <dd><kbd>ctrl + m</kbd></dd>
+								<dt><strong>show fps</strong>:</dt> <dd><kbd>ctrl + 1</kbd></dd>
+								<dt><strong>screenshot</strong>:</dt> <dd><kbd>ctrl + 6</kbd> / <kbd>f6</kbd> / <kbd>f1</kbd></dd>
+								<dt><strong>cart img</strong>:</dt> <dd><kbd>ctrl + 7</kbd> / <kbd>f7</kbd> / <kbd>f2</kbd></dd>
+								<dt><strong>start video</strong>:</dt> <dd><kbd>ctrl + 8</kbd> / <kbd>f8</kbd> / <kbd>f3</kbd></dd>
+								<dt><strong>save video</strong>:</dt> <dd><kbd>ctrl + 9</kbd> / <kbd>f9</kbd> / <kbd>f4</kbd></dd>
+								<dt><strong>keyboard cursor</strong>:</dt> <dd><kbd>f10</kbd></dd>
+								<dt><strong>navigate editors</strong>:</dt> <dd><kbd>alt + right</kbd> / <kbd>alt + left</kbd></dd>
+								<dt><strong>cli completion</strong>:</dt> <dd><kbd>tab</kbd></dd>
+							</dl>
+
+							<h5><u>Splore</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>navigate lists</strong>:</dt> <dd><kbd>left</kbd> / <kbd>right</kbd></dd>
+								<dt><strong>navigate carts</strong>:</dt> <dd><kbd>up</kbd> / <kbd>down</kbd> / <kbd>home</kbd> / <kbd>end</kbd> / <kbd>pageup</kbd> / <kbd>pagedown</kbd></dd>
+								<dt><strong>launch cart</strong>:</dt> <dd><kbd>x</kbd> / <kbd>o</kbd> / <kbd>menu</kbd></dd>
+								<dt><strong>favourite cart</strong>:</dt> <dd><kbd>f</kbd></dd>
+							</dl>
+
+							<h5><u>Sprite / Map Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>undo</strong>:</dt> <dd><kbd>ctrl + z</kbd></dd>
+								<dt><strong>copy (bbs support)</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste (bbs support)</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>pan</strong>:</dt> <dd><kbd>space</kbd> / <kbd>mmb</kbd></dd>
+								<dt><strong>navigate sprite <i>l/r</i></strong>:</dt> <dd><kbd>q</kbd> / <kbd>w</kbd></dd>
+								<dt><strong>navigate sprite <i>u/d</i></strong>:</dt> <dd><kbd>shift + q</kbd> / <kbd>shift + w</kbd></dd>
+								<dt><strong>navigate colours</strong>:</dt> <dd><kbd>1</kbd> / <kbd>2</kbd></dd>
+								<dt><strong>navigate tabs</strong>:</dt> <dd><kbd>+</kbd> / <kbd>-</kbd></dd>
+								<dt><strong>fullscreen</strong>:</dt> <dd><kbd>tab</kbd></dd>
+								<dt><strong>zoom</strong>:</dt> <dd><kbd>mousewheel</kbd></dd>
+								<dt><strong>zoom</strong>:</dt> <dd><kbd>shift + ,</kbd> / <kbd>shift + .</kbd></dd>
+								<dt><strong>flip y</strong>:</dt> <dd><kbd>f</kbd></dd>
+								<dt><strong>flip x</strong>:</dt> <dd><kbd>v</kbd></dd>
+								<dt><strong>rotate</strong>:</dt> <dd><kbd>r</kbd></dd>
+								<dt><strong>move</strong>:</dt> <dd><kbd>cursors</kbd></dd>
+								<h6>Draw Tool</h6>
+								<dt><strong>replace colour</strong>:</dt> <dd><kbd>lctrl</kbd></dd>
+								<dt><strong>eyedropper</strong>:</dt> <dd><kbd>rmb</kbd></dd>
+								<h6>stamp tool</h6>
+								<dt><strong>stamp w/ transparency</strong>:</dt> <dd><kbd>lctrl</kbd></dd>
+								<h6>select tool</h6>
+								<dt><strong>select sprites</strong>:</dt> <dd><kbd>shift + drag</kbd></dd>
+								<h6>shape tool</h6>
+								<dt><strong>toggle shape</strong>:</dt> <dd><kbd>leftclick on icon</kbd></dd>
+								<dt><strong>fill shape</strong>:</dt> <dd><kbd>ctrl</kbd></dd>
+							</dl>
+						</div>
+
+						<!-- KEYS_1 -->
+						<div class="col-md-6">
+							<h5><u>Code Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>skip across words</strong>:</dt> <dd><kbd>ctrl + left</kbd> / <kbd>ctrl + right</kbd></dd>
+								<dt><strong>jump to start of line</strong>:</dt> <dd><kbd>ctrl + w</kbd></dd>
+								<dt><strong>jump to end of line</strong>:</dt> <dd><kbd>ctrl + e</kbd></dd>
+								<dt><strong>select</strong>:</dt> <dd><kbd>shift</kbd></dd>
+								<dt><strong>select word</strong>:</dt> <dd><kbd>double click</kbd></dd>
+								<dt><strong>cut</strong>:</dt> <dd><kbd>ctrl + x</kbd></dd>
+								<dt><strong>copy</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>undo</strong>:</dt> <dd><kbd>ctrl + z</kbd></dd>
+								<dt><strong>redo</strong>:</dt> <dd><kbd>ctrl + y</kbd></dd>
+								<dt><strong>toggle commenting</strong>:</dt> <dd><kbd>ctrl + b</kbd></dd>
+								<dt><strong>next code tab</strong>:</dt> <dd><kbd>ctrl + tab</kbd></dd>
+								<dt><strong>previous code tab</strong>:</dt> <dd><kbd>ctrl + shift + tab</kbd></dd>
+								<dt><strong>indent</strong>:</dt> <dd><kbd>tab</kbd></dd>
+								<dt><strong>unindent</strong>:</dt> <dd><kbd>shift + tab</kbd></dd>
+								<dt><strong>auto-indent/end</strong>:</dt> <dd><kbd>shift + enter</kbd></dd>
+								<dt><strong>duplicate line</strong>:</dt> <dd><kbd>ctrl + d</kbd></dd>
+								<dt><strong>search</strong>:</dt> <dd><kbd>ctrl + f</kbd></dd>
+								<dt><strong>search across tabs</strong>:</dt> <dd><kbd>ctrl + h</kbd></dd>
+								<dt><strong>repeat search</strong>:</dt> <dd><kbd>ctrl + g</kbd></dd>
+								<dt><strong>navigate functions</strong>:</dt> <dd><kbd>alt + up</kbd> / <kbd>alt + down</kbd></dd>
+								<dt><strong>start / end of code</strong>:</dt> <dd><kbd>ctrl + up</kbd> / <kbd>ctrl + down</kbd></dd>
+								<dt><strong>button glyphs</strong>:</dt> <dd><kbd>shift + l, r, u, d, x, o</kbd></dd>
+								<dt><strong>icons</strong>:</dt> <dd><kbd>shift + qwetyipasfghjkzcvbnm</kbd></dd>
+								<dt><strong>glyph mode</strong>:</dt> <dd><kbd>ctrl + k</kbd></dd>
+								<dt><strong>puny font mode</strong>:</dt> <dd><kbd>ctrl + p</kbd></dd>
+								<dt><strong>hiragana mode</strong>:</dt> <dd><kbd>ctrl + j</kbd></dd>
+								<dt><strong>katakana mode</strong>:</dt> <dd><kbd>ctrl + k</kbd></dd>
+
+							</dl>
+
+							<h5><u>SFX / Music Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>play / pause</strong>:</dt> <dd><kbd>space</kbd></dd>
+								<dt><strong>copy</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>set all notes</strong>:</dt> <dd><kbd>shift + lmb</kbd></dd>
+								<dt><strong>modify speed</strong>:</dt> <dd><kbd>&lt;</kbd> / <kbd>&gt;</kbd></dd>
+								<dt><strong>navigate</strong>:</dt> <dd><kbd>home</kbd>, <kbd>end</kbd>, <kbd>pageup</kbd>, <kbd>pagedown</kbd>, <kbd>mousewheel</kbd></dd>
+								<dt><strong>navigate patterns</strong>:</dt> <dd><kbd>+</kbd> / <kbd>-</kbd></dd>
+								<dt><strong>snap to Cm pentatonic</strong>:</dt> <dd><kbd>ctrl</kbd></dd>
+								<dt><strong>speed x4</strong>:</dt> <dd><kbd>shift</kbd></dd>
+								<dt><strong>release loop</strong>:</dt> <dd><kbd>a</kbd></dd>
+								<dt><strong>delete</strong>:</dt> <dd><kbd>backspace</kbd></dd>
+								<h6>SFX</h6>
+								<dt><strong>select all in note</strong>:</dt> <dd><kbd>doubleclick</kbd></dd>
+								<h6>Effects</h6>
+								<dt><strong>0</strong> ::</dt> <dd>none</dd>
+								<dt><strong>1</strong> ::</dt> <dd>slide</dd>
+								<dt><strong>2</strong> ::</dt> <dd>vibrato</dd>
+								<dt><strong>3</strong> ::</dt> <dd>drop (drum kick!)</dd>
+								<dt><strong>4</strong> ::</dt> <dd>fade in</dd>
+								<dt><strong>5</strong> ::</dt> <dd>fade out</dd>
+								<dt><strong>6</strong> ::</dt> <dd>fast arpeggio (4 notes)</dd>
+								<dt><strong>7</strong> ::</dt> <dd>slow arpeggio (4 notes)</dd>
+							</dl>
+						</div>
+					</div>
+			</div>
+		</div>
+
+		<div class="footer">
+			<div class="row">
+				<div class="col-md-4" style="text-align: center;">pico-8 by <a href="http://www.lexaloffle.com/" target="_blank">lexaloffle</a> <img src="img/lexaloffle.png" style="width: 25px;"></img></div>
+				<div class="col-md-4" style="text-align: center;">made with <i class="fa fa-heart text-danger"></i> by <a href="https://neko250.github.io" target="_blank">neko250</a></div>
+				<div class="col-md-4" style="text-align: center;">updated with <i class="fa fa-heart text-danger"></i> by <a href="https://odd.codes" target="_blank">iiviigames</a></div>
+				<div class="col-md-4" style="text-align: center;">contribute on <a href="https://github.com/iiviigames/pico8-api" target="_blank">github</a> <i class="fa fa-lg fa-code-fork text-primary"></i></div>
+			</div>
+		</div>
+
+		<script src="js/jquery.min.js" charset="utf-8"></script>
+		<script src="js/bootstrap.min.js" charset="utf-8"></script>
+
+		<script src="js/highlight.default.lua.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+
+
+		<!-- <script src="js/hljs/highlight.pack.js"></script> -->
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script> -->
+		<!-- <script src="./js/hljs/lua.js"></script> -->
+		<!-- <script src="js/hljs/lua.js"></script> -->
+		<!-- <script>
+			import hljs from 'js/hljs/highlight.js';
+			import p8 from "js/hljs/p8.js"
+			hljs.registerLanguage("p8");
+			hljs.highlightAll();
+			// hljs.initHighlightingOnLoad();
+		</script> -->
+	</body>
+</html>

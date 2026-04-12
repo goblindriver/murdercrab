@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%" data-target="pico8" data-lt-installed="true"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><style id="error_marker.css">
+    .error_widget_wrapper {
+        background: inherit;
+        color: inherit;
+        border:none
+    }
+    .error_widget {
+        border-top: solid 2px;
+        border-bottom: solid 2px;
+        margin: 5px 0;
+        padding: 10px 40px;
+        white-space: pre-wrap;
+    }
+    .error_widget.ace_error, .error_widget_arrow.ace_error{
+        border-color: #ff5a5a
+    }
+    .error_widget.ace_warning, .error_widget_arrow.ace_warning{
+        border-color: #F1D817
+    }
+    .error_widget.ace_info, .error_widget_arrow.ace_info{
+        border-color: #5a5a5a
+    }
+    .error_widget.ace_ok, .error_widget_arrow.ace_ok{
+        border-color: #5aaa5a
+    }
+    .error_widget_arrow {
+        position: absolute;
+        border: solid 5px;
+        border-top-color: transparent!important;
+        border-right-color: transparent!important;
+        border-left-color: transparent!important;
+        top: -5px;
+    }
+
+/*# sourceURL=ace/css/error_marker.css */</style><style id="ace-tm">.ace-tm .ace_gutter {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.ace-tm .ace_print-margin {
+  width: 1px;
+  background: #e8e8e8;
+}
+
+.ace-tm .ace_fold {
+    background-color: #6B72E6;
+}
+
+.ace-tm {
+  background-color: #FFFFFF;
+  color: black;
+}
+
+.ace-tm .ace_cursor {
+  color: black;
+}
+        
+.ace-tm .ace_invisible {
+  color: rgb(191, 191, 191);
+}
+
+.ace-tm .ace_storage,
+.ace-tm .ace_keyword {
+  color: blue;
+}
+
+.ace-tm .ace_constant {
+  color: rgb(197, 6, 11);
+}
+
+.ace-tm .ace_constant.ace_buildin {
+  color: rgb(88, 72, 246);
+}
+
+.ace-tm .ace_constant.ace_language {
+  color: rgb(88, 92, 246);
+}
+
+.ace-tm .ace_constant.ace_library {
+  color: rgb(6, 150, 14);
+}
+
+.ace-tm .ace_invalid {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: red;
+}
+
+.ace-tm .ace_support.ace_function {
+  color: rgb(60, 76, 114);
+}
+
+.ace-tm .ace_support.ace_constant {
+  color: rgb(6, 150, 14);
+}
+
+.ace-tm .ace_support.ace_type,
+.ace-tm .ace_support.ace_class {
+  color: rgb(109, 121, 222);
+}
+
+.ace-tm .ace_keyword.ace_operator {
+  color: rgb(104, 118, 135);
+}
+
+.ace-tm .ace_string {
+  color: rgb(3, 106, 7);
+}
+
+.ace-tm .ace_comment {
+  color: rgb(76, 136, 107);
+}
+
+.ace-tm .ace_comment.ace_doc {
+  color: rgb(0, 102, 255);
+}
+
+.ace-tm .ace_comment.ace_doc.ace_tag {
+  color: rgb(128, 159, 191);
+}
+
+.ace-tm .ace_constant.ace_numeric {
+  color: rgb(0, 0, 205);
+}
+
+.ace-tm .ace_variable {
+  color: rgb(49, 132, 149);
+}
+
+.ace-tm .ace_xml-pe {
+  color: rgb(104, 104, 91);
+}
+
+.ace-tm .ace_entity.ace_name.ace_function {
+  color: #0000A2;
+}
+
+
+.ace-tm .ace_heading {
+  color: rgb(12, 7, 255);
+}
+
+.ace-tm .ace_list {
+  color:rgb(185, 6, 144);
+}
+
+.ace-tm .ace_meta.ace_tag {
+  color:rgb(0, 22, 142);
+}
+
+.ace-tm .ace_string.ace_regex {
+  color: rgb(255, 0, 0)
+}
+
+.ace-tm .ace_marker-layer .ace_selection {
+  background: rgb(181, 213, 255);
+}
+.ace-tm.ace_multiselect .ace_selection.ace_start {
+  box-shadow: 0 0 3px 0px white;
+}
+.ace-tm .ace_marker-layer .ace_step {
+  background: rgb(252, 255, 0);
+}
+
+.ace-tm .ace_marker-layer .ace_stack {
+  background: rgb(164, 229, 101);
+}
+
+.ace-tm .ace_marker-layer .ace_bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid rgb(192, 192, 192);
+}
+
+.ace-tm .ace_marker-layer .ace_active-line {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.ace-tm .ace_gutter-active-line {
+    background-color : #dcdcdc;
+}
+
+.ace-tm .ace_marker-layer .ace_selected-word {
+  background: rgb(250, 250, 255);
+  border: 1px solid rgb(200, 200, 250);
+}
+
+.ace-tm .ace_indent-guide {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;
+}
+
+.ace-tm .ace_indent-guide-active {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAAZSURBVHjaYvj///9/hivKyv8BAAAA//8DACLqBhbvk+/eAAAAAElFTkSuQmCC") right repeat-y;
+}
+
+/*# sourceURL=ace/css/ace-tm */</style><style id="ace_editor.css">/*
+styles = []
+for (var i = 1; i < 16; i++) {
+    styles.push(".ace_br" + i + "{" + (
+        ["top-left", "top-right", "bottom-right", "bottom-left"]
+    ).map(function(x, j) {
+        return i & (1<<j) ? "border-" + x + "-radius: 3px;" : "" 
+    }).filter(Boolean).join(" ") + "}")
+}
+styles.join("\n")
+*/
+.ace_br1 {border-top-left-radius    : 3px;}
+.ace_br2 {border-top-right-radius   : 3px;}
+.ace_br3 {border-top-left-radius    : 3px; border-top-right-radius:    3px;}
+.ace_br4 {border-bottom-right-radius: 3px;}
+.ace_br5 {border-top-left-radius    : 3px; border-bottom-right-radius: 3px;}
+.ace_br6 {border-top-right-radius   : 3px; border-bottom-right-radius: 3px;}
+.ace_br7 {border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px;}
+.ace_br8 {border-bottom-left-radius : 3px;}
+.ace_br9 {border-top-left-radius    : 3px; border-bottom-left-radius:  3px;}
+.ace_br10{border-top-right-radius   : 3px; border-bottom-left-radius:  3px;}
+.ace_br11{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-left-radius:  3px;}
+.ace_br12{border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br13{border-top-left-radius    : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br14{border-top-right-radius   : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br15{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;}
+
+
+.ace_editor {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    direction: ltr;
+    text-align: left;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.ace_scroller {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    background-color: inherit;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: text;
+}
+
+.ace_content {
+    position: absolute;
+    box-sizing: border-box;
+    min-width: 100%;
+    contain: style size layout;
+    font-variant-ligatures: no-common-ligatures;
+}
+
+.ace_dragging .ace_scroller:before{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    background: rgba(250, 250, 250, 0.01);
+    z-index: 1000;
+}
+.ace_dragging.ace_dark .ace_scroller:before{
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.ace_gutter {
+    position: absolute;
+    overflow : hidden;
+    width: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    cursor: default;
+    z-index: 4;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    contain: style size layout;
+}
+
+.ace_gutter-active-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.ace_scroller.ace_scroll-left {
+    box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0.4) inset;
+}
+
+.ace_gutter-cell {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: 19px;
+    padding-right: 6px;
+    background-repeat: no-repeat;
+}
+
+.ace_gutter-cell.ace_error {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABOFBMVEX/////////QRswFAb/Ui4wFAYwFAYwFAaWGAfDRymzOSH/PxswFAb/SiUwFAYwFAbUPRvjQiDllog5HhHdRybsTi3/Tyv9Tir+Syj/UC3////XurebMBIwFAb/RSHbPx/gUzfdwL3kzMivKBAwFAbbvbnhPx66NhowFAYwFAaZJg8wFAaxKBDZurf/RB6mMxb/SCMwFAYwFAbxQB3+RB4wFAb/Qhy4Oh+4QifbNRcwFAYwFAYwFAb/QRzdNhgwFAYwFAbav7v/Uy7oaE68MBK5LxLewr/r2NXewLswFAaxJw4wFAbkPRy2PyYwFAaxKhLm1tMwFAazPiQwFAaUGAb/QBrfOx3bvrv/VC/maE4wFAbRPBq6MRO8Qynew8Dp2tjfwb0wFAbx6eju5+by6uns4uH9/f36+vr/GkHjAAAAYnRSTlMAGt+64rnWu/bo8eAA4InH3+DwoN7j4eLi4xP99Nfg4+b+/u9B/eDs1MD1mO7+4PHg2MXa347g7vDizMLN4eG+Pv7i5evs/v79yu7S3/DV7/498Yv24eH+4ufQ3Ozu/v7+y13sRqwAAADLSURBVHjaZc/XDsFgGIBhtDrshlitmk2IrbHFqL2pvXf/+78DPokj7+Fz9qpU/9UXJIlhmPaTaQ6QPaz0mm+5gwkgovcV6GZzd5JtCQwgsxoHOvJO15kleRLAnMgHFIESUEPmawB9ngmelTtipwwfASilxOLyiV5UVUyVAfbG0cCPHig+GBkzAENHS0AstVF6bacZIOzgLmxsHbt2OecNgJC83JERmePUYq8ARGkJx6XtFsdddBQgZE2nPR6CICZhawjA4Fb/chv+399kfR+MMMDGOQAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: 2px center;
+}
+
+.ace_gutter-cell.ace_warning {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAmVBMVEX///8AAAD///8AAAAAAABPSzb/5sAAAAB/blH/73z/ulkAAAAAAAD85pkAAAAAAAACAgP/vGz/rkDerGbGrV7/pkQICAf////e0IsAAAD/oED/qTvhrnUAAAD/yHD/njcAAADuv2r/nz//oTj/p064oGf/zHAAAAA9Nir/tFIAAAD/tlTiuWf/tkIAAACynXEAAAAAAAAtIRW7zBpBAAAAM3RSTlMAABR1m7RXO8Ln31Z36zT+neXe5OzooRDfn+TZ4p3h2hTf4t3k3ucyrN1K5+Xaks52Sfs9CXgrAAAAjklEQVR42o3PbQ+CIBQFYEwboPhSYgoYunIqqLn6/z8uYdH8Vmdnu9vz4WwXgN/xTPRD2+sgOcZjsge/whXZgUaYYvT8QnuJaUrjrHUQreGczuEafQCO/SJTufTbroWsPgsllVhq3wJEk2jUSzX3CUEDJC84707djRc5MTAQxoLgupWRwW6UB5fS++NV8AbOZgnsC7BpEAAAAABJRU5ErkJggg==");
+    background-position: 2px center;
+}
+
+.ace_gutter-cell.ace_info {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAJ0Uk5TAAB2k804AAAAPklEQVQY02NgIB68QuO3tiLznjAwpKTgNyDbMegwisCHZUETUZV0ZqOquBpXj2rtnpSJT1AEnnRmL2OgGgAAIKkRQap2htgAAAAASUVORK5CYII=");
+    background-position: 2px center;
+}
+.ace_dark .ace_gutter-cell.ace_info {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAChoaGAgIAqKiq+vr6tra1ZWVmUlJSbm5s8PDxubm56enrdgzg3AAAAAXRSTlMAQObYZgAAAClJREFUeNpjYMAPdsMYHegyJZFQBlsUlMFVCWUYKkAZMxZAGdxlDMQBAG+TBP4B6RyJAAAAAElFTkSuQmCC");
+}
+
+.ace_scrollbar {
+    contain: strict;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 6;
+}
+
+.ace_scrollbar-inner {
+    position: absolute;
+    cursor: text;
+    left: 0;
+    top: 0;
+}
+
+.ace_scrollbar-v{
+    overflow-x: hidden;
+    overflow-y: scroll;
+    top: 0;
+}
+
+.ace_scrollbar-h {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    left: 0;
+}
+
+.ace_print-margin {
+    position: absolute;
+    height: 100%;
+}
+
+.ace_text-input {
+    position: absolute;
+    z-index: 0;
+    width: 0.5em;
+    height: 1em;
+    opacity: 0;
+    background: transparent;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    resize: none;
+    outline: none;
+    overflow: hidden;
+    font: inherit;
+    padding: 0 1px;
+    margin: 0 -1px;
+    contain: strict;
+    -ms-user-select: text;
+    -moz-user-select: text;
+    -webkit-user-select: text;
+    user-select: text;
+    /*with `pre-line` chrome inserts &nbsp; instead of space*/
+    white-space: pre!important;
+}
+.ace_text-input.ace_composition {
+    background: transparent;
+    color: inherit;
+    z-index: 1000;
+    opacity: 1;
+}
+.ace_composition_placeholder { color: transparent }
+.ace_composition_marker { 
+    border-bottom: 1px solid;
+    position: absolute;
+    border-radius: 0;
+    margin-top: 1px;
+}
+
+[ace_nocontext=true] {
+    transform: none!important;
+    filter: none!important;
+    clip-path: none!important;
+    mask : none!important;
+    contain: none!important;
+    perspective: none!important;
+    mix-blend-mode: initial!important;
+    z-index: auto;
+}
+
+.ace_layer {
+    z-index: 1;
+    position: absolute;
+    overflow: hidden;
+    /* workaround for chrome bug https://github.com/ajaxorg/ace/issues/2312*/
+    word-wrap: normal;
+    white-space: pre;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    /* setting pointer-events: auto; on node under the mouse, which changes
+        during scroll, will break mouse wheel scrolling in Safari */
+    pointer-events: none;
+}
+
+.ace_gutter-layer {
+    position: relative;
+    width: auto;
+    text-align: right;
+    pointer-events: auto;
+    height: 1000000px;
+    contain: style size layout;
+}
+
+.ace_text-layer {
+    font: inherit !important;
+    position: absolute;
+    height: 1000000px;
+    width: 1000000px;
+    contain: style size layout;
+}
+
+.ace_text-layer > .ace_line, .ace_text-layer > .ace_line_group {
+    contain: style size layout;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.ace_hidpi .ace_text-layer,
+.ace_hidpi .ace_gutter-layer,
+.ace_hidpi .ace_content,
+.ace_hidpi .ace_gutter {
+    contain: strict;
+    will-change: transform;
+}
+.ace_hidpi .ace_text-layer > .ace_line, 
+.ace_hidpi .ace_text-layer > .ace_line_group {
+    contain: strict;
+}
+
+.ace_cjk {
+    display: inline-block;
+    text-align: center;
+}
+
+.ace_cursor-layer {
+    z-index: 4;
+}
+
+.ace_cursor {
+    z-index: 4;
+    position: absolute;
+    box-sizing: border-box;
+    border-left: 2px solid;
+    /* workaround for smooth cursor repaintng whole screen in chrome */
+    transform: translatez(0);
+}
+
+.ace_multiselect .ace_cursor {
+    border-left-width: 1px;
+}
+
+.ace_slim-cursors .ace_cursor {
+    border-left-width: 1px;
+}
+
+.ace_overwrite-cursors .ace_cursor {
+    border-left-width: 0;
+    border-bottom: 1px solid;
+}
+
+.ace_hidden-cursors .ace_cursor {
+    opacity: 0.2;
+}
+
+.ace_hasPlaceholder .ace_hidden-cursors .ace_cursor {
+    opacity: 0;
+}
+
+.ace_smooth-blinking .ace_cursor {
+    transition: opacity 0.18s;
+}
+
+.ace_animate-blinking .ace_cursor {
+    animation-duration: 1000ms;
+    animation-timing-function: step-end;
+    animation-name: blink-ace-animate;
+    animation-iteration-count: infinite;
+}
+
+.ace_animate-blinking.ace_smooth-blinking .ace_cursor {
+    animation-duration: 1000ms;
+    animation-timing-function: ease-in-out;
+    animation-name: blink-ace-animate-smooth;
+}
+    
+@keyframes blink-ace-animate {
+    from, to { opacity: 1; }
+    60% { opacity: 0; }
+}
+
+@keyframes blink-ace-animate-smooth {
+    from, to { opacity: 1; }
+    45% { opacity: 1; }
+    60% { opacity: 0; }
+    85% { opacity: 0; }
+}
+
+.ace_marker-layer .ace_step, .ace_marker-layer .ace_stack {
+    position: absolute;
+    z-index: 3;
+}
+
+.ace_marker-layer .ace_selection {
+    position: absolute;
+    z-index: 5;
+}
+
+.ace_marker-layer .ace_bracket {
+    position: absolute;
+    z-index: 6;
+}
+
+.ace_marker-layer .ace_error_bracket {
+    position: absolute;
+    border-bottom: 1px solid #DE5555;
+    border-radius: 0;
+}
+
+.ace_marker-layer .ace_active-line {
+    position: absolute;
+    z-index: 2;
+}
+
+.ace_marker-layer .ace_selected-word {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+}
+
+.ace_line .ace_fold {
+    box-sizing: border-box;
+
+    display: inline-block;
+    height: 11px;
+    margin-top: -2px;
+    vertical-align: middle;
+
+    background-image:
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACJJREFUeNpi+P//fxgTAwPDBxDxD078RSX+YeEyDFMCIMAAI3INmXiwf2YAAAAASUVORK5CYII=");
+    background-repeat: no-repeat, repeat-x;
+    background-position: center center, top left;
+    color: transparent;
+
+    border: 1px solid black;
+    border-radius: 2px;
+
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.ace_dark .ace_fold {
+}
+
+.ace_fold:hover{
+    background-image:
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACBJREFUeNpi+P//fz4TAwPDZxDxD5X4i5fLMEwJgAADAEPVDbjNw87ZAAAAAElFTkSuQmCC");
+}
+
+.ace_tooltip {
+    background-color: #FFF;
+    background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+    border: 1px solid gray;
+    border-radius: 1px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    color: black;
+    max-width: 100%;
+    padding: 3px 4px;
+    position: fixed;
+    z-index: 999999;
+    box-sizing: border-box;
+    cursor: default;
+    white-space: pre;
+    word-wrap: break-word;
+    line-height: normal;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: normal;
+    pointer-events: none;
+}
+
+.ace_folding-enabled > .ace_gutter-cell {
+    padding-right: 13px;
+}
+
+.ace_fold-widget {
+    box-sizing: border-box;
+
+    margin: 0 -12px 0 1px;
+    display: none;
+    width: 11px;
+    vertical-align: top;
+
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42mWKsQ0AMAzC8ixLlrzQjzmBiEjp0A6WwBCSPgKAXoLkqSot7nN3yMwR7pZ32NzpKkVoDBUxKAAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: center;
+
+    border-radius: 3px;
+    
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.ace_folding-enabled .ace_fold-widget {
+    display: inline-block;   
+}
+
+.ace_fold-widget.ace_end {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42m3HwQkAMAhD0YzsRchFKI7sAikeWkrxwScEB0nh5e7KTPWimZki4tYfVbX+MNl4pyZXejUO1QAAAABJRU5ErkJggg==");
+}
+
+.ace_fold-widget.ace_closed {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAGCAYAAAAG5SQMAAAAOUlEQVR42jXKwQkAMAgDwKwqKD4EwQ26sSOkVWjgIIHAzPiCgaqiqnJHZnKICBERHN194O5b9vbLuAVRL+l0YWnZAAAAAElFTkSuQmCCXA==");
+}
+
+.ace_fold-widget:hover {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.ace_fold-widget:active {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+/**
+ * Dark version for fold widgets
+ */
+.ace_dark .ace_fold-widget {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHklEQVQIW2P4//8/AzoGEQ7oGCaLLAhWiSwB146BAQCSTPYocqT0AAAAAElFTkSuQmCC");
+}
+.ace_dark .ace_fold-widget.ace_end {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAH0lEQVQIW2P4//8/AxQ7wNjIAjDMgC4AxjCVKBirIAAF0kz2rlhxpAAAAABJRU5ErkJggg==");
+}
+.ace_dark .ace_fold-widget.ace_closed {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAFCAYAAACAcVaiAAAAHElEQVQIW2P4//+/AxAzgDADlOOAznHAKgPWAwARji8UIDTfQQAAAABJRU5ErkJggg==");
+}
+.ace_dark .ace_fold-widget:hover {
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.ace_dark .ace_fold-widget:active {
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.ace_inline_button {
+    border: 1px solid lightgray;
+    display: inline-block;
+    margin: -1px 8px;
+    padding: 0 5px;
+    pointer-events: auto;
+    cursor: pointer;
+}
+.ace_inline_button:hover {
+    border-color: gray;
+    background: rgba(200,200,200,0.2);
+    display: inline-block;
+    pointer-events: auto;
+}
+
+.ace_fold-widget.ace_invalid {
+    background-color: #FFB4B4;
+    border-color: #DE5555;
+}
+
+.ace_fade-fold-widgets .ace_fold-widget {
+    transition: opacity 0.4s ease 0.05s;
+    opacity: 0;
+}
+
+.ace_fade-fold-widgets:hover .ace_fold-widget {
+    transition: opacity 0.05s ease 0.05s;
+    opacity:1;
+}
+
+.ace_underline {
+    text-decoration: underline;
+}
+
+.ace_bold {
+    font-weight: bold;
+}
+
+.ace_nobold .ace_bold {
+    font-weight: normal;
+}
+
+.ace_italic {
+    font-style: italic;
+}
+
+
+.ace_error-marker {
+    background-color: rgba(255, 0, 0,0.2);
+    position: absolute;
+    z-index: 9;
+}
+
+.ace_highlight-marker {
+    background-color: rgba(255, 255, 0,0.2);
+    position: absolute;
+    z-index: 8;
+}
+
+.ace_mobile-menu {
+    position: absolute;
+    line-height: 1.5;
+    border-radius: 4px;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background: white;
+    box-shadow: 1px 3px 2px grey;
+    border: 1px solid #dcdcdc;
+    color: black;
+}
+.ace_dark > .ace_mobile-menu {
+    background: #333;
+    color: #ccc;
+    box-shadow: 1px 3px 2px grey;
+    border: 1px solid #444;
+
+}
+.ace_mobile-button {
+    padding: 2px;
+    cursor: pointer;
+    overflow: hidden;
+}
+.ace_mobile-button:hover {
+    background-color: #eee;
+    opacity:1;
+}
+.ace_mobile-button:active {
+    background-color: #ddd;
+}
+
+.ace_placeholder {
+    font-family: arial;
+    transform: scale(0.9);
+    transform-origin: left;
+    white-space: pre;
+    opacity: 0.7;
+    margin: 0 10px;
+}
+/*# sourceURL=ace/css/ace_editor.css */</style><style>.ace_editor>.ace_sb-v div, .ace_editor>.ace_sb-h div{
+  position: absolute;
+  background: rgba(128, 128, 128, 0.6);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+  border-radius: 2px;
+  z-index: 8;
+}
+.ace_editor>.ace_sb-v, .ace_editor>.ace_sb-h {
+  position: absolute;
+  z-index: 6;
+  background: none;  overflow: hidden!important;
+}
+.ace_editor>.ace_sb-v {
+  z-index: 6;
+  right: 0;
+  top: 0;
+  width: 12px;
+}.ace_editor>.ace_sb-v div {
+  z-index: 8;
+  right: 0;
+  width: 100%;
+}.ace_editor>.ace_sb-h {
+  bottom: 0;
+  left: 0;
+  height: 12px;
+}.ace_editor>.ace_sb-h div {
+  bottom: 0;
+  height: 100%;
+}.ace_editor>.ace_sb_grabbed {
+  z-index: 8;
+  background: #000;
+}</style>
+    <title>Shrinko8 webapp</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Shrinko8 - minifier for Pico-8 carts">
+    <link rel="icon" href="https://thisismypassport.github.io/shrinko8/favicon.svg">
+    <script src="Shrinko8%20webapp_files/jquery-3.6.1.min.js"></script>
+    <script src="Shrinko8%20webapp_files/jquery-ui.min.js"></script>
+    <link href="Shrinko8%20webapp_files/jquery-ui.css" rel="stylesheet">
+    <script src="Shrinko8%20webapp_files/ace.js"></script>
+    <script src="Shrinko8%20webapp_files/comlink.min.js"></script>
+    <style>
+      .ace_placeholder {
+        transform: scale(1);
+      }
+
+      .base {
+        position: relative;
+      }
+
+      .overlay {
+        background: rgba(255,255,255,0.7); 
+        position: absolute; 
+        width: 100%; 
+        height: 100%; 
+        z-index: 100;
+        top: 0;
+        display: none;
+      }
+
+      .minioverlay { /* for use with overlay */
+        background: white;
+        z-index: 50;
+      }
+
+      .full {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%; 
+        height: 100%; 
+      }
+
+      .center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .asis {
+        font-family: monospace;
+        white-space: pre;
+      }
+
+      .flex-column {
+        display: flex;
+        flex-flow: column;
+      }
+      .flex-row {
+        display: flex;
+        flex-flow: row;
+      }
+      .flex-center {
+        display: flex;
+        justify-content: center;
+      }
+
+      .margin {
+        margin: 10px;
+      }
+
+      .border {
+        border: 1px solid black;
+      }
+
+      .scroll {
+        overflow-x: auto;
+        overflow-y: auto;
+      }
+
+      .count-table {
+        border-collapse: collapse;
+      }
+
+      .count-table td {
+        border: 1px solid;
+      }
+      
+      .dragover {
+        outline: 2px solid blue;
+      }
+
+      .selected {
+        background-color: skyblue;
+      }
+
+      .extra-selected {
+        background-color: orchid;
+      }
+
+      .edu-url {
+        font-size: large;
+        color: darkblue !important;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .ace-textarea {
+        border: 1px solid gray;
+      }
+
+      .ui-tabs .ui-tabs-panel {
+        padding: 0;
+        display: flex; /* hack */
+      }
+
+      textarea {
+        resize: none;
+      }
+
+      a { /* even without href */
+        cursor: pointer;
+      }
+    </style>
+  <script src="Shrinko8%20webapp_files/mode-lua.js"></script><script src="Shrinko8%20webapp_files/mode-python.js"></script></head>
+  <body style="height: 100%; margin: 0;" data-droptarget="#input-code" ondragover="onDragEnter(this, event)" ondragleave="onDragLeave(this, event)" ondrop="onDrop(this, event, 'input')">
+    <form class="flex-column" style="height: 100%" autocomplete="off"> <!--here to disable autocomplete-->
+
+      <div class="flex-column margin" style="flex: 1">
+        <div class="flex-row">
+          <div style="flex: 1">
+            <label style="font-weight: bold;">Open your Pico-8 file:
+              <input id="input-file" type="file" multiple="" style="margin-bottom: 10px;" accept=".p8,.lua,.png,.rom,.js,.pod" onchange="loadSelectedFiles(this)">
+            </label>
+            <span id="input-extra-files" style="display: none">
+              (+ <span id="input-extra-count"></span> extra files for multi-cart export)
+            </span>
+          </div>
+          <div>
+            <span id="version" style="vertical-align: super">v1.2.6g
+</span>
+            <a href="https://github.com/thisismypassport/shrinko8" target="_blank">
+              <svg width="24" height="24" viewBox="0 0 98 96"><title>GitHub</title><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#24292f"></path></svg><!--
+            --></a>
+            <select id="target" style="vertical-align: super" onchange="onTargetChange()" aria-label="Cart Type">
+              <option value="pico8" selected="selected">Pico-8</option>
+              <option value="picotron">Picotron</option>
+            </select>
+          </div>
+        </div>
+        <div class="base" style="flex: 1">
+          <div id="input-code" class="ace-textarea full ace_editor ace_hidpi ace-tm ace_hasPlaceholder" placeholder="You can also paste your code here, or drag &amp; drop a Pico-8 file here.
+It can be a .p8 file, a .png cart, and more."><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(44px, 16px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 41px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1000000px; transform: translate(0px); width: 41px;"><div class="ace_gutter-cell ace_gutter-active-line " style="height: 16px; top: 0px;">1<span style="display: none;"></span></div></div></div><div class="ace_scroller" style="line-height: 16px; left: 40.1992px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px); width: 1602.8px; height: 461px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 580px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div style="height: 16px; top: 0px; left: 0px; right: 0px;" class="ace_active-line"></div></div><div class="ace_layer ace_text-layer" style="height: 1000000px; margin: 0px 4px; transform: translate(0px);"><div style="height: 16px; top: 0px;" class="ace_line"></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px); width: 7px; height: 16px;"></div></div><div class="ace_placeholder">You can also paste your code here, or drag &amp; drop a Pico-8 file here.
+It can be a .p8 file, a .png cart, and more.</div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 20px; height: 429px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 20px; height: 16px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 20px; left: 40.1992px; right: 0px; width: 1602.8px;"><div class="ace_scrollbar-inner" style="height: 20px; width: 1602.8px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size-adjust: inherit; font-kerning: inherit; font-language-override: inherit; font-feature-settings: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+          <div id="input-overlay" class="overlay">
+            <div class="center">Opening...</div>
+          </div>
+          <div id="input-error-overlay" class="overlay">
+            <div class="center flex-column">
+              <div class="base" style="flex: 1">
+                <div id="input-error-output" class="scroll asis" style="max-height: 30vh"></div>
+              </div>
+              <div class="flex-center">
+                <button type="button" onclick="onInputErrorClose()">Close</button>
+              </div>
+            </div>
+          </div>
+          <div id="input-select-overlay" class="overlay">
+            <div class="center flex-column">
+              <div id="input-select-main-label">Which is the main file to open? (The others will be used as includes)</div>
+              <div id="input-select-export-label">This file contains multiple carts, which one do you want to open?</div>
+              <div class="base" style="flex: 1">
+                <div id="input-select-list" class="scroll border asis" style="max-height: 30vh"></div>
+              </div>
+              <div class="margin flex-center">
+                <span>
+                  <button type="button" onclick="onInputSelect()">Open</button>
+                  <button type="button" onclick="onInputSelectClose()">Cancel</button>
+                </span>
+              </div>
+              <div class="margin">
+                <label id="input-select-extra-label">
+                  <input type="checkbox" id="input-select-extra">Select extra files for multi-cart export
+                </label><br>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="output-tabs" class="flex-column ui-tabs ui-corner-all ui-widget ui-widget-content" style="flex: 1; border: 0; padding: 0">
+        <ul role="tablist" class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
+          <li role="tab" tabindex="0" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active ui-state-active" aria-controls="tab-minify" aria-labelledby="ui-id-1" aria-selected="true" aria-expanded="true"><a href="#tab-minify" tabindex="-1" class="ui-tabs-anchor" id="ui-id-1">Minify</a></li>
+          <li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tab-lint" aria-labelledby="ui-id-2" aria-selected="false" aria-expanded="false"><a href="#tab-lint" tabindex="-1" class="ui-tabs-anchor" id="ui-id-2">Lint</a></li>
+          <li role="tab" tabindex="-1" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab" aria-controls="tab-advanced" aria-labelledby="ui-id-3" aria-selected="false" aria-expanded="false"><a href="#tab-advanced" tabindex="-1" class="ui-tabs-anchor" id="ui-id-3">Advanced</a></li>
+        </ul>
+
+        <div id="tab-minify" class="flex-row margin ui-tabs-panel ui-corner-bottom ui-widget-content" style="flex: 1" aria-labelledby="ui-id-1" role="tabpanel" aria-hidden="false">
+          <div class="flex-column" style="flex: 1">
+            <label style="display: block; margin-bottom: 10px;">Target format:
+              <select id="minify-format">
+                <option value="png" selected="selected">.PNG cart</option>
+                <option value="p8">.P8 file</option>
+                <option value="rom">.ROM file</option>
+                
+                <option value="" disabled="disabled">──────────</option>
+                <option value="lua">.LUA file (Code only)</option>
+                <option value="tiny-rom">Tiny .ROM file (Code only)</option>
+                <option value="url">Edu URL (Code &amp; gfx only)</option>
+                <option value="" disabled="disabled">──────────</option>
+                <option value="bin">All HTML + Binary exports</option>
+                <option value="js">.JS file (Advanced)</option>
+                <option value="pod">.POD file (Advanced)</option>
+                
+              </select>
+            </label>
+            
+            <div id="minify-overlay-parent" style="flex: 1" class="base">
+              <div id="minify-text-div" class="full flex-column" style="display: none;">
+                <div id="minify-code" class="ace-textarea" style="flex: 1; margin-right: 10px" readonly=""></div>
+                <div><button type="button" style="margin-top: 10px" onclick="saveOutputFile()">Download</button></div>
+              </div>
+              
+              <div id="minify-url-div" class="full flex-column" style="display: none;">
+                <a id="minify-url" target="_blank" class="edu-url" style="margin-bottom: 10px">...</a>
+                <div>
+                  <button type="button" style="margin-bottom: 10px" onclick="copyUrlToClipboard()">Copy URL</button>
+                  <span id="minify-url-copied" style="display: none">Copied!</span>
+                </div>
+                <div>Preview:</div>
+                <div id="minify-url-preview" class="ace-textarea" style="flex: 1; margin-top: 10px; margin-right: 10px" readonly=""></div>
+              </div>
+
+              <div id="minify-binary-div" class="full flex-row">
+                <div>
+                  <div style="cursor: pointer" onclick="saveOutputFile()">
+                    <img id="minify-image" width="160" height="205" style="margin: 10px 0" alt="Cart Image" src="blob:https://thisismypassport.github.io/5c3d66b7-9567-4060-8041-75927b81e43b">
+                    <svg id="file-icon" width="86" height="86" viewBox="0 0 128 128" style="display: none;"><path d="m82 6h-60v115h85v-90h-25v-25l25 25" fill="none" stroke="black"></path>
+                      <text id="file-icon-text" x="64" y="74" fill="gray" text-anchor="middle">PNG</text>
+                    </svg>
+                  </div>
+                  <button type="button" onclick="saveOutputFile()">Download</button>
+                </div>
+                <div style="flex: 1" class="flex-column margin">
+                  <div>Preview:<span style="color: gray"> (Shrinko8 can compress better than Pico-8 itself, so you're recommended to 
+                    <a onclick="saveOutputFile()">download</a> the file instead of copy/pasting)</span></div>
+                  <div id="minify-preview" class="ace-textarea ace_editor ace_hidpi ace-tm" style="flex: 1; margin-top: 10px" readonly=""><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(44px, 16px);" readonly="readonly"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 41px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1000000px; transform: translate(0px); width: 41px;"><div class="ace_gutter-cell ace_gutter-active-line " style="height: 16px; top: 0px;">1<span style="display: none;"></span></div><div class="ace_gutter-cell " style="height: 16px; top: 16px;">2<span style="display: none;"></span></div><div class="ace_gutter-cell " style="height: 16px; top: 32px;">3<span style="display: none;"></span></div><div class="ace_gutter-cell " style="height: 16px; top: 48px;">4<span style="display: none;"></span></div><div class="ace_gutter-cell " style="height: 16px; top: 64px;">5<span style="display: none;"></span></div></div></div><div class="ace_scroller" style="line-height: 16px; left: 40.1992px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px); width: 1157.8px; height: 344px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 580px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div style="height: 16px; top: 0px; left: 0px; right: 0px;" class="ace_active-line"></div></div><div class="ace_layer ace_text-layer" style="height: 1000000px; margin: 0px 4px; transform: translate(0px);"><div style="height: 16px; top: 0px;" class="ace_line"><span class="ace_identifier">pico</span><span class="ace_keyword ace_operator">-</span><span class="ace_constant ace_numeric">8</span> <span class="ace_identifier">cartridge</span> <span class="ace_keyword ace_operator">//</span> <span class="ace_identifier">http</span><span class="ace_keyword ace_operator">://</span><span class="ace_identifier">www</span>.<span class="ace_identifier">pico</span><span class="ace_keyword ace_operator">-</span><span class="ace_constant ace_numeric">8.</span><span class="ace_identifier">com</span></div><div style="height: 16px; top: 16px;" class="ace_line"><span class="ace_identifier">version</span> <span class="ace_constant ace_numeric">42</span></div><div style="height: 16px; top: 32px;" class="ace_line"><span class="ace_identifier">__lua__</span></div><div style="height: 16px; top: 48px;" class="ace_line"></div><div style="height: 16px; top: 64px;" class="ace_line"></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px); width: 7px; height: 16px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 20px; height: 312px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 20px; height: 80px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 20px; left: 40.1992px; right: 0px; width: 1157.8px;"><div class="ace_scrollbar-inner" style="height: 20px; width: 1157.8px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size-adjust: inherit; font-kerning: inherit; font-language-override: inherit; font-feature-settings: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                </div>
+              </div>
+
+              <div id="minify-overlay" class="overlay" style="display: none;">
+                <div class="center">Minifying...</div>
+              </div>
+              <div id="minify-error-overlay" class="overlay minioverlay flex-column" style="display: none;">
+                <div id="minify-error-output" class="scroll border asis" style="flex: 1"></div>
+              </div>
+              <div id="minify-picodat-overlay" class="overlay flex-column" style="display: none;">
+                <div class="center">
+                  Creating exports requires the pico8.dat file from your pico8 folder.<br>
+                  <label style="font-weight: bold;">Open pico8.dat:
+                    <input id="picodat-file" type="file" accept=".dat" onchange="loadPicoDat(this.files[0])">
+                  </label>
+                </div>
+              </div>
+              <div id="loading-overlay" class="overlay" style="display: none;">
+                <div class="center">
+                  <h1 style="text-align: center">Loading Shrinko8...</h1>
+                  <progress id="loading-progress" value="60" max="100" style="width: 500px; height: 30px"></progress>
+                  <h1 id="loading-failed" style="display: none; color: red">Failed! (See console for the gory details)</h1>
+                </div>
+              </div>
+            </div>
+
+            <div id="minify-diag-output" class="asis scroll border" style="flex: 0 0 20%; display: none; margin: 0px 10px 0px 170px; color: darkgoldenrod;"><span></span><br></div>
+          </div>
+
+          <div id="minify-opts" style="flex: 0 0 20%; padding-left: 10px; border-left: 1px solid black" class="flex-column">
+            <div style="flex: 1">
+              <label><input type="radio" name="minify" value="--unminify">Undo Minification (Beautify)</label><br>
+              <label><input type="radio" name="minify" value="">No Minification (Convert Format)</label><br>
+              <label><input type="radio" name="minify" value="--minify-safe-only --no-minify-rename --no-minify-lines">Minimal Minification (Easy to read &amp; debug)</label><br>
+              <label><input type="radio" name="minify" value="--minify-safe-only" checked="checked">Safe Minification</label><br>
+              <label><input type="radio" name="minify" value="--minify" id="minify-agg">Aggressive Minification</label><br>
+
+              <div id="minify-max-div" style="display: none;">
+                <div style="color: darkorange; margin-top: 10px; width: 100%">
+                  See <a href="https://github.com/thisismypassport/shrinko8#pitfalls-of-full-minification" target="_blank">readme</a>
+                  for what can go wrong with aggresive minification and how to resolve it.
+                </div>
+                <div id="minify-max-table" class="border" style="display: none;">
+                  <label><input type="checkbox" id="minify-rename-max" checked="checked">Rename aggressively</label><br>
+                  <label><input type="checkbox" id="minify-reorder-max" checked="checked">Reorder aggressively</label><br>
+                </div>
+              </div>
+
+              <label style="display: block; margin-top: 10px; ">Focus on reducing:
+                <select id="minify-focus">
+                  <option value="" selected="selected">(Balanced)</option>
+                  <option value="--focus-tokens">Tokens</option>
+                  <option value="--focus-chars">Character count</option>
+                  <option value="--focus-compressed">Compressed size</option>
+                  <option value="--focus-tokens --focus-chars">Tokens &amp; Character count</option>
+                  <option value="--focus-tokens --focus-compressed">Tokens &amp; Compressed size</option>
+                </select>
+              </label>
+
+              <label><input type="checkbox" style="margin-top: 20px" id="minify-keep-lines">Keep linebreaks (Helps debugging)</label>
+            </div>
+            
+            <div style="flex: 0">
+              <table class="count-table" style="margin-top: 15px">
+                <tbody><tr style="">
+                  <td>Tokens: </td>
+                  <td id="count-tokens" style="width: 50px">0</td>
+                  <td id="percent-tokens" style="width: 50px">0%</td>
+                </tr>
+                <tr style="">
+                  <td>Chars: </td>
+                  <td id="count-chars">0</td>
+                  <td id="percent-chars">0%</td>
+                </tr>
+                <tr id="row-compressed">
+                  <td>Compressed: </td>
+                  <td id="count-compressed">8</td>
+                  <td id="percent-compressed">0%</td>
+                </tr>
+                <tr id="row-url-compressed" style="display: none;">
+                  <td>URL chars: </td>
+                  <td id="count-url">0</td>
+                  <td id="percent-url">0%</td>
+                </tr>
+                <tr id="no-row-compressed" style="color: gray; display: none;">
+                  <td>Compressed: </td>
+                  <td colspan="2">N/A</td>
+                </tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-lint" class="flex-row margin ui-tabs-panel ui-corner-bottom ui-widget-content" style="flex: 1 1 0%; display: none;" aria-labelledby="ui-id-2" role="tabpanel" aria-hidden="true">
+          <div id="lint-overlay-parent" class="base" style="flex: 1">
+            <div id="lint-output" class="full asis scroll border" style="margin: 0"></div>
+            <div id="lint-overlay" class="overlay">
+              <div class="center">Linting...</div>
+            </div>
+          </div>
+
+          <div id="lint-opts" style="flex: 0 0 10%; margin-left: 10px">
+            Show lint warnings for:<br>
+            <label><input type="checkbox" id="lint-undef" checked="checked">Undefined vars</label><br>
+            <label><input type="checkbox" id="lint-dup" checked="checked">Duplicate vars</label><br>
+            <label><input type="checkbox" id="lint-unused" checked="checked">Unused vars</label><br>
+            <span style="color: gray">See 
+              <a href="https://github.com/thisismypassport/shrinko8#undefined-variable-lints" target="_blank">readme</a> for more info
+            </span>
+          </div>
+        </div>
+
+        <div id="tab-advanced" class="flex-column margin ui-tabs-panel ui-corner-bottom ui-widget-content" style="flex: 1 1 0%; display: none;" aria-labelledby="ui-id-3" role="tabpanel" aria-hidden="true">
+          <span style="color: gray; margin-bottom: 10px">
+            See <a href="https://github.com/thisismypassport/shrinko8#shrinko8" target="_blank">here</a> for the readme.
+          </span>
+          <textarea id="extra-args" style="flex: 3; margin-bottom: 10px" spellcheck="false" placeholder="You can add custom Shrinko8 command line arguments here (see readme)"></textarea>
+          <div id="script-code" class="ace-textarea ace_editor ace_hidpi ace-tm ace_hasPlaceholder" style="flex: 7" placeholder="You can paste a custom python script here that customizes how Shrinko8 operates.
+For example, you can paste the example sublanguage from the readme"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="opacity: 0; font-size: 1px;"></textarea><div class="ace_gutter" aria-hidden="true"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1000000px;"></div></div><div class="ace_scroller" style="line-height: 0px;"><div class="ace_content"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 4px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_text-layer" style="height: 1000000px; margin: 0px 4px;"></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor"></div></div><div class="ace_placeholder">You can paste a custom python script here that customizes how Shrinko8 operates.
+For example, you can paste the example sublanguage from the readme</div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 20px;"><div class="ace_scrollbar-inner" style="width: 20px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 20px;"><div class="ace_scrollbar-inner" style="height: 20px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;"></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+        </div>
+      </div>
+    </form>
+
+    <script src="Shrinko8%20webapp_files/utils.js"></script>
+    <script src="Shrinko8%20webapp_files/index.js"></script>
+  
+
+</body></html>

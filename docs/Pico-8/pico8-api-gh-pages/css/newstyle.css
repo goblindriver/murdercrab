@@ -1,0 +1,13 @@
+.izoom img:hover {
+  transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+}
+
+.imgrow {
+  display: flex;
+}
+
+.imgcol {
+  flex: 50%;
+  padding: 5px;
+}

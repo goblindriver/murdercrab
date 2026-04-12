@@ -1,0 +1,37 @@
+
+                    #kofi-button-container-wrap { 
+                        position: absolute; 
+                        bottom: 5%; 
+                        left: 5%;
+                    }
+                    
+                    .kofi-supporter-img {
+                            position: absolute;
+                            width: 46px;
+                            @@ -56,28 +50,6 @@ namespace Ko_Fi_2.Data
+                            border-radius: 25px;
+                            border: 2px solid #DDD;
+                    }
+
+                    .kofi-alert-box {
+                        position: absolute;
+                        left: 70px;
+                        bottom: 70%;
+                        max-width: 530px;
+                        font-weight:bold;
+                        background-size: cover;
+                        padding: 45px 10px 10px 10px;
+                        font-size: 20px;
+                        color:white;
+                        text-shadow: 1px 1px 0px black, 0px 0px 2px black, 0px 0px 1px black;
+                        opacity: 0;
+                    }
+
+                    .kofi-alert-box-body {
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                        text-align: center;
+                    }
+
+                    

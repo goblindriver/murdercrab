@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en" class="fa-events-icons-ready" data-lt-installed="true"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="PICO-8%20API_files/icon.png" rel="icon">
+		<title>PICO-8 API</title>
+		<link rel="stylesheet" href="PICO-8%20API_files/bootstrap.min.css" media="screen" title="bootstrap" charset="utf-8">
+		<link rel="stylesheet" href="PICO-8%20API_files/pico8.css">
+		<!-- <link rel="stylesheet" href="css/hljs/p8-default.css"> -->
+		<link rel="stylesheet" href="PICO-8%20API_files/newstyle.css">
+		<!-- Fira Code -->
+		<link href="PICO-8%20API_files/css2.css" rel="stylesheet">
+		<!-- IMAGE STYLE -->
+		<style type="text/css">
+			.imgrow {
+				display: flex;
+				flex-wrap: wrap;
+				padding: 0 4px;
+			}
+
+				/* Create two equal columns that sits next to each other */
+			.imgcolumn {
+				flex: 50%;
+				padding: 0 4px;
+			}
+
+			.imgcolumn img {
+				padding-left: 25%;
+				margin-top: 8px;
+				vertical-align: middle;
+			}
+				</style>
+		<!-- BASE STYLE -->
+		<style type="text/css">
+			@font-face {
+				font-family: "Pico8";
+				src: url("css/pico-8.woff");
+			}
+
+
+
+			body {
+				background-image: url("img/bg.png");
+				background-repeat: repeat;
+			}
+			.nav-pills > li > a {
+				border-radius: 4px 4px 0 0;
+			}
+			.tab-content {
+				color: #FFF1E8;
+				background-color: #337ab7;
+				padding: 15px 15px 5px 15px;
+				border-radius: 15px;
+				border-color: #83769C;
+			}
+			div.tab-pane ul {
+				padding-left: 1.7rem;
+				padding-bottom: 1.7rem;
+			}
+			.api {
+				background-color: #FFF1E8;
+				border-radius: 5px;
+				border-color: #FF004D;
+				margin-top: 20px;
+				margin-bottom: 20px;
+			}
+			.footer {
+				background-color: #FFF1E8;
+				margin-top: 20px;
+				margin-bottom: 10px;
+				border-radius: 5px;
+			}
+
+			.sub-heading {
+				font-family: "Pico8";
+				background-color:  #FF004D;
+				background-size: min-content;
+				/*color:#FF77A8;*/
+				color:#FFF1E8;
+				border-top: 10px solid #7E2553;
+				border-left: 10px solid #7E2553;
+				border-right: 10px solid #7E2553;
+				border-bottom: 0px solid #7E2553;
+				border-top-left-radius: 15px;
+				border-top-right-radius: 15px;
+				border-bottom-left-radius: 0px;
+				border-bottom-right-radius: 0px;
+				padding: 4px 5px 4px 10px;
+				margin-bottom: -1px;
+			}
+
+			/*.sh-link {
+				color:#FF77A8;
+			}			*/
+
+			h6 a {
+				color:#FF77A8;
+			}
+
+			code {
+				font-family: 'Fira Code', monospace;
+				font-size: 10px;
+			}
+			pre {
+				font-family: 'Fira Code', monospace;
+				font-size: 11px;
+				background: #7E2553;
+				border-color: #7E2553;
+				border-top-width: 0px;
+				border-top-left-radius: 0px;
+				border-top-right-radius: 0px;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+
+			/* Tab Paragraph */
+			.note {
+				display: block;
+				font-size: 14px;
+				border-color: #FF77A8;
+			  background:  #1D2B53;
+			  color: #fff1e8;
+			  padding: 0.5em;
+			  border: 20px solid #7E2553;
+				border-radius: 12%;
+				border: 25%;
+			}
+
+			.note code {background: #1D2B53; color: #FFF1E8; font-size:16px;}
+
+		</style>
+		<script src="PICO-8%20API_files/1452dd4c19.js"></script><link href="PICO-8%20API_files/1452dd4c19.css" media="all" rel="stylesheet">
+	</head>
+	<body>
+
+		<!-- TABLE OF CONTENTS
+			[ TOC ]
+			=======
+
+			0x00. HEADER
+			0x01. NAVBAR
+			0x02. HOME
+			0x03. AUDIO
+			0x04. CART DATA
+			0x05. COROUTINES
+			0x06. FLOW CONTROL
+			0x07. GRAPHICS
+			0x08. INPUT
+			0x09. MAP
+			0x0A. MATH
+			0x0B. MEMORY
+			0x0C. OPERATORS
+			0x0D. PEEK / POKE
+			0x0E. PICO-8
+			0x0F. STAT
+			0x10. STRINGS
+			0x11. TABLES
+			0x12. KEYS
+				0x00. KEYS_0
+				0x01. KEYS_1
+			0x13. P8SCII
+			0x14. LUA
+		-->
+
+		<div id="content" class="container api">
+			<!-- HEADER -->
+			<div class="page-header">
+				<h1 style="font-family: Pico8; font-weight: bold; text-align: center;">Pico-8 API Cheatsheet</h1>
+			</div>
+
+			<!-- NAVBAR -->
+			<ul class="nav nav-pills">
+				<!-- class="active" in li -->
+				<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab"><img src="PICO-8%20API_files/icon.png" height="12em" alt="Welcome"></a></li>
+				<li role="presentation"><a href="#audio" aria-controls="audio" role="tab" data-toggle="tab">Audio</a></li>
+				<li role="presentation"><a href="#cartdata" aria-controls="data" role="tab" data-toggle="tab">Cart Data</a></li>
+				<li role="presentation"><a href="#coroutines" aria-controls="coroutines" role="tab" data-toggle="tab">Coroutines</a></li>
+				<li role="presentation"><a href="#flow" aria-controls="flow" role="tab" data-toggle="tab">Flow Control</a></li>
+				<li role="presentation"><a href="#graphics" aria-controls="graphics" role="tab" data-toggle="tab">Graphics</a></li>
+				<li role="presentation"><a href="#input" aria-controls="input" role="tab" data-toggle="tab">Input</a></li>
+				<li role="presentation"><a href="#map" aria-controls="map" role="tab" data-toggle="tab">Map</a></li>
+				<li role="presentation"><a href="#math" aria-controls="math" role="tab" data-toggle="tab">Math</a></li>
+				<li role="presentation"><a href="#memory" aria-controls="memory" role="tab" data-toggle="tab">Memory</a></li>
+				<li role="presentation"><a href="#operators" aria-controls="memory" role="tab" data-toggle="tab">Operators</a></li>
+				<!-- <li role="presentation"><a href="#peekpoke" aria-controls="peekpoke" role="tab" data-toggle="tab">Peek / Poke</a></li> -->
+				<li role="presentation"><a href="#pico8" aria-controls="picocli" role="tab" data-toggle="tab">PICO-8</a></li>
+				<li role="presentation"><a href="#stat" aria-controls="stat" role="tab" data-toggle="tab">Stat</a></li>
+				<li role="presentation"><a href="#strings" aria-controls="strings" role="tab" data-toggle="tab">Strings</a></li>
+				<li role="presentation"><a href="#p8scii" aria-controls="p8scii" role="tab" data-toggle="tab">P8SCII</a></li>
+				<li role="presentation"><a href="#lua" aria-controls="lua" role="tab" data-toggle="tab">Lua</a></li>
+				<li role="presentation"><a href="#tables" aria-controls="tables" role="tab" data-toggle="tab">Tables</a></li>
+				<li role="presentation"><a href="#keys" aria-controls="keys" role="tab" data-toggle="tab">Keyboard Shortcuts</a></li>
+			</ul>
+
+			<div class="tab-content clearfix">
+				<!-- HOME -->
+				<div role="tabpanel" class="tab-pane active" id="home">
+					<p></p><center><img src="PICO-8%20API_files/icon.png" alt="" class="img-responsive"></center><p></p>
+
+					
+					<p class="note">Version <code>0.2.3</code> <br>
+					<!-- <i>Added <b>P8SCII</b> tab, Secret Palette.</i></p> -->
+					<i>Added <code>config</code> section.<br>More to come.</i></p>
+					<h6 class="sub-heading">Commandline Arguments</h6>
+					<style>.a{font-style: italic; color: #fdcc59; font-weight: 900;}</style>
+					<pre><code class="gml hljs sql"><span class="hljs-comment">--  Run Pico-8 from Terminal</span>
+pico-8 [switches] cart.p8
+
+-splore                       <span class="hljs-comment">-- boot in splore mode</span>
+-width                  <span class="a">n</span>     <span class="hljs-comment">-- set the window width</span>
+-height                 <span class="a">n</span>     <span class="hljs-comment">-- set the window height</span>
+-windowed               <span class="a">n</span>     <span class="hljs-comment">-- set windowed mode off (0) or on (1)</span>
+-frameless              <span class="a">n</span>     <span class="hljs-comment">-- run pico-8 in borderless window mode w/ (1); normally w/ (0)</span>
+-volume                 <span class="a">n</span>     <span class="hljs-comment">-- set all audio volume [0..256]</span>
+-sound                  <span class="a">n</span>     <span class="hljs-comment">-- set only sfx volume [0..256]</span>
+-music                  <span class="a">n</span>     <span class="hljs-comment">-- set only music volume [0..256]</span>
+-joystick               <span class="a">n</span>     <span class="hljs-comment">-- joystick controls starts at player n (0..7)</span>
+-pixel_perfect          <span class="a">n</span>     <span class="hljs-comment">-- 1 for unfiltered screen stretching at integer scales</span>
+-preblit_scale          <span class="a">n</span>     <span class="hljs-comment">-- scale the display by n before blitting to screen</span>
+-draw_rect              <span class="a">xywh</span>  <span class="hljs-comment">-- absolute window coordinates and size to draw the p8 screen</span>
+-run                    <span class="a">cart</span>  <span class="hljs-comment">-- load and run a cartridge</span>
+-x                      <span class="a">cart</span>  <span class="hljs-comment">-- execute a PICO-8 cart headless and then quit (experimental!)</span>
+-export                 <span class="a">args</span>  <span class="hljs-comment">-- run EXPORT command in headless mode and exit</span>
+-p                      <span class="a">args</span>  <span class="hljs-comment">-- pass a parameter string to the specified cartridge</span>
+-home_path              <span class="a">path</span>  <span class="hljs-comment">-- set the path to store config.txt and other user data files</span>
+-root_path              <span class="a">path</span>  <span class="hljs-comment">-- set the path to store cartridge files</span>
+-desktop                <span class="a">path</span>  <span class="hljs-comment">-- set a location for screenshots and gifs to be saved</span>
+-gif_scale              <span class="a">n</span>     <span class="hljs-comment">-- scale of gif captures. default: 2 (256x256 pixels)</span>
+-gif_len                <span class="a">n</span>     <span class="hljs-comment">-- set the maximum gif length in seconds (1..120)</span>
+-gui_theme              <span class="a">n</span>     <span class="hljs-comment">-- use 1 for a grey, higher contrast editor color scheme (0: blue)</span>
+-timeout                <span class="a">n</span>     <span class="hljs-comment">-- how many seconds to wait for splore downloads timeout (d: 30)</span>
+-software_blit          <span class="a">n</span>     <span class="hljs-comment">-- use software blitting mode off (0) or on (1)</span>
+-screenshot_scale       <span class="a">n</span>     <span class="hljs-comment">-- scale of screenshots.  default: 3 (368x368 pixels)</span>
+-foreground_sleep_ms    <span class="a">n</span>     <span class="hljs-comment">-- how many milliseconds to sleep between frames.</span>
+-background_sleep_ms    <span class="a">n</span>     <span class="hljs-comment">-- how many milliseconds to sleep between frames in bg</span>
+-accept_future          <span class="a">n</span>     <span class="hljs-comment">-- use (1) to allow loading cartridges made w/ newer P8 versions</span>
+-global_api             <span class="a">n</span>     <span class="hljs-comment">-- use (1) to leave api functions in global scope (debugging)</span>
+-show_fps               <span class="a">n</span>     <span class="hljs-comment">-- displays fps counter (1) on, (0) off</span>
+</code></pre>
+
+<hr>
+					<blockquote style="font-size: 12px;">In 0.2.3, Pico-8 granted us more configuration options with the new <code style="color:  #fff1e8;background-color: #1d2b53">config <i>[option]</i></code> function, allowing for interactive customization while Pico-8 is running.</blockquote>
+					<h6 class="sub-heading">Configuration</h6>
+					<pre><code class="markdown hljs"><span class="hljs-header"># sets the volume, minimum of 8, max of 256.</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> volume [</span><span class="a"><span class="hljs-blockquote">8 - 256</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># set the theme of the pico-8 IDE. choices are </span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> theme [</span><span class="a"><em><span class="hljs-blockquote">auto</span></em><span class="hljs-blockquote">, </span><em><span class="hljs-blockquote">blue</span></em><span class="hljs-blockquote">, </span><em><span class="hljs-blockquote">classic</span></em></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># set the length of saved gifs. defaults to 8, max is 120.</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> gif_len [</span><span class="a"><span class="hljs-blockquote">1 - 120</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># post-gif-recording behavior. 0: </span><b><span class="hljs-header">no reset</span></b><span class="hljs-header">, 1: </span><b><span class="hljs-header">reset</span></b>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> gif_reset_mode [</span><span class="a"><span class="hljs-blockquote">0 - 1</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># gif scaling</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> gif_scale [</span><span class="a"><span class="hljs-blockquote">1 - 8</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># screenshot scaling</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> screenshot_scale [</span><span class="a"><span class="hljs-blockquote">1 - 8</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># splore filtering. </span>
+<span class="hljs-header"># when enabled, any carts marked </span><b><span class="hljs-header">mature</span></b><span class="hljs-header"> will not be downloaded.</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> splore_filter [</span><span class="a"><span class="hljs-blockquote">on, off</span></span><span class="hljs-blockquote">]</span>
+<span class="hljs-header"># tab width size</span>
+<span class="hljs-blockquote">&gt; </span><span class="hljs-built_in"><span class="hljs-blockquote">config</span></span><span class="hljs-blockquote"> tab_width [</span><span class="a"><span class="hljs-blockquote">1 - 8</span></span><span class="hljs-blockquote">]</span>
+</code></pre>
+
+<hr>
+					<h6 class="sub-heading">PICO-8 Specs</h6>
+					<pre><code class="markdown hljs"><span class="hljs-bullet">- </span>display: 128x128, fixed 16 colour palette
+<span class="hljs-bullet">- </span>input: 6 buttons
+<span class="hljs-bullet">- </span>cartridge size: 32k
+<span class="hljs-bullet">- </span>sound: 4 channel, 64 definable chip blerps
+<span class="hljs-bullet">- </span>code: lua, max 8192 tokens of code
+<span class="hljs-bullet">- </span>sprites: single bank of 128 8x8 sprites + 128 shared
+<span class="hljs-bullet">- </span>map: 128x32 8-bit cels + 128x32 shared</code></pre>
+
+				</div>
+
+				<!-- AUDIO -->
+				<div role="tabpanel" class="tab-pane fade" id="audio">
+					<p></p><center><img src="PICO-8%20API_files/keyboard.png" alt="" class="img-responsive"></center><p></p>
+
+					<h6 class="sub-heading">Audio Manipulation</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">music</span>([n, [fade_len, [channel_mask]]]) <span class="hljs-comment">-- play music; n = -1: stop</span>
+<span class="hljs-built_in">sfx</span>(n, [channel, [offset]]) <span class="hljs-comment">-- play sfx; n = -1: stop in channel; n = -2: release loop in channel</span></code></pre>
+				</div>
+
+				<!-- CART DATA -->
+				<div role="tabpanel" class="tab-pane fade" id="cartdata">
+					<h6 class="sub-heading">Cart Data Manipulation</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">cartdata</span>(id) <span class="hljs-comment">-- permanent data storage in slot [id]; once/execution</span>
+<span class="hljs-built_in">dget</span>(idx) <span class="hljs-comment">-- get number at index</span>
+<span class="hljs-built_in">dset</span>(idx, val) <span class="hljs-comment">-- set number at index to value</span></code></pre>
+				</div>
+
+				<!-- COROUTINES -->
+				<div role="tabpanel" class="tab-pane fade" id="coroutines">
+					<h6 class="sub-heading">Coroutines::<u><a href="http://www.lexaloffle.com/bbs/?tid=3458" target="_blank" style="color: white;">view coroutines thread</a></u></h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">cocreate</span>(f) <span class="hljs-comment">-- returns a coroutine that executes f</span>
+<span class="hljs-built_in">coresume</span>(c) <span class="hljs-comment">-- resume coroutine c execution</span>
+<span class="hljs-built_in">costatus</span>(c) <span class="hljs-comment">-- returns true if c is still executing, false otherwise</span>
+<span class="hljs-built_in">yield</span>() <span class="hljs-comment">-- use inside a coroutine; makes a coroutine pause execution until next resume</span></code></pre>
+					<p></p><center></center><p></p>
+				</div>
+
+
+				<!-- FLOW CONTROL -->
+				<div role="tabpanel" class="tab-pane fade" id="flow">
+
+					<h6 class="sub-heading">Execution Flow</h6>
+					<pre><code class="lua hljs">_draw()		<span class="hljs-comment">-- called once per visible frame</span>
+_init()		<span class="hljs-comment">-- called once on program startup</span>
+_update()	<span class="hljs-comment">-- called once per update at 30fps</span>
+_update60()	<span class="hljs-comment">-- called once per update at 60fps</span></code></pre>
+
+					<h6 class="sub-heading">Flow Control</h6>
+					<pre><code class="lua hljs">::label:: <span class="hljs-comment">-- label</span>
+goto label <span class="hljs-comment">-- jump</span>
+
+<span class="hljs-keyword">if</span> (&lt;condition&gt;) <span class="hljs-comment">-- inline if</span>
+
+<span class="hljs-keyword">if</span> &lt;condition&gt; <span class="hljs-keyword">then</span>
+ <span class="hljs-comment">-- if block</span>
+<span class="hljs-keyword">elseif</span> &lt;condition&gt; <span class="hljs-keyword">then</span>
+ <span class="hljs-comment">-- elseif block</span>
+<span class="hljs-keyword">else</span>
+ <span class="hljs-comment">-- else block</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-keyword">while</span> &lt;condition&gt; <span class="hljs-keyword">do</span>
+ <span class="hljs-comment">-- while block</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-keyword">repeat</span>
+ <span class="hljs-comment">-- repeat block</span>
+<span class="hljs-keyword">until</span> &lt;condition&gt;
+
+<span class="hljs-keyword">for</span> &lt;var&gt; = &lt;first&gt;, &lt;last&gt;, &lt;step&gt; <span class="hljs-keyword">do</span>
+ <span class="hljs-comment">-- for block</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-keyword">for</span> &lt;var&gt; <span class="hljs-keyword">in</span> all(&lt;<span class="hljs-built_in">table</span>&gt;) <span class="hljs-keyword">do</span>
+ <span class="hljs-comment">-- for block</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-keyword">for</span> &lt;key&gt;, &lt;value&gt; <span class="hljs-keyword">in</span> <span class="hljs-built_in">pairs</span>(&lt;<span class="hljs-built_in">table</span>&gt;) <span class="hljs-keyword">do</span>
+ <span class="hljs-comment">-- for block</span>
+<span class="hljs-keyword">end</span></code></pre>
+				</div>
+
+				<!-- GRAPHICS -->
+				<div role="tabpanel" class="tab-pane fade" id="graphics">
+
+
+					<h6 class="sub-heading">PALETTES</h6>
+						<pre><code class="lua hljs">
+						
+						<div class="imgrow">
+
+								<div class="imgcolumn"><img src="PICO-8%20API_files/normal_palette.png" alt="Normal Palette"></div>
+								<div class="imgcolumn"><img src="PICO-8%20API_files/secret_palette.png" alt="Secret Palette"></div>
+						</div>
+					</code></pre>
+
+
+					<h6 class="sub-heading">Graphics Manipulation</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">camera</span>([x, y]) <span class="hljs-comment">-- set camera position</span>
+<span class="hljs-built_in">circ</span>(x, y, r, [col]) <span class="hljs-comment">-- draw circle</span>
+<span class="hljs-built_in">circfill</span>(x, y, r, [col]) <span class="hljs-comment">-- draw filled circle</span>
+<span class="hljs-built_in">clip</span>([x, y, w, h]) <span class="hljs-comment">-- set screen clipping region</span>
+<span class="hljs-built_in">cls</span>([col]) <span class="hljs-comment">-- clear screen; col = clear color</span>
+<span class="hljs-built_in">color</span>(col) <span class="hljs-comment">-- set default color</span>
+<span class="hljs-built_in">cursor</span>(x, y) <span class="hljs-comment">-- set cursor and CR/LF margin position</span>
+<span class="hljs-built_in">fget</span>(n, [f]) <span class="hljs-comment">-- get values of sprite flags</span>
+<span class="hljs-built_in">fillp</span>(mask) <span class="hljs-comment">-- set fill pattern for circ, circfill, rect, rectfill, pset, and line</span>
+<span class="hljs-built_in">flip</span>() <span class="hljs-comment">-- flip screen back buffer (30fps)</span>
+<span class="hljs-built_in">fset</span>(n, [f], v) <span class="hljs-comment">-- set values of sprite flags</span>
+<span class="hljs-built_in">line</span>(x0, y0, x1, y1, [col]) <span class="hljs-comment">-- draw line</span>
+<span class="hljs-built_in">oval</span>(x0, y0, x1, y1, [col]) <span class="hljs-comment">-- draws an ellipse inside of a bounding rectangle</span>
+<span class="hljs-built_in">ovalfill</span>(x0, y0, x1, y1, [col]) <span class="hljs-comment">-- draws a colored ellipse</span>
+<span class="hljs-built_in">pal</span>(c0, c1, [p]) <span class="hljs-comment">-- swaps col 0 to col 1; p = 0 = draw palette; p = 1 = screen palette</span>
+<span class="hljs-built_in">palt</span>(col, t) <span class="hljs-comment">-- set transparency for colour to t (bool)</span>
+<span class="hljs-built_in">pget</span>(x, y) <span class="hljs-comment">-- get pixel colour</span>
+<span class="hljs-built_in"><span class="hljs-built_in">print</span></span>(str, [x, y, [col]]) <span class="hljs-comment">-- print string</span>
+<span class="hljs-built_in">pset</span>(x, y, [col]) <span class="hljs-comment">-- set pixel colour</span>
+<span class="hljs-built_in">rect</span>(x0, y0, x1, y1, [col]) <span class="hljs-comment">-- draw rectangle</span>
+<span class="hljs-built_in">rectfill</span>(x0, y0, x1, y1, [col]) <span class="hljs-comment">-- draw filled rectangle</span>
+<span class="hljs-built_in">sget</span>(x, y) <span class="hljs-comment">-- get spritesheet pixel colour</span>
+<span class="hljs-built_in">spr</span>(n, x, y, [w, h], [flip_x], [flip_y]) <span class="hljs-comment">-- draw sprite</span>
+<span class="hljs-built_in">sset</span>(x, y, [col]) <span class="hljs-comment">-- set spritesheet pixel colour</span>
+<span class="hljs-built_in">sspr</span>(sx, sy, sw, sh, dx, dy, [dw, dh], [flip_x], [flip_y]) <span class="hljs-comment">-- draw texture from spritesheet</span>
+
+ <span class="hljs-comment">-- Draws a textured line between two points, sampling the map for data</span>
+<span class="hljs-built_in">tline</span>(x0, y0, x1, y1, mx, my, [mdx], [mdy])
+</code></pre>
+
+
+					<h6 class="sub-heading"><code>fillp()</code> mask</h6>
+					<pre><code class="hljs sql">.<span class="hljs-comment">-----------------------.</span>
+|32768|16384| 8192| 4096|
+|<span class="hljs-comment">-----|-----|-----|-----|</span>
+| 2048| 1024| 512 | 256 |
+|<span class="hljs-comment">-----|-----|-----|-----|</span>
+| 128 |  64 |  32 |  16 |
+|<span class="hljs-comment">-----|-----|-----|-----|</span>
+|  8  |  4  |  2  |  1  |
+'<span class="hljs-comment">-----------------------'</span></code></pre>
+				</div>
+
+				<!-- INPUT -->
+				<div role="tabpanel" class="tab-pane fade" id="input">
+					<p></p><center><img style="border-radius: 5px;" src="PICO-8%20API_files/input.png" alt="" class="img-responsive"></center><p></p>
+
+					<h6 class="sub-heading">Input Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">btn</span>([i, [p]]) <span class="hljs-comment">-- get button i state for player p</span>
+<span class="hljs-built_in">btnp</span>([i, [p]]) <span class="hljs-comment">-- true when the button was not pressed the last frame; delays 4 frames after button held for 15 frames</span></code></pre>
+
+					<h6 class="sub-heading">Input::Custom Delays</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- Button check time delays; measured in frames @ 30FPS</span>
+<span class="hljs-comment">-- The default values of 15 and 4 will be used if a value of 0 is given for delay</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5F5C</span>, delay) <span class="hljs-comment">-- sets the initial delay before repeating; 255 will turn off repeat completely</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5F5D</span>, delay) <span class="hljs-comment">-- sets the repeating delay.</span>
+</code></pre>
+				</div>
+
+				<!-- MAP -->
+				<div role="tabpanel" class="tab-pane fade" id="map">
+					<h6 class="sub-heading">Map Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">map</span>(cel_x, cel_y, sx, sy, cel_w, cel_h, [layer]) <span class="hljs-comment">-- draw map; layers from flags; sprite 0 is empty</span>
+<span class="hljs-built_in">mget</span>(x, y) <span class="hljs-comment">-- get map value</span>
+<span class="hljs-built_in">mset</span>(x, y, v) <span class="hljs-comment">-- set map value</span></code></pre>
+
+					<h6 class="sub-heading">Map::Deprecated</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- Functions just like map(), but is no longer used.</span>
+<span class="hljs-built_in">mapdraw</span>(cel_x, cel_y, sx, sy, cel_w, cel_h, [layer])</code></pre>
+				</div>
+
+				<!-- MATH -->
+				<div role="tabpanel" class="tab-pane fade" id="math">
+					<h6 class="sub-heading">Mathematical Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- numeric representation range</span>
+-<span class="hljs-number">32768.0</span> .. <span class="hljs-number">32767.99</span><br>
+<span class="hljs-built_in">abs</span>(x) <span class="hljs-comment">-- x absolute value</span>
+<span class="hljs-built_in">atan2</span>(x, y) <span class="hljs-comment">-- coordinate to angle; range [0..1]</span>
+<span class="hljs-built_in">cos</span>(x) <span class="hljs-comment">-- cosinus; range [0..1]</span>
+<span class="hljs-built_in">flr</span>(x) <span class="hljs-comment">-- round down</span>
+-<span class="hljs-built_in">flr</span>(-x) <span class="hljs-comment">-- not a function per se, but will work as ceil(x)</span>
+<span class="hljs-built_in">max</span>(x, y) <span class="hljs-comment">-- x/y maximum</span>
+<span class="hljs-built_in">mid</span>(x, y, z) <span class="hljs-comment">-- x/y/z middle value</span>
+<span class="hljs-built_in">min</span>(x, y) <span class="hljs-comment">-- x/y minimum</span>
+<span class="hljs-built_in">rnd</span>(x) <span class="hljs-comment">-- random; 0 &lt;= n &lt; x</span>
+<span class="hljs-built_in">sgn</span>(x) <span class="hljs-comment">-- returns argument sign: -1 or 1; sgn(0) = 1</span>
+<span class="hljs-built_in">sin</span>(x) <span class="hljs-comment">-- x sine, [0..1]; inverted</span>
+<span class="hljs-built_in">sqrt</span>(x) <span class="hljs-comment">-- x square root</span>
+<span class="hljs-built_in">srand</span>(x) <span class="hljs-comment">-- set random seed</span></code></pre>
+				</div>
+
+
+
+				<!-- MEMORY -->
+				<div role="tabpanel" class="tab-pane fade" id="memory">
+
+					<h6 class="sub-heading">Memory Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- The two following functions load from filename, and work with multi-cart export</span>
+<span class="hljs-comment">-- copy bytes from ram to rom</span>
+<span class="hljs-built_in">cstore</span>(dest_addr, src_addr, len, [filename])
+<span class="hljs-comment">-- copy bytes from rom to ram</span>
+<span class="hljs-built_in">reload</span>(dest_addr, src_addr, len, [filename])
+
+<span class="hljs-comment">-- copy bytes</span>
+<span class="hljs-built_in">memcpy</span>(dest_addr, src_addr, len)
+<span class="hljs-comment">-- set len bytes to val</span>
+<span class="hljs-built_in">memset</span>(dest_addr, val, len)
+
+<span class="hljs-comment">-- read byte in ram address</span>
+<span class="hljs-built_in">peek</span>(addr)
+<span class="hljs-comment">-- write val in ram address</span>
+<span class="hljs-built_in">poke</span>(addr, val) 
+
+<span class="hljs-comment">-- interface for Raspberry Pi</span>
+<span class="hljs-built_in">serial</span>(channel, address, length) <span class="hljs-comment">-- write val in ram address</span></code></pre>
+
+
+					<h6 class="sub-heading">Memory::Ram Layout</h6>
+					<pre><code class="lua hljs"><span class="hljs-number">0x0</span>    <span class="hljs-comment">-- gfx</span>
+<span class="hljs-number">0x1000</span> <span class="hljs-comment">-- shared gfx2/map2</span>
+<span class="hljs-number">0x2000</span> <span class="hljs-comment">-- map</span>
+<span class="hljs-number">0x3000</span> <span class="hljs-comment">-- gfx flags</span>
+<span class="hljs-number">0x3100</span> <span class="hljs-comment">-- song</span>
+<span class="hljs-number">0x3200</span> <span class="hljs-comment">-- sfx</span>
+<span class="hljs-number">0x4300</span> <span class="hljs-comment">-- user data</span>
+<span class="hljs-number">0x5e00</span> <span class="hljs-comment">-- persistent cart data (256 bytes)</span>
+<span class="hljs-number">0x5f00</span> <span class="hljs-comment">-- draw state</span>
+<span class="hljs-number">0x5f40</span> <span class="hljs-comment">-- hardware state</span>
+<span class="hljs-number">0x5f80</span> <span class="hljs-comment">-- gpio pins (128 bytes)</span>
+<span class="hljs-number">0x6000</span> <span class="hljs-comment">-- screen (8k)</span></code></pre>
+
+					<h6 class="sub-heading">Memory::Types</h6>
+					<pre><code class="markdown hljs"><span class="hljs-bullet">1. </span>base ram (32kB)
+<span class="hljs-bullet">2. </span>cart rom
+<span class="hljs-bullet">3. </span>lua ram (1MB)</code></pre>
+
+
+
+					<h6 class="sub-heading">Memory::Keyboard/Mouse Mode</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- enable keyboard and mouse experimental mode</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2d</span>, flags) <span class="hljs-comment">-- flags are the following:</span>
+<span class="hljs-number">0x1</span> <span class="hljs-comment">-- enable</span>
+<span class="hljs-number">0x2</span> <span class="hljs-comment">-- mouse buttons trigger btn(4)..btn(6)</span>
+<span class="hljs-number">0x4</span> <span class="hljs-comment">-- pointer lock (use stat 38..39 to read movements)</span>
+
+<span class="hljs-comment">-- example init function</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mouse_init</span><span class="hljs-params">(on,b2b,plock)</span></span>
+ <span class="hljs-comment">-- assign appropriate values</span>
+ on = on <span class="hljs-keyword">and</span> <span class="hljs-number">0x01</span> <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-comment">-- on ……enables mouse </span>
+ b2b = b2b <span class="hljs-keyword">and</span> <span class="hljs-number">0x02</span> <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-comment">-- b2b……mouse btns-&gt;btn(❎🅾️◆)</span>
+ plock = plock <span class="hljs-keyword">and</span> <span class="hljs-number">0x04</span> <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-comment">-- plock…enable pointer lock</span>
+ <span class="hljs-comment">-- combine into a bitfield</span>
+ <span class="hljs-keyword">local</span> flags = on+b2b+plock
+ <span class="hljs-comment">-- pass the bitfield into memory</span>
+ <span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2d</span>,flags)
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">30</span>) <span class="hljs-comment">-- read keyboard had input (bool); repeats every 4 frames after key held for 15 frames</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">31</span>) <span class="hljs-comment">-- read keyboard character</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">32</span>) <span class="hljs-comment">-- read x coord</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">33</span>) <span class="hljs-comment">-- read y coord</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">34</span>) <span class="hljs-comment">-- read button bitmask; 1 = primary, 2 = secondary, 4 = middle</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">30</span>) <span class="hljs-comment">-- a boolean value representing if a keypress has occurred</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">31</span>) <span class="hljs-comment">-- string name of the keypress when stat(30) is true</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">32</span>) <span class="hljs-comment">-- mouse X</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">33</span>) <span class="hljs-comment">-- mouse Y</span>
+<span class="hljs-comment">-- mouse buttons bitfield</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">34</span>)<span class="hljs-comment">-- 0x1: left, 0x2: right, 0x4: middle</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">35</span>)<span class="hljs-comment">-- unknown</span>
+<span class="hljs-comment">-- mouse wheel event</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">36</span>) <span class="hljs-comment">-- 1 up, -1 down</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">37</span>) <span class="hljs-comment">-- mouse acceleration delta</span>
+<span class="hljs-comment">-- 0x4 flag must be set for 38 and 39</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">38</span>) <span class="hljs-comment">-- relative x movement in host desktop pixels</span>
+<span class="hljs-built_in">stat</span>(<span class="hljs-number">39</span>) <span class="hljs-comment">-- relative y movement in host desktop pixels</span>
+</code></pre>
+
+					<h6 class="sub-heading">Memory::Graphics Modes</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">0</span>) <span class="hljs-comment">-- standard, 128x128</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">1</span>) <span class="hljs-comment">-- horizontal stretch, 64x128</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">2</span>) <span class="hljs-comment">-- vertical stretch, 128x64</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">3</span>) <span class="hljs-comment">-- zoomed, 64x64</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">4</span>) <span class="hljs-comment">-- standard, 128x128</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">5</span>) <span class="hljs-comment">-- mirror left half</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">6</span>) <span class="hljs-comment">-- mirror top half</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f2c</span>, <span class="hljs-number">7</span>) <span class="hljs-comment">-- mirror top-left quarter</span>
+</code></pre>
+
+					<h6 class="sub-heading">Memory::Raspberry Pi / Pocketchip GPIO</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- run pico-8 as root ("sudo pico-8")</span>
+<span class="hljs-comment">-- 128 pin values in the range [0..255]</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f80</span>, value) <span class="hljs-comment">-- send value to gpio0</span>
+<span class="hljs-built_in">peek</span>(<span class="hljs-number">0x5f81</span>) <span class="hljs-comment">-- get value from gpio1</span>
+
+<span class="hljs-comment">--[[
+For more precise timing, the serial() command can be used. GPIO writes are buffered and 
+dispatched at the end of each frame, allowing clock cycling at higher and/or more regular 
+speeds than is possible by manually bit-banging using poke() calls
+
+  channel:
+    0x000..0x0fe    corresponds to gpio pin numbers; send 0x00 for LOW or 0xFF for HIGH
+    0x0ff           delay; length is taken to mean "duration" in microseconds (excl. overhead)
+    0x400..0x401    ws281x LED string (experimental)
+  	
+  address: The PICO-8 memory location to read from / write to.
+  length:  Number of bytes to send. 1/8ths are allowed to send partial bit strings.
+]]</span><span class="hljs-comment">--</span>
+</code></pre>
+
+				</div>
+
+				<!-- OPERATORS -->
+				<div role="tabpanel" class="tab-pane fade" id="operators">
+					<h6 class="sub-heading">Operators::Bitwise</h6>
+					<pre><code class="lua hljs">x &amp; y&nbsp;&nbsp; <span class="hljs-comment">-- both bits are set</span>
+x | y&nbsp;&nbsp; <span class="hljs-comment">-- either bit is set</span>
+x ^^ y&nbsp; <span class="hljs-comment">-- either bit is set, but not both of them</span>
+~ x&nbsp;&nbsp;&nbsp;&nbsp; <span class="hljs-comment">-- each bit is not set</span>
+x &lt;&lt; n&nbsp;&nbsp;<span class="hljs-comment">-- shift left n bits (zeros come in from the right)</span>
+x &gt;&gt; n&nbsp;&nbsp;<span class="hljs-comment">-- arithmetic right shift (the left-most bit state is duplicated)</span>
+x &gt;&gt;&gt; n <span class="hljs-comment">-- logical right shift (zeros comes in from the left)</span>
+x &lt;&lt;&gt; n <span class="hljs-comment">-- rotate all bits in x left by n places</span>
+x &gt;&gt;&lt; n <span class="hljs-comment">-- rotate all bits in x right by n places</span></code></pre>
+
+					<h6 class="sub-heading">Operations::Bitwise</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">band</span>(x, y) <span class="hljs-comment">-- both bits are set</span>
+<span class="hljs-built_in">bor</span>(x, y)&nbsp; <span class="hljs-comment">-- either bit is set</span>
+<span class="hljs-built_in">bxor</span>(x, y) <span class="hljs-comment">-- either bit is set, but not both of them</span>
+<span class="hljs-built_in">bnot</span>(x)&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-comment">-- each bit is not set</span>
+<span class="hljs-built_in">shl</span>(x, n)&nbsp;&nbsp;<span class="hljs-comment">-- shift left n bits (zeros come in from the right)</span>
+<span class="hljs-built_in">shr</span>(x, n)&nbsp;&nbsp;<span class="hljs-comment">-- arithmetic right shift (the left-most bit state is duplicated)</span>
+<span class="hljs-built_in">lshr</span>(x, n) <span class="hljs-comment">-- logical right shift (zeros comes in from the left)</span>
+<span class="hljs-built_in">rotl</span>(x, n) <span class="hljs-comment">-- rotate all bits in x left by n places</span>
+<span class="hljs-built_in">rotr</span>(x, n) <span class="hljs-comment">-- rotate all bits in x right by n places</span></code></pre>
+
+					<h6 class="sub-heading">Operators::Assignment</h6>
+					<pre><code class="lua hljs">a = b <span class="hljs-comment">-- set</span>
+a + b <span class="hljs-comment">-- sum</span>
+a - b <span class="hljs-comment">-- sub</span>
+a * b <span class="hljs-comment">-- mul</span>
+a / b <span class="hljs-comment">-- div</span>
+a \ b <span class="hljs-comment">-- int div; ie: flr(x)/n</span>
+a % b <span class="hljs-comment">-- mod</span>
+a ^ b <span class="hljs-comment">-- pow</span></code></pre>
+
+
+					<h6 class="sub-heading">Operators::Augmented Assignment</h6>
+					<pre><code class="lua hljs">a += b <span class="hljs-comment">-- sum to</span>
+a -= b <span class="hljs-comment">-- sub to</span>
+a *= b <span class="hljs-comment">-- mul to</span>
+a /= b <span class="hljs-comment">-- div to</span>
+a %= b <span class="hljs-comment">-- mod to</span>
+a ^= b <span class="hljs-comment">-- pow to</span></code></pre>
+
+
+					<h6 class="sub-heading">Operators::Relational</h6>
+					<pre><code class="lua hljs">a == b <span class="hljs-comment">-- equivalent</span>
+a ~= b <span class="hljs-comment">-- non-equivalent</span>
+a != b <span class="hljs-comment">-- non-equivalent</span>
+a &gt; b&nbsp; <span class="hljs-comment">-- greater</span>
+a &lt; b&nbsp; <span class="hljs-comment">-- less</span>
+a &gt;= b <span class="hljs-comment">-- greater or equivalent</span>
+a &lt;= b <span class="hljs-comment">-- less or equivalent</span></code></pre>
+
+					<h6 class="sub-heading">Operators::Boolean</h6>
+					<pre><code class="lua hljs"><span class="hljs-keyword">not</span> a&nbsp;&nbsp; <span class="hljs-comment">-- negation</span>
+a <span class="hljs-keyword">and</span> b <span class="hljs-comment">-- conjunction</span>
+a <span class="hljs-keyword">or</span> b&nbsp; <span class="hljs-comment">-- disjunction</span></code></pre>
+
+					<h6 class="sub-heading">Operators::Delimiters</h6>
+					<pre><code class="lua hljs">(a)</code></pre>
+				</div>
+
+
+
+				<!-- PICO-8 -->
+				<div role="tabpanel" class="tab-pane fade" id="pico8">
+
+					<h6 class="sub-heading">Command Line Interface</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">assert</span>(condition) <span class="hljs-comment">-- verify that condition is true</span>
+cd .. <span class="hljs-comment">-- change to parent directory</span>
+cd [dirname] <span class="hljs-comment">-- change directory</span>
+dir() <span class="hljs-comment">-- list items</span>
+exit() <span class="hljs-comment">-- close pico-8 app</span>
+export(filename.html, [cart1.p8, cart2.p8 ... cart15]) <span class="hljs-comment">-- export game in html; up to 15 extra carts (.p8 format)</span>
+export(filename.png) <span class="hljs-comment">-- export spritesheet</span>
+export(filename.wav) <span class="hljs-comment">-- export the current sfx / music</span>
+export(filename%d.wav) <span class="hljs-comment">-- export all sfx as numbered files</span>
+extcmd(cmd) <span class="hljs-comment">-- control screenshots; "label" = cart label; "screen" = screenshot; "rec" = start gif; "video" = save gif</span>
+folder() <span class="hljs-comment">-- open carts folder in operating system</span>
+help() <span class="hljs-comment">-- show summary of system commands</span>
+import(filename.png) <span class="hljs-comment">-- import spritesheet. expects 128x128 png and colour-fits to the pico-8 palette</span>
+info() <span class="hljs-comment">-- print cart info</span>
+install_demos() <span class="hljs-comment">-- install demo p8 carts alongside pico-8 app</span>
+install_games() <span class="hljs-comment">-- install selection of bbs carts</span>
+keyconfig() <span class="hljs-comment">-- keyboard configuration for player buttons</span>
+<span class="hljs-built_in">load</span>(<span class="hljs-string">"@clip"</span>) <span class="hljs-comment">-- paste cart from clipboard, bbs support</span>
+<span class="hljs-built_in">load</span>(filename) <span class="hljs-comment">-- load cart; works with multi-cart export</span>
+ls() <span class="hljs-comment">-- list items</span>
+menuitem(index, [label, callback]) <span class="hljs-comment">-- add an extra item to the pause menu; index in [1..5]; no label or callback removes the item</span>
+mkdir(dirname) <span class="hljs-comment">-- create directory</span>
+printh(str, [filename, overwrite]) <span class="hljs-comment">-- print str to terminal; append or overwrite to filename</span>
+reboot() <span class="hljs-comment">-- reboot pico8</span>
+resume() <span class="hljs-comment">-- resume cart execution</span>
+run() <span class="hljs-comment">-- boot cart</span>
+save(<span class="hljs-string">"@clip"</span>) <span class="hljs-comment">-- copy cart to clipboard, bbs support</span>
+save(filename) <span class="hljs-comment">-- save cart</span>
+shutdown() <span class="hljs-comment">-- close pico-8 app</span>
+splore() <span class="hljs-comment">-- explore cartridges</span>
+stat(x) <span class="hljs-comment">-- read some execution values, read below</span>
+time() <span class="hljs-comment">-- returns seconds since last reboot</span>
+<span class="hljs-built_in">type</span>(v) <span class="hljs-comment">-- returns type of v: number, string or table</span></code></pre>
+
+					<h6 class="sub-heading">Debugging</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- After running the game with </span><kbd><span class="hljs-comment">ctrl + r</span></kbd><span class="hljs-comment">, press </span><kbd><span class="hljs-comment">escape</span></kbd><span class="hljs-comment"> to pause execution</span>
+. <span class="hljs-comment">-- Entering a '.' into the console will advance the game to the next frame</span>
+<kbd>enter</kbd> <span class="hljs-comment">-- Continue entering the '.' character or simply press </span><kbd><span class="hljs-comment">enter</span></kbd>
+<span class="hljs-built_in">print</span>(player.x) <span class="hljs-comment">-- Show the current, live x value of the player. Game does not cease execution, &amp; updates each frame!</span>
+?player.x <span class="hljs-comment">-- '?' functions just like 'print' and can be used in place as shorthand</span>
+resume() <span class="hljs-comment">-- The 'resume' function will return the game to a normal running state.</span>
+</code></pre>
+
+					<h6 class="sub-heading">Javascript</h6>
+					<pre><code class="javascript hljs">pico8_gpio[] <span class="hljs-comment">// read and write gpio pins</span>
+pico8_buttons[] <span class="hljs-comment">// bitfields for player input</span></code></pre>
+
+					<h6 class="sub-heading">Private Functions</h6>
+					<!-- <p>Use Carefully!</p> -->
+					<pre><code class="lua hljs">_get_frames_skipped() <span class="hljs-comment">-- used automatically by _mainloop()</span>
+_get_menu_item_selected(n) <span class="hljs-comment">-- returns true or false if the n-th menu item is selected; n in [1..5]; used automatically by _mainloop()</span>
+_mainloop() <span class="hljs-comment">-- main pico-8's "while true"</span>
+_pausemenu[n].callback() <span class="hljs-comment">-- execute the n-th menu item's callback; n in [1..5]; used automatically by _mainloop()</span>
+_set_mainloop_exists(n) <span class="hljs-comment">-- ?</span>
+_update_buttons() <span class="hljs-comment">-- used automatically by _mainloop()</span>
+holdframe() <span class="hljs-comment">-- used automatically by _mainloop()</span></code></pre>
+				</div>
+
+
+				<!-- STATS -->
+				<div role="tabpanel" class="tab-pane fade" id="stat">
+					<p>The stat() function returns information about the current runtime environment.<br>
+						Each kind of information has an <code>ID</code> (a number), described below. </p>
+
+					<h6 class="sub-heading">Stat Overview</h6>
+					<pre><code class="lua hljs">stat(<span class="hljs-number">4</span>) <span class="hljs-comment">-- clipboard; after user pressed ctrl-v</span>
+stat([<span class="hljs-number">16.</span><span class="hljs-number">.19</span>]) <span class="hljs-comment">-- index of playing sfx on channels [0..3]</span>
+stat([<span class="hljs-number">20.</span><span class="hljs-number">.23</span>]) <span class="hljs-comment">-- note number (0..31) on channels [0..3]</span>
+stat(<span class="hljs-number">30</span>) <span class="hljs-comment">-- keyboard key hit; see "peek / poke" tab</span>
+stat(<span class="hljs-number">31</span>) <span class="hljs-comment">-- keyboard character; see "peek / poke" tab</span>
+stat(<span class="hljs-number">32</span>) <span class="hljs-comment">-- mouse x coord; see "peek / poke" tab</span>
+stat(<span class="hljs-number">33</span>) <span class="hljs-comment">-- mouse y coord; see "peek / poke" tab</span>
+stat(<span class="hljs-number">34</span>) <span class="hljs-comment">-- mouse button bitmask; see "peek / poke" tab</span></code></pre>
+
+					<h6 class="sub-heading">Stat::Memory and CPU</h6>
+					<pre><code class="lua hljs">stat(<span class="hljs-number">0</span>) <span class="hljs-comment">--[[ Memory Usage
+The number returned is a value in Kilobytes, with 1 representing 1024 bytes.
+Any decimal value returned is accurate, for example, 1.875 is equivalent to 1920 bytes.
+
+This value accounts for ANY &amp; ALL data used in the Lua code, including variables and tables, etc.
+Thus, the maxiumum amount this can return is 2048, ie, 2 Megabytes, the total amount of memory alloted to Lua.
+
+This value does NOT include any peekable/pokeable RAM, ie, graphical/video, nor does it include the cart ROM.
+]]</span><span class="hljs-comment">--</span>
+
+stat(<span class="hljs-number">1</span>) <span class="hljs-comment">--[[ Total CPU Usage
+Initializes at </span><code><span class="hljs-comment">0</span></code><span class="hljs-comment"> from the first _update call after the most recent _draw call.
+The value will increment steadily towards 1 as the next frame approaches.
+
+Ultimately, if the _update function is used, a value of 1 would represent 1/30th of a second having elapsed.
+If instead the _update60 function is used, a value of 1 would represent 1/60th of a second instead.
+
+Any time this returns a value exceeding 1 is an indication that the current cart is beyond the processing power it
+is allotted for that frame. This means that frames will likely be dropped to compensate for the slow down.
+]]</span><span class="hljs-comment">--</span>
+
+stat(<span class="hljs-number">2</span>) <span class="hljs-comment">--[[ System CPU Usage
+This value represents the the range/behavior seen in stat(1)
+
+The difference between the two is that this value will only increase when PICO-8 is processing unseen code.
+
+For example, if the screen was cleared 70 times in a step, stat(2) would return a value &gt; 1.
+That's because the cls() function is a system call, but if the frame was spent calculating PI,
+stat(2) wouldn't rise, as such calculations are not system calls.
+]]</span><span class="hljs-comment">--</span></code></pre>
+				</div>
+
+
+				<!-- STRINGS -->
+				<div role="tabpanel" class="tab-pane fade" id="strings">
+					<!-- Glyph Images (OUTDATED) -->
+					<!-- 					<div class="imgrow">
+												Plain Glyphs
+											<div class="imgcol"><img src="img/glyphs.png" alt="" class="img-responsive"></div>
+										ALL Glyphs
+											<div class="imgcol"><img src="img/all_glyphs.png" alt="" class="img-responsive"></div>
+										</div> -->
+				<p></p><center><img style="border-radius: 6px;width: 25%; height: 25%" src="PICO-8%20API_files/all_glyphs.png" alt="" class="izoom"></center><p></p>
+
+					<h6 class="sub-heading">Strings</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- single quotes require no shift key, quicker to type!</span>
+single = <span class="hljs-string">'type faster'</span>
+<span class="hljs-comment">-- double quotes keep the escape sequences at bay!</span>
+double = <span class="hljs-string">"type safer"</span>
+
+<span class="hljs-comment">-- if you need the single quote character while inside a single quoted string,</span>
+<span class="hljs-comment">-- you must make use of the backslash as an escape character</span>
+escaped = <span class="hljs-string">'it\'s a mad, mad, mad, mad world'</span>
+
+<span class="hljs-comment">-- lua and pico-8 have escape sequences that allow you to use non-text symbols in strings</span>
+<span class="hljs-comment">-- click </span><a href="https://www.lua.org/pil/2.4.html" target="_blank"><span class="hljs-comment">here</span></a><span class="hljs-comment"> for more on escape sequences in lua</span>
+newline = <span class="hljs-string">"\n"</span>
+backspace = <span class="hljs-string">"\b"</span>
+
+<span class="hljs-comment">-- multiline strings use double brackets</span>
+<span class="hljs-comment">-- they preserve the formatting within them allowing for a newline at their start too</span>
+bracketed = <span class="hljs-string">[[
+Through me you pass into the city of woe:
+Through me you pass into eternal pain:
+Through me among the people lost for aye.
+Justice the founder of my fabric moved:
+To rear me was the task of power divine,
+Supremest wisdom, and primeval love.
+Before me things create were none, save things
+Eternal, and eternal I shall endure.
+All hope abandon, ye who enter here.
+]]</span></code></pre>
+
+					<h6 class="sub-heading">String:Operators</h6>
+					<pre><code class="lua hljs">#	<span class="hljs-comment">-- Retrieves the length of a string</span>
+..	<span class="hljs-comment">-- </span><a href="https://en.wikipedia.org/wiki/Concatenation"><span class="hljs-comment">Concatenation</span></a></code></pre>
+
+
+
+					<h6 class="sub-heading">String::Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">sub</span>(str, from, [to]) <span class="hljs-comment">-- Get character[s] in the range [from]:[to]</span>
+
+<span class="hljs-comment">-- Convert val to a string; if hex is true and val is a number; Output: "0x0000.0000"</span>
+<span class="hljs-built_in">tostr</span>(val, [hex])
+<span class="hljs-comment">-- Cast parseable str to number; nil if str isn't a number; "0xAF" format for hex</span>
+<span class="hljs-built_in">tonum</span>(str) <span class="hljs-keyword">or</span> <span class="hljs-string">"123.45"</span> + <span class="hljs-number">0</span> <span class="hljs-comment">-- alternative to tonum</span>
+
+<span class="hljs-comment">-- gets a string character from a value[0..255]</span>
+<span class="hljs-built_in">chr</span>(num)
+<span class="hljs-comment">-- gets the index [0..255] from a character</span>
+<span class="hljs-built_in">ord</span>(str)
+
+<span class="hljs-comment">-- ♥ : 135 </span>
+<span class="hljs-built_in">print</span>(chr(<span class="hljs-number">135</span>).. <span class="hljs-string">" : "</span>.. ord(<span class="hljs-string">'♥'</span>))
+
+<span class="hljs-comment">-- split a string into a table of elements delimited by the given separator (defaults to ",").</span>
+<span class="hljs-built_in">split</span>(str, [separator], [convert_numbers])
+
+<span class="hljs-comment">--[[
+When convert_numbers is true, numerical tokens are stored as numbers (defaults to true).
+Empty elements are stored as empty strings.
+When the separator is "", every character is split into a separate element.
+]]</span><span class="hljs-comment">--</span>
+
+<span class="hljs-built_in">split</span>(str, [separator], [convert_numbers])
+	split(<span class="hljs-string">"1,2,3"</span>) <span class="hljs-comment">-- returns {1,2,3}</span>
+	split(<span class="hljs-string">"one:two:3"</span>,<span class="hljs-string">":"</span>,<span class="hljs-keyword">false</span>) <span class="hljs-comment">-- returns {"one","two","3"}</span>
+	split(<span class="hljs-string">"1,,2,"</span>) <span class="hljs-comment">-- returns {1,"",2,""}</span></code></pre>
+
+
+					<h6 class="sub-heading">String::Special</h6>
+					<pre><code class="lua hljs"> <span class="hljs-comment">-- written on a single line, ? can be used to call print without brackets</span>
+?<span class="hljs-string">"hi"</span>
+<span class="hljs-comment">-- when printing without [x,y] arguments, newlines are automatically added to strings</span>
+<span class="hljs-comment">-- this behavior can be overridden by using the </span><b><span class="hljs-comment">explicit termination command</span></b>
+?<span class="hljs-string">"quick brown fox"</span>
+<span class="hljs-comment">-- &gt;&gt; quick brown fox</span>
+<span class="hljs-comment">-- &gt;&gt; </span>
+?<span class="hljs-string">"quick brown fox\0"</span>
+<span class="hljs-comment">-- &gt;&gt; quick brown fox</span>
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">"l:\x8b r:\x91 u:\x94 d:\x83 o:\x8e x:\x97"</span>)</code></pre>
+				</div>
+
+				<!-- 0x13. P8SCII-->
+				<div role="tabpanel" class="tab-pane fade" id="p8scii">
+					<p>
+						When used with <span class="hljs-built_in">print</span>(), some characters have a special meaning.<br>
+						Each possibility is detailed below.<br>
+					</p>
+
+					<h6 class="sub-heading">P8SCII</h6>
+
+
+
+					<pre><code class="lua hljs"><span class="hljs-comment">-- all control characters are the values in this range.</span>
+<span class="hljs-built_in">chr</span>(<span class="hljs-number">0</span>)..<span class="hljs-built_in">chr</span>(<span class="hljs-number">15</span>)
+<span class="hljs-comment">-- they can also be written with their corresponding escape sequence</span>
+<span class="hljs-string">"\n"</span> <span class="hljs-comment">-- creates a newline</span>
+</code></pre>
+
+					<p class="note"><code style="background: #1D2B53; color: #C2C3C7;">?</code> is pico-8 shorthand for <span class="hljs-built_in">print</span></p>
+
+					<h6 class="sub-heading">P8SCII::Parameters</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- Extended Hexadecimal</span>
+<span class="hljs-string">'0'</span>..<span class="hljs-string">'f'</span> == <span class="hljs-number">0.</span><span class="hljs-number">.15</span>.
+<span class="hljs-comment">--[[
+Some of the control codes below take parameters which are written using a scheme that is
+a superset of hexidecimal format. That is, '0'..'f' also mean 0..15. But characters after
+'f' are also accepted: 'g' means 16 and so on. Such parameters are written below as P0, P1.
+]]</span><span class="hljs-comment">--</span>
+
+<span class="hljs-comment">-- For example, to print with a blue background ("\#c") and dark gray foreground ("\f5"):</span>
+
+<span class="hljs-built_in"><span class="hljs-built_in">print</span></span>(<span class="hljs-string">"\#c\f5 blue "</span>)
+
+<span class="hljs-comment">-- the only side-effects on the draw state are changes in cursor position and foreground color</span>
+<span class="hljs-comment">-- all other attributes are reset each time print() is called</span>
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII:Control Codes</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- Control Codes</span>
+<span class="hljs-built_in">chr</span>(<span class="hljs-number">0</span>) <span class="hljs-string">"\0"</span>   <span class="hljs-comment">-- terminate printing</span>
+<span class="hljs-number">1</span> <span class="hljs-string">"\*"</span>   <span class="hljs-comment">-- repeat next character P0 times. ?"\*3a" --&gt; aaa</span>
+<span class="hljs-number">2</span> <span class="hljs-string">"\#"</span>   <span class="hljs-comment">-- draw solid background with colour P0</span>
+<span class="hljs-number">3</span> <span class="hljs-string">"\-"</span>   <span class="hljs-comment">-- shift cursor horizontally by P0-16 pixels</span>
+<span class="hljs-number">4</span> <span class="hljs-string">"\|"</span>   <span class="hljs-comment">-- shift cursor vertically by P0-16 pixels</span>
+<span class="hljs-number">5</span> <span class="hljs-string">"\+"</span>   <span class="hljs-comment">-- shift cursor by P0-16, P1-16 pixels</span>
+<span class="hljs-number">6</span> <span class="hljs-string">"\^"</span>   <span class="hljs-comment">-- special command (see P8SCII::Special Commands)</span>
+<span class="hljs-number">7</span> <span class="hljs-string">"\a"</span>   <span class="hljs-comment">-- audio (see below)</span>
+<span class="hljs-number">8</span> <span class="hljs-string">"\b"</span>   <span class="hljs-comment">-- backspace</span>
+<span class="hljs-number">9</span> <span class="hljs-string">"\t"</span>   <span class="hljs-comment">-- tab</span>
+a <span class="hljs-string">"\n"</span>   <span class="hljs-comment">-- newline</span>
+b <span class="hljs-string">"\v"</span>   <span class="hljs-comment">-- decorate previous character (see below)</span>
+c <span class="hljs-string">"\f"</span>   <span class="hljs-comment">-- set foreground colour</span>
+d <span class="hljs-string">"\r"</span>   <span class="hljs-comment">-- carriage return</span>
+e <span class="hljs-string">"\014"</span> <span class="hljs-comment">-- switch to font defined at 0x5600</span>
+f <span class="hljs-string">"\015"</span> <span class="hljs-comment">-- switch to default font</span>
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Special Commands</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- All of these are strings used in the print function</span>
+<span class="hljs-number">1.</span><span class="hljs-number">.9</span>  <span class="hljs-comment">-- skip 1,2,4,8,16,32..256 frames</span>
+c <span class="hljs-comment">-- cls to colour P0, set cursor to 0,0</span>
+g <span class="hljs-comment">-- set cursor position to home</span>
+h <span class="hljs-comment">-- set home to cursor position</span>
+j <span class="hljs-comment">-- jump to absolute P0*4, P1*4 (in screen pixels)</span>
+s <span class="hljs-comment">-- set tab stop width to P0 pixels (used by "\t")</span>
+x <span class="hljs-comment">-- set character width  (default: 4)</span>
+y <span class="hljs-comment">-- set character height (default: 6)</span>
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Audio</h6>
+					<pre><code class="lua hljs">?<span class="hljs-string">"\a"</span>   <span class="hljs-comment">-- single beep</span>
+?<span class="hljs-string">"\a12"</span> <span class="hljs-comment">-- play existing data at sfx 12 (the index is written in decimal)</span>
+
+<span class="hljs-comment">-- If an sfx index is not specified, a non-active sfx between 60..63 is selected automatically.</span>
+<span class="hljs-comment">-- To fill the SFX with data before playback, the following commands can then be appended.</span>
+
+<span class="hljs-comment">-- 1. (optional) SFX attributes must appear once at the start as they apply to the whole sound:</span>
+
+	s P0     set the sfx speed
+	l P0 P1  set the sfx loop start <span class="hljs-keyword">and</span> <span class="hljs-keyword">end</span> points
+
+<span class="hljs-comment">-- 2. Note data:</span>
+
+Notes are written as a..g, optionally followed by a sharp # <span class="hljs-keyword">or</span> flat -, <span class="hljs-keyword">and</span> octave number.
+
+	<span class="hljs-built_in"><span class="hljs-built_in">print</span></span> <span class="hljs-string">"\ace-g"</span> <span class="hljs-comment">-- minor triad</span>
+
+Note attributes apply to allow following notes. Adjust with:
+
+	i P0    set the instrument (default: <span class="hljs-number">5</span>)
+	v P0    set the volume     (default: <span class="hljs-number">5</span>)
+	x P0    set the effect     (default: <span class="hljs-number">0</span>)
+	&lt;  &gt;   increase <span class="hljs-keyword">or</span> decrease volume by <span class="hljs-number">1</span>
+
+<span class="hljs-comment">-- For example, to play a fast (speed 4), staccato (effect 5) arpeggio starting at C1:</span>
+
+	<span class="hljs-built_in"><span class="hljs-built_in">print</span></span> <span class="hljs-string">"\as4x5c1egc2egc3egc4"</span>
+</code></pre>
+					<h6 class="sub-heading">P8SCII::Decoration Characters</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- \v</span>
+The control character \v can be used to decorate the last printed character with another
+character at a given offset, without needing to otherwise manage the cursor position.
+After the decorating character is printed, the previous cursor position is restored.
+
+The format is \v P0 char, where P0 is a number giving the desired offset, <span class="hljs-keyword">and</span> char
+is any character to <span class="hljs-built_in">print</span> at that offset (relative to the previous printed character).
+
+The offset has x packed into the lowest <span class="hljs-number">2</span> bits, <span class="hljs-keyword">and</span> starts (-<span class="hljs-number">2</span>,-<span class="hljs-number">8</span>) <span class="hljs-keyword">in</span> reading order.
+So <span class="hljs-number">3</span> means (+<span class="hljs-number">1</span>, -<span class="hljs-number">8</span>), <span class="hljs-number">4</span> means (-<span class="hljs-number">2</span>, -<span class="hljs-number">7</span>) <span class="hljs-keyword">and</span> so on.
+
+For example, to write <span class="hljs-string">"café!"</span>, using a comma to draw the accute accent:
+
+	<span class="hljs-built_in">print</span><span class="hljs-string">"\ncafe\vb,!"</span>
+
+In this case P0 is <span class="hljs-string">'b'</span>, which is read as the number <span class="hljs-number">11.</span> So the comma is drawn at:
+	x = (<span class="hljs-number">11</span>%<span class="hljs-number">4</span>)-<span class="hljs-number">2</span> = <span class="hljs-number">1</span>
+	y = (<span class="hljs-number">11</span>\<span class="hljs-number">4</span>)-<span class="hljs-number">8</span> = -<span class="hljs-number">6</span>
+</code></pre>
+
+
+					<h6 class="sub-heading">P8SCII::Custom Font</h6>
+					<pre><code class="lua hljs"><span class="hljs-number">0x5600</span> <span class="hljs-comment">--Custom Font Location</span>
+ 
+A custom font can be defined at <span class="hljs-number">0x5600</span>, consisting of <span class="hljs-number">8</span> bytes per character * <span class="hljs-number">256</span> characters
+= <span class="hljs-number">2048</span> bytes. Each character is an <span class="hljs-number">8</span>x8 bitfield (<span class="hljs-number">1</span> bit/pixel), where starting from the top,
+each row is a single byte starting with <span class="hljs-number">0x1</span> on the left.
+
+The first five bytes (character <span class="hljs-number">0</span> is never drawn) describes attributes of the font:
+
+	<span class="hljs-number">0x5f60</span> <span class="hljs-comment">-- character width in pixels (can be more than 8, but only 8 pixels are drawn)</span>
+	<span class="hljs-number">0x5f61</span> <span class="hljs-comment">-- character width for character 128 and above</span>
+	<span class="hljs-number">0x5f62</span> <span class="hljs-comment">-- character height in pixels</span>
+	<span class="hljs-number">0x5f63</span> <span class="hljs-comment">-- draw offset x</span>
+	<span class="hljs-number">0x5f64</span> <span class="hljs-comment">-- draw offset y</span>
+</code></pre>
+
+					<h6 class="sub-heading">P8SCII::Default Attributes</h6>
+					<!-- ? == <span class="hljs-built_in">print</span> -->
+					<pre><code class="lua hljs"><span class="hljs-comment">-- attributes are reset every time print() is called</span>
+<span class="hljs-comment">-- it is possible, however to reset their values by writing to the following memory addresses</span>
+<span class="hljs-number">0x5f58</span> .. <span class="hljs-number">0x5f5b</span>
+
+<span class="hljs-comment">-- bitfield map</span>
+<span class="hljs-number">0x5f58</span>
+	<span class="hljs-number">0x1</span>  <span class="hljs-comment">-- when set to 0x1, bits 1..7 are observed:</span>
+	<span class="hljs-number">0x2</span>  <span class="hljs-comment">-- padding</span>
+	<span class="hljs-number">0x4</span>  <span class="hljs-comment">-- wide</span>
+	<span class="hljs-number">0x8</span>  <span class="hljs-comment">-- tall</span>
+	<span class="hljs-number">0x10</span> <span class="hljs-comment">-- solid background</span>
+	<span class="hljs-number">0x20</span> <span class="hljs-comment">-- invert</span>
+	<span class="hljs-number">0x40</span> <span class="hljs-comment">-- dotty</span>
+	<span class="hljs-number">0x80</span> <span class="hljs-comment">-- use custom font</span>
+
+<span class="hljs-comment">-- e.g. pinball everywhere</span>
+<span class="hljs-built_in">poke</span>(<span class="hljs-number">0x5f58</span>, <span class="hljs-number">0x1</span> | <span class="hljs-number">0x2</span> | <span class="hljs-number">0x4</span> | <span class="hljs-number">0x8</span> | <span class="hljs-number">0x20</span> | <span class="hljs-number">0x40</span>)
+
+<span class="hljs-number">0x5f59</span> <span class="hljs-comment">--char_w   (low nibble), char_h   (high)</span>
+<span class="hljs-number">0x5f5a</span> <span class="hljs-comment">--char_w2  (low nibble), tab_w    (high)</span>
+<span class="hljs-number">0x5f5b</span> <span class="hljs-comment">--offset_x (low nibble), offset_y (high)</span>
+
+<span class="hljs-comment">-- any nibbles equal to 0 are ignored</span>
+<span class="hljs-comment">-- tab_w values mapped to the following range</span>
+<span class="hljs-number">4.</span><span class="hljs-number">.64</span></code></pre>
+
+				</div>
+
+				<!-- 0x14. LUA-->
+				<div role="tabpanel" class="tab-pane fade" id="lua">
+
+					<h6 class="sub-heading">Lua</h6>
+					<pre><code class="lua hljs">
+<span class="hljs-comment">-- returns all of the arguments after index.</span>
+<span class="hljs-built_in"><span class="hljs-built_in">select</span></span>(index, ...)
+
+<span class="hljs-comment">-- these functions provide raw access to tables</span>
+<span class="hljs-comment">-- if any metamethods are defined for them, they are ignored</span>
+<span class="hljs-built_in"><span class="hljs-built_in">rawset</span></span>(t, key, value)
+<span class="hljs-built_in"><span class="hljs-built_in">rawget</span></span>(t, key)
+<span class="hljs-built_in"><span class="hljs-built_in">rawequal</span></span>(t1, t2)
+<span class="hljs-built_in">rawlen</span>(t)
+
+
+</code></pre>
+				</div>
+
+				<!-- TABLES -->
+				<div role="tabpanel" class="tab-pane fade" id="tables">
+					<h6 class="sub-heading">Table Functions</h6>
+					<pre><code class="lua hljs"><span class="hljs-built_in">add</span>(t, v) <span class="hljs-comment">-- add v to t</span>
+<span class="hljs-built_in">all</span>(t) <span class="hljs-comment">-- used in 'for v in all(t)' loops</span>
+<span class="hljs-built_in">count</span>(t) <span class="hljs-comment">-- returns number of elements in the table</span>
+<span class="hljs-built_in">del</span>(t, v) <span class="hljs-comment">-- delete first instance of v in t</span>
+<span class="hljs-built_in">foreach</span>(t, f) <span class="hljs-comment">-- call f() for each v in t</span>
+<span class="hljs-built_in">ipairs</span>(t) <span class="hljs-comment">-- loops through a numerically indexed table; for _, v in ipairs(t) do end</span>
+<span class="hljs-built_in">pairs</span>(t) <span class="hljs-comment">-- loops through string indexed tables; for k,v in pairs(t) do end</span>
+<span class="hljs-built_in">pack</span>(...) <span class="hljs-comment">-- adds any number of arguments into a table and returns the table</span>
+<span class="hljs-built_in">unpack</span>(t, [i], [j]) <span class="hljs-comment">-- returns all entries in a table as arguments</span>
+<span class="hljs-built_in">rnd</span>(t) <span class="hljs-comment">-- returns a random value from a table</span>
+</code></pre>
+
+					<h6 class="sub-heading">Metatables::<u><a href="http://www.lexaloffle.com/bbs/?tid=3342" target="_blank">view metatables thread</a></u></h6>
+					<pre><code class="lua hljs">mt = {} <span class="hljs-comment">-- init metatable</span>
+<span class="hljs-built_in">setmetatable</span>(t, mt) <span class="hljs-comment">-- set metatable mt to table t</span></code></pre>
+
+					<h6 class="sub-heading">Metatables::Special Keys</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- object oriented programming; invoked as 't:foo()' / 't:bar()'</span>
+fun = {}
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fun.foo</span><span class="hljs-params">(t)</span></span> dosomething() <span class="hljs-keyword">end</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fun.bar</span><span class="hljs-params">(t)</span></span> dosomethingmore() <span class="hljs-keyword">end</span>
+mt.__index = fun
+
+<span class="hljs-comment">-- property assignment; invoked when calling 't[k] = v'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__newindex</span><span class="hljs-params">(t, k, v)</span></span> <span class="hljs-built_in">rawset</span>(t, k, v) <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- weak references; keys and / or values</span>
+mt.__mode = <span class="hljs-string">"k"</span> <span class="hljs-keyword">or</span> <span class="hljs-string">"v"</span> <span class="hljs-keyword">or</span> <span class="hljs-string">"kv"</span>
+
+<span class="hljs-comment">-- treat a table like a function; invoked when calling 't()'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__call</span><span class="hljs-params">(t)</span></span> dosomething() <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- hide metatable; returned by 'getmetatable(t)'</span>
+public_mt = {}
+mt.__metatable = public_mt
+
+<span class="hljs-comment">-- string casting; returned by 'tostring(t)'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__tostring</span><span class="hljs-params">(t)</span></span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">tostr</span>(t) <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- table length; returned by '#t'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__len</span><span class="hljs-params">(t)</span></span> <span class="hljs-keyword">return</span> #t <span class="hljs-keyword">end</span></code></pre>
+
+					<h6 class="sub-heading">Metatables::Mathematic Operators</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- unary minus; returned by '-t'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__unm</span><span class="hljs-params">(t)</span></span> <span class="hljs-keyword">return</span> -t <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- addition; returned by 'a + b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__add</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a + b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- subtraction; returned by 'a - b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__sub</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a - b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- multiplication; returned by 'a * b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__mul</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a * b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- division; returned by 'a / b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__div</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a / b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- modulo; returned by 'a % b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__mod</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a % b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- involution; returned by 'a ^ b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__pow</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a ^ b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- concatenation; returned by 'a .. b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__concat</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a .. b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- stringcasting; returned by 'a .. b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt:__tostring</span><span class="hljs-params">()</span></span> <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">in</span> <span class="hljs-built_in">pairs</span>(self) <span class="hljs-keyword">do</span> <span class="hljs-built_in">print</span>(tostr(k)..<span class="hljs-string">": "</span>..tostr(v)) <span class="hljs-keyword">end</span> <span class="hljs-keyword">end</span></code></pre>
+
+					<h6 class="sub-heading">Metatables::Comparison Operators</h6>
+					<pre><code class="lua hljs"><span class="hljs-comment">-- check for equality; returned by 'a == b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__eq</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a == b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- check for less-than; returned by 'a &lt; b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__lt</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a &lt; b <span class="hljs-keyword">end</span>
+
+<span class="hljs-comment">-- check for less-than-or-equal; returned by 'a &lt;= b'</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mt.__le</span><span class="hljs-params">(a, b)</span></span> <span class="hljs-keyword">return</span> a &lt;= b <span class="hljs-keyword">end</span></code></pre>
+				</div>
+
+				<!-- KEYS -->
+				<div role="tabpanel" class="tab-pane fade" id="keys">
+					<div class="row">
+						<!-- KEYS_0 -->
+						<div class="col-md-6">
+							<h5><u>General</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>fullscreen</strong>:</dt> <dd><kbd>alt + enter</kbd> / <kbd>cmd + f</kbd></dd>
+								<dt><strong>quit</strong>:</dt> <dd><kbd>alt + f4</kbd> / <kbd>cmd + q</kbd></dd>
+								<dt><strong>reload and run</strong>:</dt> <dd><kbd>ctrl + r</kbd></dd>
+								<dt><strong>save</strong>:</dt> <dd><kbd>ctrl + s</kbd></dd>
+								<dt><strong>cpu graph</strong>:</dt> <dd><kbd>ctrl + p</kbd></dd>
+								<dt><strong>mute / unmute</strong>:</dt> <dd><kbd>ctrl + m</kbd></dd>
+								<dt><strong>show fps</strong>:</dt> <dd><kbd>ctrl + 1</kbd></dd>
+								<dt><strong>screenshot</strong>:</dt> <dd><kbd>ctrl + 6</kbd> / <kbd>f6</kbd> / <kbd>f1</kbd></dd>
+								<dt><strong>cart img</strong>:</dt> <dd><kbd>ctrl + 7</kbd> / <kbd>f7</kbd> / <kbd>f2</kbd></dd>
+								<dt><strong>start video</strong>:</dt> <dd><kbd>ctrl + 8</kbd> / <kbd>f8</kbd> / <kbd>f3</kbd></dd>
+								<dt><strong>save video</strong>:</dt> <dd><kbd>ctrl + 9</kbd> / <kbd>f9</kbd> / <kbd>f4</kbd></dd>
+								<dt><strong>keyboard cursor</strong>:</dt> <dd><kbd>f10</kbd></dd>
+								<dt><strong>navigate editors</strong>:</dt> <dd><kbd>alt + right</kbd> / <kbd>alt + left</kbd></dd>
+								<dt><strong>cli completion</strong>:</dt> <dd><kbd>tab</kbd></dd>
+							</dl>
+
+							<h5><u>Splore</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>navigate lists</strong>:</dt> <dd><kbd>left</kbd> / <kbd>right</kbd></dd>
+								<dt><strong>navigate carts</strong>:</dt> <dd><kbd>up</kbd> / <kbd>down</kbd> / <kbd>home</kbd> / <kbd>end</kbd> / <kbd>pageup</kbd> / <kbd>pagedown</kbd></dd>
+								<dt><strong>launch cart</strong>:</dt> <dd><kbd>x</kbd> / <kbd>o</kbd> / <kbd>menu</kbd></dd>
+								<dt><strong>favourite cart</strong>:</dt> <dd><kbd>f</kbd></dd>
+							</dl>
+
+							<h5><u>Sprite / Map Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>undo</strong>:</dt> <dd><kbd>ctrl + z</kbd></dd>
+								<dt><strong>copy (bbs support)</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste (bbs support)</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>pan</strong>:</dt> <dd><kbd>space</kbd> / <kbd>mmb</kbd></dd>
+								<dt><strong>navigate sprite <i>l/r</i></strong>:</dt> <dd><kbd>q</kbd> / <kbd>w</kbd></dd>
+								<dt><strong>navigate sprite <i>u/d</i></strong>:</dt> <dd><kbd>shift + q</kbd> / <kbd>shift + w</kbd></dd>
+								<dt><strong>navigate colours</strong>:</dt> <dd><kbd>1</kbd> / <kbd>2</kbd></dd>
+								<dt><strong>navigate tabs</strong>:</dt> <dd><kbd>+</kbd> / <kbd>-</kbd></dd>
+								<dt><strong>fullscreen</strong>:</dt> <dd><kbd>tab</kbd></dd>
+								<dt><strong>zoom</strong>:</dt> <dd><kbd>mousewheel</kbd></dd>
+								<dt><strong>zoom</strong>:</dt> <dd><kbd>shift + ,</kbd> / <kbd>shift + .</kbd></dd>
+								<dt><strong>flip y</strong>:</dt> <dd><kbd>f</kbd></dd>
+								<dt><strong>flip x</strong>:</dt> <dd><kbd>v</kbd></dd>
+								<dt><strong>rotate</strong>:</dt> <dd><kbd>r</kbd></dd>
+								<dt><strong>move</strong>:</dt> <dd><kbd>cursors</kbd></dd>
+								<h6>Draw Tool</h6>
+								<dt><strong>replace colour</strong>:</dt> <dd><kbd>lctrl</kbd></dd>
+								<dt><strong>eyedropper</strong>:</dt> <dd><kbd>rmb</kbd></dd>
+								<h6>stamp tool</h6>
+								<dt><strong>stamp w/ transparency</strong>:</dt> <dd><kbd>lctrl</kbd></dd>
+								<h6>select tool</h6>
+								<dt><strong>select sprites</strong>:</dt> <dd><kbd>shift + drag</kbd></dd>
+								<h6>shape tool</h6>
+								<dt><strong>toggle shape</strong>:</dt> <dd><kbd>leftclick on icon</kbd></dd>
+								<dt><strong>fill shape</strong>:</dt> <dd><kbd>ctrl</kbd></dd>
+							</dl>
+						</div>
+
+						<!-- KEYS_1 -->
+						<div class="col-md-6">
+							<h5><u>Code Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>skip across words</strong>:</dt> <dd><kbd>ctrl + left</kbd> / <kbd>ctrl + right</kbd></dd>
+								<dt><strong>jump to start of line</strong>:</dt> <dd><kbd>ctrl + w</kbd></dd>
+								<dt><strong>jump to end of line</strong>:</dt> <dd><kbd>ctrl + e</kbd></dd>
+								<dt><strong>select</strong>:</dt> <dd><kbd>shift</kbd></dd>
+								<dt><strong>select word</strong>:</dt> <dd><kbd>double click</kbd></dd>
+								<dt><strong>cut</strong>:</dt> <dd><kbd>ctrl + x</kbd></dd>
+								<dt><strong>copy</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>undo</strong>:</dt> <dd><kbd>ctrl + z</kbd></dd>
+								<dt><strong>redo</strong>:</dt> <dd><kbd>ctrl + y</kbd></dd>
+								<dt><strong>toggle commenting</strong>:</dt> <dd><kbd>ctrl + b</kbd></dd>
+								<dt><strong>next code tab</strong>:</dt> <dd><kbd>ctrl + tab</kbd></dd>
+								<dt><strong>previous code tab</strong>:</dt> <dd><kbd>ctrl + shift + tab</kbd></dd>
+								<dt><strong>indent</strong>:</dt> <dd><kbd>tab</kbd></dd>
+								<dt><strong>unindent</strong>:</dt> <dd><kbd>shift + tab</kbd></dd>
+								<dt><strong>auto-indent/end</strong>:</dt> <dd><kbd>shift + enter</kbd></dd>
+								<dt><strong>duplicate line</strong>:</dt> <dd><kbd>ctrl + d</kbd></dd>
+								<dt><strong>search</strong>:</dt> <dd><kbd>ctrl + f</kbd></dd>
+								<dt><strong>search across tabs</strong>:</dt> <dd><kbd>ctrl + h</kbd></dd>
+								<dt><strong>repeat search</strong>:</dt> <dd><kbd>ctrl + g</kbd></dd>
+								<dt><strong>navigate functions</strong>:</dt> <dd><kbd>alt + up</kbd> / <kbd>alt + down</kbd></dd>
+								<dt><strong>start / end of code</strong>:</dt> <dd><kbd>ctrl + up</kbd> / <kbd>ctrl + down</kbd></dd>
+								<dt><strong>button glyphs</strong>:</dt> <dd><kbd>shift + l, r, u, d, x, o</kbd></dd>
+								<dt><strong>icons</strong>:</dt> <dd><kbd>shift + qwetyipasfghjkzcvbnm</kbd></dd>
+								<dt><strong>glyph mode</strong>:</dt> <dd><kbd>ctrl + k</kbd></dd>
+								<dt><strong>puny font mode</strong>:</dt> <dd><kbd>ctrl + p</kbd></dd>
+								<dt><strong>hiragana mode</strong>:</dt> <dd><kbd>ctrl + j</kbd></dd>
+								<dt><strong>katakana mode</strong>:</dt> <dd><kbd>ctrl + k</kbd></dd>
+
+							</dl>
+
+							<h5><u>SFX / Music Editor</u></h5>
+							<dl class="dl-horizontal">
+								<dt><strong>play / pause</strong>:</dt> <dd><kbd>space</kbd></dd>
+								<dt><strong>copy</strong>:</dt> <dd><kbd>ctrl + c</kbd></dd>
+								<dt><strong>paste</strong>:</dt> <dd><kbd>ctrl + v</kbd></dd>
+								<dt><strong>set all notes</strong>:</dt> <dd><kbd>shift + lmb</kbd></dd>
+								<dt><strong>modify speed</strong>:</dt> <dd><kbd>&lt;</kbd> / <kbd>&gt;</kbd></dd>
+								<dt><strong>navigate</strong>:</dt> <dd><kbd>home</kbd>, <kbd>end</kbd>, <kbd>pageup</kbd>, <kbd>pagedown</kbd>, <kbd>mousewheel</kbd></dd>
+								<dt><strong>navigate patterns</strong>:</dt> <dd><kbd>+</kbd> / <kbd>-</kbd></dd>
+								<dt><strong>snap to Cm pentatonic</strong>:</dt> <dd><kbd>ctrl</kbd></dd>
+								<dt><strong>speed x4</strong>:</dt> <dd><kbd>shift</kbd></dd>
+								<dt><strong>release loop</strong>:</dt> <dd><kbd>a</kbd></dd>
+								<dt><strong>delete</strong>:</dt> <dd><kbd>backspace</kbd></dd>
+								<h6>SFX</h6>
+								<dt><strong>select all in note</strong>:</dt> <dd><kbd>doubleclick</kbd></dd>
+								<h6>Effects</h6>
+								<dt><strong>0</strong> ::</dt> <dd>none</dd>
+								<dt><strong>1</strong> ::</dt> <dd>slide</dd>
+								<dt><strong>2</strong> ::</dt> <dd>vibrato</dd>
+								<dt><strong>3</strong> ::</dt> <dd>drop (drum kick!)</dd>
+								<dt><strong>4</strong> ::</dt> <dd>fade in</dd>
+								<dt><strong>5</strong> ::</dt> <dd>fade out</dd>
+								<dt><strong>6</strong> ::</dt> <dd>fast arpeggio (4 notes)</dd>
+								<dt><strong>7</strong> ::</dt> <dd>slow arpeggio (4 notes)</dd>
+							</dl>
+						</div>
+					</div>
+			</div>
+		</div>
+
+		<div class="footer">
+			<div class="row">
+				<div class="col-md-4" style="text-align: center;">pico-8 by <a href="http://www.lexaloffle.com/" target="_blank">lexaloffle</a> <img src="PICO-8%20API_files/lexaloffle.png" style="width: 25px;"></div>
+				<div class="col-md-4" style="text-align: center;">made with <i class="fa fa-heart text-danger"></i> by <a href="https://neko250.github.io/" target="_blank">neko250</a></div>
+				<div class="col-md-4" style="text-align: center;">updated with <i class="fa fa-heart text-danger"></i> by <a href="https://odd.codes/" target="_blank">iiviigames</a></div>
+				<div class="col-md-4" style="text-align: center;">contribute on <a href="https://github.com/iiviigames/pico8-api" target="_blank">github</a> <i class="fa fa-lg fa-code-fork text-primary"></i></div>
+			</div>
+		</div>
+
+		<script src="PICO-8%20API_files/jquery.min.js" charset="utf-8"></script>
+		<script src="PICO-8%20API_files/bootstrap.min.js" charset="utf-8"></script>
+
+		<script src="PICO-8%20API_files/highlight.default.lua.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+
+
+		<!-- <script src="js/hljs/highlight.pack.js"></script> -->
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script> -->
+		<!-- <script src="./js/hljs/lua.js"></script> -->
+		<!-- <script src="js/hljs/lua.js"></script> -->
+		<!-- <script>
+			import hljs from 'js/hljs/highlight.js';
+			import p8 from "js/hljs/p8.js"
+			hljs.registerLanguage("p8");
+			hljs.highlightAll();
+			// hljs.initHighlightingOnLoad();
+		</script> -->
+	
+
+</div></body></html>

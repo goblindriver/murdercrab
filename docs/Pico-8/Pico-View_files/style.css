@@ -1,0 +1,671 @@
+
+/****************************************************************************************
+                                                        THEME COLOR PALETTE VARIABLES
+****************************************************************************************/
+
+:root{
+    /*  PICO-8 DEFAULT COLORS  */
+    --p8-black: #000000;
+    --p8-d-blue: #1D2B53;
+    --p8-d-purple: #7E2553;
+    --p8-d-green: #008751;
+    --p8-brown: #AB5236;
+    --p8-d-gray: #5F574F;
+    --p8-gray: #C2C3C7;
+    --p8-white: #FFF1E8;
+    --p8-red: #FF004D;
+    --p8-orange: #FFA300;
+    --p8-yellow: #FFEC27;
+    --p8-green: #00E436;
+    --p8-blue: #29ADFF;
+    --p8-indigo: #83769C;
+    --p8-pink: #FF77A8;
+    --p8-peach: #FFCCAA;
+
+    /*  CUSTOM COLORS  */
+    --cus-d-gray: #1e1e1e;
+
+    --main-bg: #2b2b34;
+    --nav-bg: var(--cus-d-gray);
+    --nav-border: var(--cus-d-gray);
+
+    --side-btn-text: var(--p8-indigo);
+    --side-btn-bg: var(--p8-gray);
+    --side-btn-on: var(--p8-indigo);
+    --side-btn-off: var(--p8-d-gray);
+
+    --button-bg: var(--p8-gray);
+    --button-text: var(--p8-black);
+    --button-off: var(--p8-indigo);
+    --button-on: var(--p8-blue);
+
+    --text-color: var(--p8-gray);
+    --text-highlight: var(--p8-white);
+}
+
+
+@font-face {
+    font-family: 'pico8';
+    src:
+            url('/PICO-8/resources/fonts/pico8_font.ttf') format('truetype'),
+            url('/PICO-8/resources/fonts/pico8_font-webfont.woff2') format('woff2'),
+            url('/PICO-8/resources/fonts/pico8_font-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'pico8_full';
+    src:
+            url('/PICO-8/resources/fonts/pico8_font_full.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/****************************************************************************************
+                                                             HTML TAG STYLES
+****************************************************************************************/
+
+body{
+    background-color: var(--main-bg);
+    color: var(--text-color);
+    min-height: 100vh;
+    position: relative;
+    margin: 0;
+    padding-bottom: 280px;
+    overflow-x: hidden;
+}
+p {
+    text-indent: 20px;
+}
+h1, h2, h3, h4{
+    text-align: center;
+}
+h1{
+    font-size: 2em;
+    font-family: 'pico8', monospace;
+    color: var(--text-highlight);
+}
+h2{
+    font-size: 1.5em;
+    color: var(--text-highlight);
+}
+h3{
+    font-size: 1.25em;
+    color: var(--text-highlight);
+}
+h4{
+    font-size: 1em;
+    color: var(--text-highlight);
+}
+h5, h6 {
+    text-align: left;
+}
+h5{
+    font-size: 1.5em;
+}
+h6{
+    font-size: 1.25em;
+    margin-top: 1em;
+    margin-bottom: 10px;
+}
+pre{
+    max-width: 650px;
+    margin: auto;
+    border: 2px solid #74748f;
+    border-radius: 10px;
+    tab-size: 2;
+}
+code{
+    color: var(--p8-white);
+    font-family: pico8, monospace;
+    font-size: 16px;
+}
+
+pre code{
+    font-family: pico8_full, monospace;
+    font-size: 16px;
+}
+
+/* code that is in a button */
+.nerdySection code{
+    color: var(--p8-indigo);
+}
+
+hr{
+    border-top: 1px solid var(--p8-d-gray);
+}
+button:focus{
+    outline:none;
+    background-color: var(--p8-indigo);
+}
+a{ color:var(--p8-blue) }
+a:hover{ color:var(--p8-orange)}
+a:visited{ color:var(--p8-peach)}
+a:active{ color:var(--p8-peach)}
+
+
+/*********BLOCKQUOTES**********/
+blockquote {
+    font-weight: 100;
+    max-width: 500px;
+    line-height: 1.25;
+    position: relative;
+    margin: 0 auto;
+}
+
+blockquote:before,
+blockquote:after {
+    position: absolute;
+    color: #5a5a5a;
+    font-size: 4rem;
+    width: 4rem;
+    height: 3rem;
+    font-family: serif;
+}
+
+blockquote:before {
+    content:"\201C";
+    left: -2rem;
+    top: -1rem;
+}
+
+blockquote:after {
+    content:"\201D";
+    right: -4rem;
+    bottom: 0;
+}
+
+
+
+/****************************************************************************************
+                                                            EASY CSS CLASSES
+****************************************************************************************/
+
+.socialIconF:hover{ color: #3b5998; }
+.socialIconG:hover{ color: #aaaaaa; }
+.socialIconT:hover{ color: #55acee; }
+.socialIconL:hover{ color: #aaaaaa; }
+.socialIconD:hover{ color: #7289da; }
+.socialIconP:hover{ color: #bd081c; }
+.socialIconY:hover{ color: #ff0000; }
+.socialIconPat:hover{ color: #f96854; }
+.socialIconTw:hover{ color: #6441A4; }
+.socialIconTw:hover{ color: #6441A4; }
+.socialIconM:hover{ color: #563acc; }
+.socialIconKofi:hover ~ .socialIconKofi-heart, .socialIconKofi-heart:hover{ color: #ff5b58; }
+
+
+.font_pico8{
+    font-family: 'pico8', 'Press Start 2P', monospace;
+}
+table.table-mini > tbody > tr > td{
+    padding: 2px 5px;
+    vertical-align: middle;
+    width: 180px;
+    height: 32px;
+}
+table.table-mini > tbody > tr > th{
+    padding: 2px 5px;
+    vertical-align: middle;
+    width: 100px;
+}
+.errmsg{
+    color: red;
+    font-size: 1.5em;
+}
+
+.modal-content{
+    background-color: #444;
+}
+
+/****************IMAGES**********************/
+
+.imgCenter{
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    border-radius: 2%;
+}
+.icon16{
+    height: 16px;
+    width: 16px;
+}
+.icon32{
+    height: 32px;
+    width: 32px;
+}
+.icon64{
+    height: 64px;
+    width: 64px;
+}
+.icon80{
+    height: 80px;
+    width: 80px;
+}
+.img100{
+    width: 100px;
+    height: auto;
+}
+.img128{
+    width: 128px;
+    height: auto;
+}
+.img192{
+    width: 192px;
+    height: auto;
+}
+.img200{
+    width:200px;
+    height:auto;
+}
+.img256{
+    width:256px;
+    height:auto;
+}
+.img300{
+    max-width:300px;
+    height:auto;
+}
+.img384{
+    max-width:384px;
+    height:auto;
+}
+.img400{
+    max-width:400px;
+    height:auto;
+}
+.img500{
+    max-width:500px;
+    width: 100%;
+    height:auto;
+}
+.img512{
+    width:512px;
+    height:auto;
+}
+.img600{
+    max-width:600px;
+    width: 100%;
+    height:auto;
+}
+.img700{
+    max-width:700px;
+    width: 100%;
+    height:auto;
+}
+
+.screenshot{
+    border: 1px var(--p8-d-gray) solid;
+}
+
+/*animated icons on hover*/
+#icon_api{
+    width: 40px;
+    height: 40px;
+    background-image: url(/PICO-8/resources/img/icon/lua_pico8.png);
+    background-size: cover;
+    cursor: pointer;
+ }
+#icon_api:hover{
+    width: 40px;
+    height: 40px;
+    background-image: url(/PICO-8/resources/img/icon/lua_pico8.gif);
+    background-size: cover;
+    cursor: pointer;
+ }
+
+
+
+/****************************************************************************************
+                                                            OVERALL TEMPLATES
+****************************************************************************************/
+
+#nav{
+    background-color: var(--nav-bg);
+    border-bottom: 3px solid var(--nav-border);
+}
+#nav-logo{
+    width:150px;
+}
+.nav-button{
+    width:40px;
+}
+#footer-accent{
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    max-height: 200px;
+    width: auto;
+}
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    background-color: var(--nav-bg);
+    color: var(--button-text);
+    text-align: center;
+    line-height: 40px;
+    padding-top: 10px;
+}
+#sidebar-wrapper {
+    width: 250px;
+    min-height: 100vh;
+    margin-left: -15rem;
+    padding: 10px;
+    background-color: var(--nav-bg);
+    border-right: solid 3px var(--nav-border);
+    border-bottom: solid 3px var(--nav-border);
+    color: var(--text-color);
+    -webkit-transition: margin .25s ease-out;
+    -moz-transition: margin .25s ease-out;
+    -o-transition: margin .25s ease-out;
+    transition: margin .25s ease-out;
+    border-radius: 0 0 16px 0;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+.sidebar-button{
+    -webkit-border-radius: 0 20px 20px 0;
+    -moz-border-radius: 0 20px 20px 0;
+    border-radius: 0 20px 20px 0;
+    background-color: var(--side-btn-bg);
+    color: var(--side-btn-text);
+    height: 100px;
+    box-shadow: inset 0 -4px var(--side-btn-off);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-off);
+}
+.sidebar-button:hover{
+    cursor: pointer;
+    background-color: var(--button-on);
+    color: var(--side-btn-text);
+    box-shadow: inset 0 -4px var(--side-btn-on);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-on);
+}
+
+
+/****************************************************************************************
+                                                            BUTTONS AND SECTIONS
+****************************************************************************************/
+
+/******WIDE NERDY IMAGE******/
+.banner{
+    max-width: 720px;
+    max-height: 300px;
+    width: 100%;
+    height: auto;
+}
+
+.nerdyButton, .nerdyButtonDisabled, .nerdySection{
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    height:auto;
+    width: auto;
+    margin: 8px;
+    padding: 8px 8px 12px 8px;
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    box-shadow: inset 0 -4px var(--button-off);
+    -webkit-box-shadow: inset 0 -4px var(--button-off);
+    text-decoration: none;
+    cursor:pointer;
+    text-align: center;
+    display: inline-block;
+    vertical-align: bottom;
+}
+.nerdySection{
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    font-size: 1.2em;
+    align-items: center
+}
+.nerdyButton:hover, .nerdySection:hover{
+    color: #000;
+    margin-top: 4px;
+    padding-bottom: 16px;
+    box-shadow: inset 0 -10px var(--button-on);
+    -webkit-box-shadow: inset 0 -10px var(--button-on);
+    text-decoration: none;
+}
+.nerdyButton:active, .nerdySection:active{
+    margin-top: 14px;
+    padding-bottom: 6px;
+    box-shadow: inset 0 0 var(--button-on);
+    -webkit-box-shadow: inset 0 0 var(--button-on);
+    text-decoration: none;
+}
+.nerdyButton:visited {
+    color: var(--button-text);
+}
+.nerdyButtonDisabled, .nerdyButtonDisabled:hover {
+    color: var(--p8-indigo);
+    text-decoration: none;
+    cursor: default;
+    pointer-events: none;
+}
+
+.nerdyButton .nav-button,
+.nerdyButton img{
+    filter: drop-shadow(2px 2px 2px black);
+}
+
+/******SECTION COLLAPSE *******/
+.nerdyTutorialText{
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+    text-justify: inter-word;
+}
+/******TOGGLE ICONS*******/
+[aria-expanded="true"] .fa-plus,
+[aria-expanded="false"] .fa-minus {
+    display:none;
+}
+
+/******FLOATING BUTTON (FONT CHANGER + Back to Top)******/
+#font-changer{
+    background-color: var(--side-btn-bg);
+    position: fixed;
+    bottom: 150px;
+    right: 0;
+    padding: 5px;
+    height: auto;
+    width: 80px;
+    text-align: center;
+    border-radius: 10px 0 0 10px;
+    box-shadow: inset 0 -4px var(--side-btn-off);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-off);
+}
+#font-changer code{
+    color:  var(--button-text);
+}
+#font-changer:hover{
+    cursor: pointer;
+    background-color: var(--button-on);
+    box-shadow: inset 0 -4px var(--side-btn-on);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-on);
+}
+
+#backtotop{
+    background-color: var(--side-btn-bg);
+    color: var(--button-text);
+    position: fixed;
+    bottom: 100px;
+    right: 0;
+    padding: 5px;
+    height: auto;
+    width: 80px;
+    text-align: center;
+    border-radius: 10px 0 0 10px;
+    box-shadow: inset 0 -4px var(--side-btn-off);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-off);
+}
+#backtotop:hover{
+    cursor: pointer;
+    background-color: var(--button-on);
+    box-shadow: inset 0 -4px var(--side-btn-on);
+    -webkit-box-shadow: inset 0 -4px var(--side-btn-on);
+}
+/**************QUICK LINK TO GUIDE************************/
+.linkToGuide{
+    text-decoration: none;
+    color: #29ADFF;
+}
+.linkToGuide:hover{
+    color: #FFA300;
+}
+.linkToGuide:visited{
+    color: #29ADFF;
+}
+
+.guideLink, .guideLink:focus{
+    color:var(--p8-d-gray);
+    border: none;
+    background: none;
+    margin-left: -30px;
+}
+.guideLink:hover{
+    color:var(--p8-blue);
+    border: none;
+    background: none;
+}
+.guideLink:active{
+    color:var(--p8-peach);
+    border: none;
+    background: none;
+}
+.guideLink:visited{
+    border: none;
+    background: none;
+}
+
+/****************************************************************************************
+                                                            VERY SPECIFIC FORMATTING
+****************************************************************************************/
+
+#nerdyJay{
+    position:absolute;
+    bottom:0;
+    left:5%;
+    height: auto;
+    max-width: 200px;
+    min-width: 150px;
+    width: 20%;
+}
+
+#nerdyBow{
+    position:absolute;
+    bottom:0;
+    right:5%;
+    height: auto;
+    max-width: 200px;
+    min-width: 150px;
+    width: 20%;
+}
+
+.tinymce-editor-fullpage{
+    padding: 20px;
+}
+
+.iframe-pico8player{
+    border: none;
+    overflow: hidden;
+    width: 620px;
+    max-width: 80vw;
+    height: 512px;
+    max-height: 80vw;
+}
+
+/******** SIDE BAR CART DOWNLOAD LINKS *********/
+.sideBarImgLink{
+    display:block;
+    width:160px;
+    margin-left: auto;
+}
+
+.sideBarImgLink svg{
+    position: absolute;
+    bottom: 0; left: 0;
+}
+
+.sideBarImgLink:hover svg{
+    visibility: visible;
+}
+
+
+.sideBarImgLink svg{
+    visibility: hidden;
+}
+
+.p8command{
+    background-color: black;
+    padding: 10px;
+}
+
+/****************************************************************************************
+                                                            CUSTOMIZE BOOTSTRAP CSS
+****************************************************************************************/
+.alert-info{
+    background-color: #53b9cc;
+    border: none;
+    margin: 20px;
+}
+
+.alert-dark{
+    color: #f7f7f7;
+    background-color: #5a5b5c;
+    border: none;
+    margin: 20px;
+}
+
+/****************************************************************************************
+                                    MEDIA RESPONSIVENESS - SMALLER SCREEN RESOLUTION
+****************************************************************************************/
+
+@media (max-width: 700px) {
+    .img256, .img300, .img384, .img400, .img500, .img512, .img600, .img700, .img800 {
+        max-width: 90%;
+    }
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .img256, .img300, .img384, .img400, .img500, .img512, .img600, .img700, .img800 {
+        max-width: 90%;
+    }
+    #backtotop{
+        display:block;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .img256, .img300, .img384, .img400, .img500, .img512, .img600, .img700, .img800 {
+        max-width: 90%;
+    }
+    .img512{
+        width:256px;
+        height:auto;
+    }
+}
