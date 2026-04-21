@@ -1,0 +1,12 @@
+*.p8
+!carts/celeste.p8
+!nocart.p8
+!editor.p8
+!test/*.p8
+# carts/murdercrab.p8 is a build artifact: run.sh copies it fresh from
+# pico8/murdercrab.p8 on every launch. The canonical cart lives at
+# pico8/murdercrab.p8 (tracked by the root repo).
+.DS_Store
+build/*.love
+luacov.report.out
+luacov.stats.out

@@ -52,6 +52,8 @@ docs/
 media/
   MurderCrab_Media_Extraction_Pack/   # v2: svg, png_16x/64x, gifs, raw sheet, backgrounds, hud, diagrams + docs/
 picotron/                    # Picotron port (planned)
+tools/
+  celia/                     # host-side TAS / bot harness (vendored Celia + srand seed patch)
 ```
 
 ## Development History
@@ -73,6 +75,14 @@ Load `murdercrab.p8` in PICO-8:
 load murdercrab
 run
 ```
+
+## TAS / bot harness
+
+`tools/celia/` is a vendored [Celia](https://github.com/gonengazit/Celia) TAS
+framework with a small patch that seeds the cart's RNG before `_init`, so runs
+are frame-for-frame reproducible. The canonical cart at `pico8/murdercrab.p8`
+is untouched; `run.sh` copies it into Celia's `carts/` on every launch. See
+[tools/celia/README.md](tools/celia/README.md) for setup and keybinds.
 
 ## License
 
