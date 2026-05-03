@@ -151,9 +151,18 @@ function tas:state_iter()
 	end
 end
 
+-- murdercrab: host-side pre_update hook (bot input override). pcall so Celia
+-- still works with upstream carts if the bootstrap file is absent. Lua caches
+-- require, so this is cheap on subsequent frames.
+local function _murdercrab_pre_update()
+	local ok, bs = pcall(require, "murdercrab_bootstrap")
+	if ok and bs and bs.pre_update then bs.pre_update(pico8) end
+end
+
 -- advance the pico8 state ignoring buttons or backing up the state
 local function rawstep()
 	pico8.frames = pico8.frames + 1
+	_murdercrab_pre_update()
 	if pico8.cart._update60 then
 		pico8.cart._update60()
 	elseif pico8.cart._update then
