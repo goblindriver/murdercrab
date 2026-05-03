@@ -47,7 +47,7 @@ rank = 0
 hitstop = 0
 
 -- player constants
-P_SPD, P_HP, P_BMBS = 1, 3, 3
+P_SPD, P_LIVES, P_BMBS = 1, 3, 3
 B_SPD = 3
 BMB_DUR, BMB_DMG = 60, 30
 
@@ -68,7 +68,7 @@ BASE_CLUSTERS = 6
 -- scoring
 S_NRM = 10
 S_STRK = 10
-S_BMB, S_HP = 25, 25
+S_BMB, S_LIFE = 25, 25
 
 -- object tables
 starfield,enemies,bullets,enemy_bullets,explosions,powerups,bullet_pool,enemy_bullet_pool,player = {},{},{},{},{},{},{},{},{}
@@ -208,7 +208,7 @@ function add_score(points)
 end
 
 function calc_bonus()
-  return player.bombs * S_BMB + player.health * S_HP
+  return player.bombs * S_BMB + player.lives * S_LIFE
 end
 
 function sc(b)
@@ -378,7 +378,7 @@ function draw_title()
     shadow_text("arrows move", 24, 8)
     shadow_text("z shoot", 34, 8)
     shadow_text("x bomb", 44, 8)
-    spr(6, 44, 62) print("health", 56, 64, 8)
+    spr(6, 44, 62) print("1up", 56, 64, 8)
     spr(5, 42, 74) print("bomb", 56, 76, 8)
     spr(7, 44, 86) print("score", 56, 88, 8)
   end
@@ -481,7 +481,7 @@ function init_game()
     x = 60, y = 100,
     width = 8, height = 8,
     speed = P_SPD,
-    health = P_HP, max_health = P_HP,
+    lives = P_LIVES,
     bombs = P_BMBS,
     invincible_timer = 0,
     visible = true,
@@ -566,7 +566,7 @@ end
 function player_hit()
   if player.invincible_timer > 0 or game_over then return end
   
-  player.health -= 1
+  player.lives -= 1
   player.invincible_timer = 60
   sfx(7, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
@@ -574,7 +574,7 @@ function player_hit()
   score_streak = 0
   rank = max(0, rank - 1)
 
-  if player.health <= 0 then
+  if player.lives <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
     game_over = true
   end
@@ -989,7 +989,7 @@ function spawn_powerup_explosion(x, y)
   end
   
   if rnd(1) < 0.05 then
-    local ptype = rnd(1) < 0.5 and "bomb" or "health"
+    local ptype = rnd(1) < 0.5 and "bomb" or "1up"
     local p = spawn_powerup(x, y, ptype)
     p.dx = cos(rnd(1)) * 1
     p.dy = sin(rnd(1)) * 1
@@ -1038,8 +1038,8 @@ function check_powerup_collection()
     if collides(p, player) then
       if p.type == "bomb" then
         player.bombs += 1
-      elseif p.type == "health" then
-        player.health += 1
+      elseif p.type == "1up" then
+        player.lives += 1
       elseif p.type == "score" then
         add_score(p.value)
         score_streak += 1
@@ -1527,7 +1527,8 @@ function update_game()
       game_over = false
       game_over_timer = 600
       game_over_grace = 60
-      player.health = 3
+      player.lives = P_LIVES
+      player.bombs = P_BMBS
       score_streak = 0
       score_multiplier = 1
     end
@@ -1602,7 +1603,7 @@ function draw_game()
   for p in all(powerups) do
     if p.type == "bomb" then
       spr(5, p.x, p.y)
-    elseif p.type == "health" then
+    elseif p.type == "1up" then
       spr(6, p.x, p.y)
     elseif p.type == "score" then
       if p.timer and p.timer < 30 and (time() * 10) % 2 < 1 then pal(8, 7) end
@@ -1670,7 +1671,7 @@ function draw_game()
   local hi_col = score_gt(sc(), hiscore) and (time() * 8 % 2 < 1 and 10 or 9) or 7
   print(score_fmt(sc()), 1, 1, 7)
   print(score_fmt(hiscore), 128 - #score_fmt(hiscore) * 4, 1, hi_col)
-  for i = 1, min(player.health, 10) do spr(1, (i - 1) * 9, 120) end
+  for i = 1, min(player.lives, 10) do spr(1, (i - 1) * 9, 120) end
   for i = 1, player.bombs do spr(5, 128 - i * 9, 120) end
   spr(7, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
   
