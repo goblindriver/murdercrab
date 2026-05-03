@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 42
+version 43
 __lua__
 
 -- murdercrab! combined cart
@@ -14,7 +14,7 @@ phase_state = "pre_mini_boss"
 current_level = 1
 max_level = 5
 game_loop = 1
-credits = 3
+credits = 0
 credits_used = 0
 score = 0
 score_hi = 0
@@ -47,7 +47,7 @@ rank = 0
 hitstop = 0
 
 -- player constants
-P_SPD, P_HP, P_BMBS = 1, 100, 3
+P_SPD, P_HP, P_BMBS = 1, 3, 3
 B_SPD = 3
 BMB_DUR, BMB_DMG = 60, 30
 
@@ -128,6 +128,7 @@ end
 
 function score_fmt(s)
   if type(s)=="number" then s=score_to_comp(s) end
+  if s.k>=1000 then s.m+=flr(s.k/1000) s.k%=1000 end
   if s.m>0 then return s.m..","..sub("000"..s.k,-3)..","..sub("000"..s.u,-3)
   elseif s.k>0 then return s.k..","..sub("000"..s.u,-3) end
   return ""..s.u
@@ -320,7 +321,7 @@ function draw_starfield()
   else
     -- background colors per level
     local bg_colors = {0, 1, 3, 2, 4}
-    local cl = min(current_level, max_level)
+    local cl = (game_state == "game" or game_state == "starting") and min(current_level, max_level) or 1
     local bg = bg_colors[cl] or 0
     if bg > 0 then rectfill(0, 0, 127, 127, bg) end
 
@@ -348,10 +349,8 @@ end
 ----------------------------------------
 function update_title()
   title_timer += 1
-  credits = 3
-  if btnp(0) or btnp(1) or btnp(2) or btnp(3) or btnp(4) or btnp(5) then
-    start_game()
-  end
+  if btnp(5) then credits += 1 sfx(19, 3) end
+  if btnp(4) then start_game() end
 end
 
 function draw_title()
@@ -365,8 +364,8 @@ function draw_title()
     circfill(64, 56, 26 + sin(time() * 0.6) * 2, 1)
     fillp()
     spr(10, 48, 40 + bob, 4, 4)
-    if title_timer % 30 < 20 then shadow_text("- press any button -", 100, logo_color) end
-    spr(1, 60, 115)
+    if credits > 0 and title_timer % 30 < 20 then shadow_text("press z to start", 100, logo_color) end
+    spr(1, 60, 109)
   elseif ph == 1 then
     shadow_text("high scores", 10, 8)
     local y = 30
@@ -376,16 +375,12 @@ function draw_title()
       y += 14
     end
   else
-    shadow_text("instructions", 10, 8)
-    shadow_text("movement: arrow keys", 24, 8)
-    shadow_text("shoot: z (hold=rapid)", 34, 8)
-    shadow_text("bomb: x button", 44, 8)
-    shadow_text("collect powerups", 58, 8)
-    local hx = 64 - (#"extra health" * 4) / 2
-    shadow_text("extra health", 70, 8) spr(6, hx - 12, 68)
-    shadow_text("extra bomb", 80, 8) spr(5, hx - 12, 78)
-    shadow_text("increase score", 90, 8) spr(7, hx - 12, 88)
-    shadow_text("10 cherries = +1x", 100, 8)
+    shadow_text("arrows move", 24, 8)
+    shadow_text("z shoot", 34, 8)
+    shadow_text("x bomb", 44, 8)
+    spr(6, 44, 62) print("health", 56, 64, 8)
+    spr(5, 42, 74) print("bomb", 56, 76, 8)
+    spr(7, 44, 86) print("score", 56, 88, 8)
   end
 end
 
@@ -446,6 +441,7 @@ end
 function start_game()
   if credits > 0 then
     credits -= 1
+    current_level = 1
     warp_time = warp_duration
     sfx(19, 3)
     update_music("silent")
@@ -1511,7 +1507,7 @@ function update_game()
       update_high_scores(final_score, get_initials())
     end
 
-    if game_over_timer <= 0 or (game_over_grace <= 0 and btnp(5)) then
+    if game_over_timer <= 0 then
       final_score = sc(calc_bonus())
       if score_gt(final_score, high_scores[3].score) then
         current_initials = nil
@@ -1524,6 +1520,7 @@ function update_game()
       return
     end
 
+    if btnp(5) then credits += 1 sfx(19, 3) end
     if game_over_grace <= 0 and credits > 0 and btnp(4) then
       credits -= 1
       credits_used += 1
@@ -1678,14 +1675,15 @@ function draw_game()
   spr(7, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
   
   if game_over and game_over_grace <= 0 then
-    local y_off = sin(time()) * 2
-    center_text("game over", 64 + y_off, 8)
-    if credits > 0 then
-      center_text("z: continue", 72, 7)
-    end
-    center_text("x: quit", 80, 7)
-    center_text("credits "..credits, 88, 6)
-    center_text(flr(game_over_timer / 60) .. "s", 96, 5)
+    center_text("game over", 42, 8)
+    local n = flr((game_over_timer - 1) / 60) + 1
+    local w = #(""..n) * 4
+    print(n, 32, 0, 7)
+    poke(0x5f54, 0x60)
+    sspr(32, 0, w, 6, 64 - w * 1.5, 56, w * 3, 18)
+    poke(0x5f54, 0)
+    rectfill(32, 0, 31 + w, 5, 0)
+    if credits > 0 then center_text("press z to continue", 88, 7) end
   end
   
   -- boss warning
@@ -1720,10 +1718,9 @@ function draw_game_complete()
     if game_loop > 1 then
       center_text("loop " .. game_loop .. " clear!", 38, 11)
     end
-    center_text("pilot: " .. get_initials(), 48, 9)
-    center_text("score: " .. score_fmt(sc()), 58, 7)
-    center_text("bonus: " .. calc_bonus(), 68, 8)
-    center_text("final: " .. score_fmt(sc(calc_bonus())), 78, 7)
+    center_text("score: " .. score_fmt(sc()), 52, 7)
+    center_text("bonus: " .. calc_bonus(), 62, 8)
+    center_text("final: " .. score_fmt(sc(calc_bonus())), 72, 7)
     
     if game_complete_grace > 0 then
       center_text("calculating...", 90, 7)
@@ -1766,7 +1763,6 @@ function _update60()
       game_complete_grace -= 1
     elseif btnp(4) then
       game_loop += 1
-      credits = 3
       credits_used = 0
       current_level = 1
       phase = "normal"
@@ -1807,6 +1803,11 @@ function _draw()
     draw_game()
   elseif game_state == "game_complete" then
     draw_game_complete()
+  end
+  if credits > 0 then
+    shadow_text("credits "..credits, 120, 8)
+  elseif time() * 2 % 1 < 0.5 then
+    shadow_text("insert coin", 120, 8)
   end
 end
 
@@ -1906,3 +1907,4 @@ __music__
 01 15144344
 00 15144344
 02 17164344
+
