@@ -572,7 +572,7 @@ function player_hit()
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
-  rank = max(0, rank - 1)
+  rank = flr(rank / 2)
 
   if player.lives <= 0 then
     create_explosion_chain(player.x + 4, player.y + 4, 5, 16)
