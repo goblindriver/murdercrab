@@ -1173,9 +1173,12 @@ function activate_bomb()
       })
     end
     
-    for b in all(enemy_bullets) do release_enemy_bullet(b) end
+    for b in all(enemy_bullets) do
+      spawn_powerup(b.x, b.y, "score", 10)
+      release_enemy_bullet(b)
+    end
     enemy_bullets = {}
-    
+
     for b in all(bullets) do release_bullet(b) end
     bullets = {}
     
@@ -1186,12 +1189,14 @@ function activate_bomb()
           create_explosion_chain(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, 8, enemy.width)
           del(enemies, enemy)
           handle_boss_defeat(enemy)
+          spawn_powerup_explosion(enemy.x, enemy.y)
         end
       else
         add_score(S_NRM)
         enemy_kill_count += 1
         create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
         del(enemies, enemy)
+        spawn_powerup_explosion(enemy.x, enemy.y)
       end
     end
     
