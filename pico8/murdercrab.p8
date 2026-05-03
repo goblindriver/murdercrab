@@ -531,9 +531,9 @@ end
 function draw_player()
   if player.invincible_timer > 0 and time() % 0.2 < 0.1 then return end
 
-  if rank >= 2 then
-    pal(11, rank >= 7 and 8 or (rank >= 4 and 10 or 11))
-    pal(12, rank >= 7 and 9 or (rank >= 4 and 8 or 12))
+  if rank >= 4 then
+    pal(11, rank >= 7 and 8 or 10)
+    pal(12, rank >= 7 and 9 or 8)
   end
   spr(player.sprite, player.x, player.y)
   pal()
@@ -1529,6 +1529,9 @@ function update_game()
       game_over_grace = 60
       player.lives = P_LIVES
       player.bombs = P_BMBS
+      score = 0
+      score_hi = 0
+      rank = 0
       score_streak = 0
       score_multiplier = 1
     end
@@ -1623,8 +1626,9 @@ function draw_game()
     elseif b.anim_frame == 4 then sprite = 34
     end
     if rank >= 3 then
-      line(b.x + 4, b.y + 8, b.x + 4, b.y + 8 + rank, rank >= 7 and 8 or 10)
-      pal(11, rank >= 7 and 8 or 10) pal(9, rank >= 7 and 9 or 8)
+      local c = rank >= 7 and 8 or 10
+      line(b.x + 4, b.y + 8, b.x + 4, b.y + 8 + rank, c)
+      pal(11, c) pal(9, rank >= 7 and 9 or 8)
     end
     spr(sprite, b.x, b.y)
     pal()
