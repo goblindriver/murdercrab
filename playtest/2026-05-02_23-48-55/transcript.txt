@@ -1,0 +1,30 @@
+[00:07] All right here we are at the title screen. On this instruction screen the cherry sprite
+[00:15] needs a little bit more padding. This screen looks good. Here we need commas in the numbers
+[00:28] that go over six figures.
+[00:36] Start the game now.
+[01:08] I just entered top rank.
+[01:11] My bullets are red.
+[01:57] So, let's take a look.
+[01:58] Ah.
+[02:20] Absolutely destroyed.
+[02:25] I'm gonna quit. Restart. Okay I quit. The background has currently switched to the
+[02:35] background that was on while I was in the stage. Here we, yeah. On this screen the
+[02:42] cherry padding issue I brought up earlier.
+[02:52] We need to fix commas on the high score screens.
+[03:02] And the text is wrong, it said level 2.
+[03:08] This is a fresh game.
+[03:26] Ah!
+[04:04] So, let's take a look.
+[04:13] So, let's go.
+[05:03] So, let's take a look at the same thing.
+[05:08] Thank you.
+[05:43] More command then.
+[06:05] I'm not wrecked. I'm going to continue this time. We should probably do a big, oh, it just sent me back to the beginning. I guess the countdown, the 10, 9, 8, whatever should be pretty big.
+[06:21] And I was thinking if this is going to be an actual arcade game, it's going to need to say how many credits you put in.
+[06:30] We currently don't have a credit system.
+[06:35] So if this was to be an actual arcade, that would be difficult.
+[06:44] New game. It says level 3, but we're restarting and it's actually level 1. Same bug.
+[07:19] So, let's take a look.
+[07:21] Okay.
+[08:19] Man, I got wrecked again.
+[08:21] I'm gonna quit to the title screen

@@ -7,3 +7,18 @@
 
 # Reference library (PDFs/CBZ too large for git, kept local)
 docs/reference-library/
+
+# Playtest pipeline artifacts (regeneratable from source .mp4 via process.sh).
+# Keep only report.md + transcript.txt; everything else is intermediate.
+playtest/*/frame_*.jpg
+playtest/*/*.wav
+playtest/*/*.mp3
+playtest/*/voice.json
+playtest/*/audio.json
+playtest/*/end_segment.json
+playtest/*/demucs_out/
+playtest/*/*.jpg
+playtest/*/*.png
+playtest/*/timeline/
+playtest/*/overview/
+playtest/*/sample*.txt
