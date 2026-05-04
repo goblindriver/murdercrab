@@ -47,7 +47,7 @@ rank = 0
 hitstop = 0
 
 -- player constants
-P_SPD, P_LIVES, P_BMBS = 1, 3, 3
+P_LIVES, P_BMBS = 3, 3
 B_SPD = 3
 BMB_DUR, BMB_DMG = 60, 30
 
@@ -66,8 +66,6 @@ B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 20, 45
 BASE_CLUSTERS = 6
 
 -- scoring
-S_NRM = 10
-S_STRK = 10
 S_BMB, S_LIFE = 25, 25
 
 -- object tables
@@ -480,7 +478,7 @@ function init_game()
   player = {
     x = 60, y = 100,
     width = 8, height = 8,
-    speed = P_SPD,
+    speed = 1,
     lives = P_LIVES,
     bombs = P_BMBS,
     invincible_timer = 0,
@@ -509,8 +507,7 @@ end
 -- bullet pool system
 ----------------------------------------
 function get_bullet()
-  if #bullet_pool > 0 then return deli(bullet_pool, 1) end
-  return {}
+  return #bullet_pool > 0 and deli(bullet_pool, 1) or {}
 end
 
 function release_bullet(b)
@@ -1044,7 +1041,7 @@ function check_powerup_collection()
       elseif p.type == "score" then
         add_score(p.value)
         score_streak += 1
-        if score_streak >= S_STRK then
+        if score_streak >= 10 then
           score_multiplier += 1
           score_streak = 0
           shake_amount = 2
@@ -1193,7 +1190,7 @@ function activate_bomb()
           spawn_powerup_explosion(enemy.x, enemy.y)
         end
       else
-        add_score(S_NRM)
+        add_score(10)
         enemy_kill_count += 1
         create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
         del(enemies, enemy)
@@ -1287,7 +1284,7 @@ function check_bullet_enemy_collisions()
           del(bullets, bullet)
           release_bullet(bullet)
           if enemy.health <= 0 then
-            add_score(S_NRM)
+            add_score(10)
             enemy_kill_count += 1
             create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
             shake_amount = 3
@@ -1332,28 +1329,29 @@ function check_bullet_enemy_collisions()
   end
 end
 
+function knock(enemy, str)
+  local dx, dy = player.x - enemy.x, player.y - enemy.y
+  local d = max(1, sqrt(dx * dx + dy * dy))
+  player.x += (dx / d) * str
+  player.y += (dy / d) * str
+end
+
 function check_player_enemy_collisions()
   if player.invincible_timer > 0 or game_over then return end
-  
+
   local hitbox = {x = player.x + 3, y = player.y + 3, width = 2, height = 2}
-  
+
   for enemy in all(enemies) do
     if enemy.state == 2 then
       if collides(player, enemy) then
         player_hit()
         create_explosion_chain(enemy.x + 4, enemy.y + 4, 3, 10)
         del(enemies, enemy)
-        local dx, dy = player.x - enemy.x, player.y - enemy.y
-        local d = max(1, sqrt(dx * dx + dy * dy))
-        player.x += (dx / d) * 5
-        player.y += (dy / d) * 5
+        knock(enemy, 5)
       end
     elseif collides(hitbox, enemy) then
       player_hit()
-      local dx, dy = player.x - enemy.x, player.y - enemy.y
-      local d = max(1, sqrt(dx * dx + dy * dy))
-      player.x += (dx / d) * 3
-      player.y += (dy / d) * 3
+      knock(enemy, 3)
     end
   end
 end
