@@ -1017,7 +1017,7 @@ function update_powerups()
     local dy = (player.y + 4) - (p.y + 4)
     local dist = sqrt(dx * dx + dy * dy)
     
-    if p.attracted or dist < 40 then
+    if p.attracted or dist < 48 then
       local spd = p.attract_speed or 0.15
       p.x += dx * spd
       p.y += dy * spd
