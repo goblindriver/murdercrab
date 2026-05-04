@@ -318,7 +318,7 @@ function draw_starfield()
     end
   else
     -- background colors per level
-    local bg_colors = {0, 1, 3, 2, 4}
+    local bg_colors = {0, 1, 3, 2, 5}
     local cl = (game_state == "game" or game_state == "starting") and min(current_level, max_level) or 1
     local bg = bg_colors[cl] or 0
     if bg > 0 then rectfill(0, 0, 127, 127, bg) end
