@@ -567,6 +567,7 @@ function player_hit()
   if player.invincible_timer > 0 or game_over then return end
   
   player.lives -= 1
+  player.bombs = P_BMBS
   player.invincible_timer = 60
   sfx(7, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
