@@ -1415,7 +1415,7 @@ end
 -- main game update
 ----------------------------------------
 function update_game()
-  rank = min(10, max(rank, score_multiplier - 1))
+  rank = min(10, max(rank, flr(score_multiplier / 2)))
   if hitstop > 0 then hitstop -= 1 return end
   update_explosions()
   update_bomb_effect()
