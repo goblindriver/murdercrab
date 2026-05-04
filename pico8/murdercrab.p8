@@ -1281,7 +1281,7 @@ function check_bullet_enemy_collisions()
   for bullet in all(bullets) do
     for enemy in all(enemies) do
       if collides(enemy, bullet) then
-        local dmg = min(3, 1 + flr(rank / 3))
+        local dmg = player.invincible_timer > 0 and 3 or min(3, 1 + flr(rank / 3))
         if not enemy.type or enemy.type == "normal" then
           enemy.health -= dmg
           del(bullets, bullet)
