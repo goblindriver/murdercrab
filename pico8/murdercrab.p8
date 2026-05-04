@@ -973,7 +973,7 @@ function spawn_powerup(x, y, ptype, value)
     width = 8, height = 8,
     speed = 2, dx = 0, dy = 0
   }
-  if ptype == "score" then p.timer = 90 end
+  if ptype == "score" then p.timer = 60 end
   add(powerups, p)
   return p
 end
@@ -1020,7 +1020,7 @@ function update_powerups()
     local dy = (player.y + 4) - (p.y + 4)
     local dist = sqrt(dx * dx + dy * dy)
     
-    if p.attracted or dist < 48 then
+    if p.attracted or dist < 24 then
       local spd = p.attract_speed or 0.15
       p.x += dx * spd
       p.y += dy * spd
