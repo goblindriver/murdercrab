@@ -1606,7 +1606,7 @@ function draw_game()
   draw_explosions()
   draw_bomb_effect()
 
-  local af = flr(time() * 4) % 3 * 16
+  local af = flr(time() * 6) % 3 * 16
 
   -- draw powerups
   for p in all(powerups) do
