@@ -1605,7 +1605,9 @@ function draw_game()
   draw_starfield()
   draw_explosions()
   draw_bomb_effect()
-  
+
+  local af = flr(time() * 4) % 3 * 16
+
   -- draw powerups
   for p in all(powerups) do
     if p.type == "bomb" then
@@ -1614,7 +1616,7 @@ function draw_game()
       spr(6, p.x, p.y)
     elseif p.type == "score" then
       if p.timer and p.timer < 30 and (time() * 10) % 2 < 1 then pal(8, 7) end
-      spr(7, p.x, p.y)
+      spr(7 + af, p.x, p.y)
       pal()
     end
   end
@@ -1672,7 +1674,7 @@ function draw_game()
   end
   
   -- draw enemy bullets
-  for b in all(enemy_bullets) do spr(4, b.x, b.y) end
+  for b in all(enemy_bullets) do spr(4 + af, b.x, b.y) end
   
   -- draw HUD
   local hiscore = high_scores[1].score
@@ -1681,7 +1683,7 @@ function draw_game()
   print(score_fmt(hiscore), 128 - #score_fmt(hiscore) * 4, 1, hi_col)
   for i = 1, min(player.lives, 10) do spr(1, (i - 1) * 9, 120) end
   for i = 1, player.bombs do spr(5, 128 - i * 9, 120) end
-  spr(7, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
+  spr(7 + af, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
   
   if game_over and game_over_grace <= 0 then
     center_text("game over", 42, 8)
