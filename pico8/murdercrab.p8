@@ -1683,7 +1683,7 @@ function draw_game()
   print(score_fmt(hiscore), 128 - #score_fmt(hiscore) * 4, 1, hi_col)
   for i = 1, min(player.lives, 10) do spr(1, (i - 1) * 9, 120) end
   for i = 1, player.bombs do spr(5, 128 - i * 9, 120) end
-  spr(7 + af, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
+  spr(7, 1, 9) print("x" .. score_multiplier, 10, 10, 7)
   
   if game_over and game_over_grace <= 0 then
     center_text("game over", 42, 8)
