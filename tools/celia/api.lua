@@ -1777,7 +1777,9 @@ function api.help()
 end
 
 function api.time()
-	return pico8.frames/30
+	-- murdercrab: real PICO-8 advances time() 1/60 per frame under _update60.
+	-- Upstream hardcodes /30, which runs a 60fps cart's clock at double speed.
+	return pico8.frames/(pico8.fps or 30)
 end
 api.t = api.time
 
