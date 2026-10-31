@@ -12,7 +12,7 @@ __lua__
 -- (score, rank, phase, timers, object tables) is set in init_game()
 game_state, title_timer = "title", 0
 current_level, max_level = 1, 5
-credits, credits_used = 0, 0
+credits = 0
 warp_time, warp_duration = 0, 360
 current_music = -1
 last_entered_initials = {"A", "C", "E"}
@@ -79,7 +79,6 @@ function score_gt(a, b)
 end
 
 function score_fmt(s)
-  if s.k>=1000 then s.m+=flr(s.k/1000) s.k%=1000 end
   if s.m>0 then return s.m..","..sub("000"..s.k,-3)..","..sub("000"..s.u,-3)
   elseif s.k>0 then return s.k..","..sub("000"..s.u,-3) end
   return ""..s.u
@@ -125,21 +124,21 @@ function save_high_scores()
 end
 
 function update_high_scores(ns, initials)
+  hs_pos = 4
   if ns.m == 0 and ns.k == 0 and ns.u == 0 then return end
   
-  local pos = 4
   for i = 1, 3 do
     if score_gt(ns, high_scores[i].score) then
-      pos = i
+      hs_pos = i
       break
     end
   end
   
-  if pos <= 3 then
-    for i = 3, pos + 1, -1 do
+  if hs_pos <= 3 then
+    for i = 3, hs_pos + 1, -1 do
       high_scores[i] = high_scores[i - 1]
     end
-    high_scores[pos] = {score={m=ns.m,k=ns.k,u=ns.u}, initials=initials}
+    high_scores[hs_pos] = {score=ns, initials=initials}
     save_high_scores()
   end
 end
@@ -156,7 +155,8 @@ end
 
 function sc(b)
   b = score + (b or 0)
-  return {m=0, k=score_hi + flr(b / 1000), u=b % 1000}
+  local k = score_hi + flr(b / 1000)
+  return {m=flr(k / 1000), k=k % 1000, u=b % 1000}
 end
 
 function get_initials()
@@ -353,7 +353,7 @@ function update_enter_initials()
     local str = current_initials[1] .. current_initials[2] .. current_initials[3]
     last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
     for i = 1, 3 do dset(17 + i, ord(current_initials[i])) end
-    if final_score then update_high_scores(final_score, str) final_score = nil end
+    if hs_pos < 4 then high_scores[hs_pos].initials = str save_high_scores() end
     current_initials = nil
     game_state = "title"
     title_timer = 0
@@ -390,8 +390,8 @@ function start_game()
 end
 
 function init_game()
-  game_loop, current_level, phase, phase_state = 1, 1, "normal", "pre_mini_boss"
-  score, score_hi, score_streak, score_multiplier, final_score, rank = 0, 0, 0, 1, nil, 0
+  game_loop, current_level, credits_used, phase, phase_state = 1, 1, 0, "normal", "pre_mini_boss"
+  score, score_hi, score_streak, score_multiplier, rank = 0, 0, 0, 1, 0
   game_over, game_over_timer, game_over_grace, game_complete_grace = false, 600, 60, 90
   boss_defeat_grace, boss_warning, enemy_kill_count, spawn_timer = 0, 0, 0, 0
   bomb_active, bomb_timer, bomb_effect_timer = false, 0, 0
@@ -936,7 +936,7 @@ end
 
 function check_powerup_collection()
   for p in all(powerups) do
-    if collides(p, player) then
+    if collides(p, player) and not game_over then
       if p.type == "bomb" then
         player.bombs += 1
       elseif p.type == "1up" then
@@ -1084,7 +1084,7 @@ function activate_bomb()
     bullets = {}
     
     for enemy in all(enemies) do
-      if enemy.type and enemy.health then
+      if enemy.type != "normal" then
         enemy.health -= BMB_DMG
         if enemy.health <= 0 then
           create_explosion_chain(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, 8, enemy.width)
@@ -1153,7 +1153,6 @@ function handle_boss_defeat(enemy)
     add_score(50)
     phase = "victory_lap"
     game_complete_grace = 240
-    final_score = sc(calc_bonus())
   end
 end
 
@@ -1317,6 +1316,7 @@ end
 function update_game()
   rank = min(10, max(rank, flr(score_multiplier / 2)))
   if hitstop > 0 then hitstop -= 1 return end
+  if shake_amount > 0 then shake_amount -= 1 end
   update_explosions()
   update_bomb_effect()
   update_powerups()
@@ -1398,13 +1398,11 @@ function update_game()
     if game_over_grace > 0 then game_over_grace -= 1 end
     
     if game_over_timer == 599 then
-      final_score = sc(calc_bonus())
-      update_high_scores(final_score, get_initials())
+      update_high_scores(sc(calc_bonus()), get_initials())
     end
 
     if game_over_timer <= 0 then
-      final_score = sc(calc_bonus())
-      if score_gt(final_score, high_scores[3].score) then
+      if hs_pos < 4 then
         current_initials = nil
         game_state = "enter_initials"
       else
@@ -1470,8 +1468,6 @@ function update_game()
   if player.invincible_timer > 0 then
     player.invincible_timer -= 1
   end
-  
-  if shake_amount > 0 then shake_amount -= 1 end
   
   if btn(0) or btn(1) or btn(2) or btn(3) then
     player.thrust_frame = (player.thrust_frame + 1) % 3
@@ -1681,7 +1677,8 @@ function _update60()
       game_loop = 1
       warp_time = 0
       current_initials = nil
-      game_state = "enter_initials"
+      update_high_scores(sc(calc_bonus()), get_initials())
+      game_state = hs_pos < 4 and "enter_initials" or "title"
       update_music("title")
     end
   end
