@@ -8,68 +8,36 @@ __lua__
 ----------------------------------------
 -- global state & constants
 ----------------------------------------
-game_state = "title"
-phase = "normal"
-phase_state = "pre_mini_boss"
-current_level = 1
-max_level = 5
-game_loop = 1
+-- only state read before init_game() lives here; per-run state
+-- (score, rank, phase, timers, object tables) is set in init_game()
+game_state, title_timer = "title", 0
+current_level, max_level = 1, 5
 credits = 0
-credits_used = 0
-score = 0
-score_hi = 0
-final_score = nil
-score_streak = 0
-score_multiplier = 1
-enemy_kill_count = 0
+warp_time, warp_duration = 0, 360
 current_music = -1
-title_timer = 0
-shoot_cd = 0
-warp_time = 0
-warp_duration = 360
-shake_amount = 0
-game_over = false
-game_over_timer = 600
-game_over_grace = 60
-game_complete_grace = 90
-boss_defeat_grace = 0
-boss_warning = 0
-bomb_active = false
-bomb_timer = 0
-bomb_effect_timer = 0
-spawn_timer = 0
-spawn_delay = 120
 last_entered_initials = {"A", "C", "E"}
-current_initials = nil
-current_index = 1
-high_scores = {}
-rank = 0
-hitstop = 0
 
 -- player constants
 P_LIVES, P_BMBS = 3, 3
 B_SPD = 3
-BMB_DUR, BMB_DMG = 60, 30
+BMB_DUR, BMB_DMG = 60, 20
 
 -- enemy constants
 E_SPD, E_SPD_SCL, E_SPD_MAX = 1, 0.2, 1.75
-E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 120, 8, 80
+E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 75, 8, 45
 E_B_SPD, E_B_SPREAD = 2.25, 10
 E_BURST_SPD, E_BURST_DLY = 2.5, 6
 
 
 
 -- boss constants
-MB_HP, MB_HP_SCL = 60, 5
-FB_HP, FB_HP_SCL = 100, 5
-B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 20, 45
+MB_HP, MB_HP_SCL = 150, 20
+FB_HP, FB_HP_SCL = 250, 25
+B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 0.5, 45
 BASE_CLUSTERS = 6
 
 -- scoring
-S_BMB, S_LIFE = 25, 25
-
--- object tables
-starfield,enemies,bullets,enemy_bullets,explosions,powerups,bullet_pool,enemy_bullet_pool,player = {},{},{},{},{},{},{},{},{}
+S_BMB, S_LIFE = 500, 1000
 
 
 ----------------------------------------
@@ -102,31 +70,15 @@ end
 ----------------------------------------
 -- save system
 ----------------------------------------
-function init_save_system()
-  cartdata("murdercrab_v2")
-end
-
-function ensure_cartdata()
-  if stat(6) == 0 then init_save_system() end
-end
-
 -- score helpers (component-based: {m=millions, k=thousands, u=units})
-function score_to_comp(n)
-  return {m=flr(n/1000000), k=flr((n%1000000)/1000), u=n%1000}
-end
-
 function score_gt(a, b)
   -- compare: returns true if a > b
-  if type(a)=="number" then a=score_to_comp(a) end
-  if type(b)=="number" then b=score_to_comp(b) end
   if a.m!=b.m then return a.m>b.m end
   if a.k!=b.k then return a.k>b.k end
   return a.u>b.u
 end
 
 function score_fmt(s)
-  if type(s)=="number" then s=score_to_comp(s) end
-  if s.k>=1000 then s.m+=flr(s.k/1000) s.k%=1000 end
   if s.m>0 then return s.m..","..sub("000"..s.k,-3)..","..sub("000"..s.u,-3)
   elseif s.k>0 then return s.k..","..sub("000"..s.u,-3) end
   return ""..s.u
@@ -134,7 +86,6 @@ end
 
 function init_high_scores()
   high_scores = {}
-  ensure_cartdata()
   
   -- load saved initials (slots 18-20)
   local c1, c2, c3 = dget(18), dget(19), dget(20)
@@ -160,8 +111,6 @@ function init_high_scores()
 end
 
 function save_high_scores()
-  ensure_cartdata()
-  
   for i = 1, 3 do
     local e = high_scores[i]
     local s = e.score
@@ -170,31 +119,26 @@ function save_high_scores()
     dset(base, s.m)
     dset(base+1, s.k)
     dset(base+2, s.u)
-    dset(base+3, ord(sub(e.initials,1,1)) or 65)
-    dset(base+4, ord(sub(e.initials,2,2)) or 67)
-    dset(base+5, ord(sub(e.initials,3,3)) or 69)
+    for j = 1, 3 do dset(base+2+j, ord(e.initials, j)) end
   end
 end
 
-function update_high_scores(new_score, initials)
-  local ns = type(new_score) == "number" and score_to_comp(new_score) or new_score
+function update_high_scores(ns, initials)
+  hs_pos = 4
   if ns.m == 0 and ns.k == 0 and ns.u == 0 then return end
-  if not initials or #initials < 3 then initials = get_initials() end
-  initials = sub(initials, 1, 3)
   
-  local pos = 4
   for i = 1, 3 do
     if score_gt(ns, high_scores[i].score) then
-      pos = i
+      hs_pos = i
       break
     end
   end
   
-  if pos <= 3 then
-    for i = 3, pos + 1, -1 do
+  if hs_pos <= 3 then
+    for i = 3, hs_pos + 1, -1 do
       high_scores[i] = high_scores[i - 1]
     end
-    high_scores[pos] = {score={m=ns.m,k=ns.k,u=ns.u}, initials=initials}
+    high_scores[hs_pos] = {score=ns, initials=initials}
     save_high_scores()
   end
 end
@@ -211,7 +155,8 @@ end
 
 function sc(b)
   b = score + (b or 0)
-  return {m=0, k=score_hi + flr(b / 1000), u=b % 1000}
+  local k = score_hi + flr(b / 1000)
+  return {m=flr(k / 1000), k=k % 1000, u=b % 1000}
 end
 
 function get_initials()
@@ -407,11 +352,8 @@ function update_enter_initials()
   if btnp(4) or btnp(5) then
     local str = current_initials[1] .. current_initials[2] .. current_initials[3]
     last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
-    ensure_cartdata()
-    dset(18, ord(current_initials[1]) or 65)
-    dset(19, ord(current_initials[2]) or 67)
-    dset(20, ord(current_initials[3]) or 69)
-    if final_score then update_high_scores(final_score, str) final_score = nil end
+    for i = 1, 3 do dset(17 + i, ord(current_initials[i])) end
+    if hs_pos < 4 then high_scores[hs_pos].initials = str save_high_scores() end
     current_initials = nil
     game_state = "title"
     title_timer = 0
@@ -429,7 +371,7 @@ function draw_enter_initials()
     end
     if (time() * 10) % 2 < 1 then line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8) end
   end
-  shadow_text("up/down: letter  left/right: position", 80, 8)
+  shadow_text("up/down: letter l/r: slot", 80, 8)
   shadow_text("z/x: confirm", 90, 8)
 end
 
@@ -448,31 +390,12 @@ function start_game()
 end
 
 function init_game()
-  game_loop = 1
-  phase = "normal"
-  phase_state = "pre_mini_boss"
-  current_level = 1
-  enemy_kill_count = 0
-  score = 0
-  score_hi = 0
-  score_streak = 0
-  score_multiplier = 1
-  final_score = nil
-  game_over = false
-  game_over_timer = 600
-  game_over_grace = 60
-  game_complete_grace = 90
-  boss_defeat_grace = 0
-  boss_warning = 0
-  shake_amount = 0
-  warp_time = 0
-  bomb_active = false
-  bomb_timer = 0
-  bomb_effect_timer = 0
-  spawn_timer = 0
-  shoot_cd = 0
-  hitstop = 0
-  rank = 0
+  game_loop, current_level, credits_used, phase, phase_state = 1, 1, 0, "normal", "pre_mini_boss"
+  score, score_hi, score_streak, score_multiplier, rank = 0, 0, 0, 1, 0
+  game_over, game_over_timer, game_over_grace, game_complete_grace = false, 600, 60, 90
+  boss_defeat_grace, boss_warning, enemy_kill_count, spawn_timer = 0, 0, 0, 0
+  bomb_active, bomb_timer, bomb_effect_timer = false, 0, 0
+  shake_amount, warp_time, shoot_cd, hitstop = 0, 0, 0, 0
   update_spawn_delay()
   
   player = {
@@ -482,25 +405,18 @@ function init_game()
     lives = P_LIVES,
     bombs = P_BMBS,
     invincible_timer = 0,
-    visible = true,
     thrust_frame = 0,
     sprite = 1
   }
   
-  enemies = {}
-  bullets = {}
-  enemy_bullets = {}
-  explosions = {}
-  powerups = {}
-  bullet_pool = {}
-  enemy_bullet_pool = {}
+  enemies, bullets, enemy_bullets, explosions, powerups, bullet_pool, enemy_bullet_pool = {}, {}, {}, {}, {}, {}, {}
   
   init_starfield()
 end
 
 function update_spawn_delay()
   local loop_reduction = (game_loop - 1) * 5
-  spawn_delay = max(60 - loop_reduction * 2, 110 - (current_level - 1) * 12 - loop_reduction * 2)
+  spawn_delay = max(45 - loop_reduction * 2, 80 - (current_level - 1) * 8 - loop_reduction * 2)
 end
 
 ----------------------------------------
@@ -566,7 +482,7 @@ function player_hit()
   player.lives -= 1
   player.bombs = P_BMBS
   player.invincible_timer = 60
-  sfx(7, 2)
+  sfx(4, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
@@ -621,26 +537,39 @@ end
 -- enemy functions
 ----------------------------------------
 function spawn_enemy()
-  local count = current_level >= 4 and 2 or 1
-  for i = 1, count do spawn_normal_enemy() end
+  -- each level unlocks one more enemy kind
+  local top = min(current_level, 4)
+  if rnd(1) < 0.35 then
+    -- formation: a v, or a snake column that weaves down single file
+    local k, x = flr(rnd(top)) + 1, 16 + rnd(88)
+    for i = -1, 1 do
+      if k == 3 then spawn_normal_enemy(x, -22 + i * 14, k)
+      else spawn_normal_enemy(x + i * 14, -8 - abs(i) * 10, k) end
+    end
+  else
+    for i = 1, current_level >= 3 and 2 or 1 do spawn_normal_enemy(rnd(120), -8, flr(rnd(top)) + 1) end
+  end
 end
 
-function spawn_normal_enemy()
+function spawn_normal_enemy(x, y, k)
   local loop_bonus = (game_loop - 1) * 2
   local interval = max(E_SHT_MIN - loop_bonus * 2, E_SHT_BASE - (current_level - 1) * E_SHT_SCL - loop_bonus * 3)
+  -- kinds: basic, kamikaze (dives fast), snake (weaves straight through), sniper (hangs back, fires fast)
+  -- fields: dive delay, hover y, speed mult, tint, fire interval mult, weave
+  local timer, hov, spm, col, sim, wv = unpack(split(split("90,20,1,8,1,0|15,30,1.25,9,1,0|0,999,0.6,14,1,1.5|600,5,1,12,0.7,0", "|")[k]))
   local e = {
-    x = flr(rnd(120)), y = -8,
-    speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15),
+    x = x, y = y,
+    speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15) * spm,
     sprite = 3, width = 8, height = 8,
     shoot_timer = interval - 40 - flr(rnd(30)),
-    shoot_interval = interval,
+    shoot_interval = interval * sim,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
     type = "normal", health = min(3, current_level + game_loop - 1),
     dx = 0, dy = 0, state = 0,
-    hover_y = 20 + rnd(15),
-    dir = rnd(1) < 0.5 and -1 or 1,
-    timer = 90, paused = false,
+    hover_y = hov + rnd(15),
+    dir = x < 64 and 1 or -1,
+    timer = timer, col = col, wv = wv,
     anim_frame = 0, anim_timer = 0, anim_speed = 10
   }
   e.dy = e.speed
@@ -705,7 +634,7 @@ function update_normal_enemy(enemy)
   
   if enemy.state == 0 then
     enemy.y += enemy.dy
-    enemy.x += enemy.dir * 0.25
+    enemy.x += enemy.dir * 0.25 + cos(enemy.y / 50) * enemy.wv
 
     if enemy.x < 0 then enemy.x = 0 enemy.dir = 1
     elseif enemy.x > 119 then enemy.x = 119 enemy.dir = -1 end
@@ -753,12 +682,10 @@ end
 function update_enemies()
   for i = #enemies, 1, -1 do
     local e = enemies[i]
-    if not e.paused then
-      if e.type == "normal" then
-        update_normal_enemy(e)
-      elseif e.type == "mini_boss" or e.type == "final_boss" or e.type == "true_last_boss" then
-        update_boss_enemy(e)
-      end
+    if e.type == "normal" then
+      update_normal_enemy(e)
+    else
+      update_boss_enemy(e)
     end
   end
 end
@@ -770,14 +697,7 @@ function get_boss_max_health(t)
   local loop_mult = 1 + (game_loop - 1) * 0.5
   if t == "mini_boss" then return flr((MB_HP + (current_level - 1) * MB_HP_SCL) * loop_mult)
   elseif t == "final_boss" then return flr((FB_HP + (current_level - 1) * FB_HP_SCL) * loop_mult)
-  else return flr(450 * loop_mult) end
-end
-
-function get_boss_count(t)
-  if t == "mini_boss" or t == "final_boss" then
-    return current_level >= 2 and 2 or 1
-  end
-  return 1
+  else return flr(900 * loop_mult) end
 end
 
 function boss_exists(t)
@@ -790,21 +710,21 @@ end
 
 function spawn_boss(btype)
   local is_final = btype == "final_boss"
-  local count = get_boss_count(btype)
+  local count = current_level >= 2 and 2 or 1
   local spacing = count > 1 and 32 or 0
   
   for i = 1, count do
     add(enemies, {
       x = 64 - 16 + spacing * (i - (count + 1) / 2), y = -32,
-      dx = is_final and 0.15 or 0.25, dy = 0.5, speed = 1,
+      dx = is_final and 0.15 or 0.25,
       width = 16, height = 16,
       health = get_boss_max_health(btype),
       type = btype,
       shoot_timer = 0, shoot_interval = is_final and 16 or 40,
-      pattern = 1, rotate_counter = 0,
+      rotate_counter = 0,
       cluster_count = BASE_CLUSTERS + current_level,
       sprite = 8, is_big_sprite = true,
-      color_offset = is_final and 12 or 0, paused = false, phase = 1
+      phase = 1
     })
   end
 end
@@ -812,7 +732,7 @@ end
 function spawn_true_last_boss()
   add(enemies, {
     x = 48, y = -32,
-    speed = 1.5, sprite = 10,
+    sprite = 10,
     width = 32, height = 32,
     shoot_timer = 0, shoot_interval = 12,
     health = get_boss_max_health("true_last_boss"),
@@ -820,15 +740,12 @@ function spawn_true_last_boss()
     cluster_count = BASE_CLUSTERS + 4 + current_level,
     rotate_counter = 0,
     is_big_sprite = true, is_tlb = true,
-    phase = 1, dx = 0.15, dy = 0, paused = false
+    phase = 1, dx = 0.15
   })
 end
 
 function update_boss_phase(enemy)
-  if not enemy.type or not enemy.health then return end
-  
-  local old_phase = enemy.phase or 1
-  local new_phase = 1
+  local new_phase
   local max_hp = get_boss_max_health(enemy.type)
   
   if enemy.type == "mini_boss" then
@@ -837,7 +754,7 @@ function update_boss_phase(enemy)
     new_phase = enemy.health <= max_hp / 3 and 3 or (enemy.health <= max_hp * 2 / 3 and 2 or 1)
   end
   
-  if new_phase > old_phase then
+  if new_phase > enemy.phase then
     enemy.phase = new_phase
     shake_amount = 8 + new_phase * 2
     
@@ -888,7 +805,7 @@ function enemy_shoot_radial(e)
     return
   end
   
-  local ph = e.phase or 1
+  local ph = e.phase
   local pattern_type
   
   if ph == 1 then
@@ -897,9 +814,11 @@ function enemy_shoot_radial(e)
     local t = flr(time() * B_PAT_CHG) % 5
     pattern_type = t < 2 and 2 or (t - 2)
   else
-    pattern_type = flr(time() * B_PAT_CHG * 1.5) % 3
+    pattern_type = flr(time() * B_PAT_CHG * 1.5) % 4
   end
-  
+  -- each level's bosses lead with a different pair of patterns
+  pattern_type = (pattern_type + current_level - 1) % 4
+
   e.rotate_counter = (e.rotate_counter + B_ROT_SPD) % 360
   local health_boost = flr((1 - h) * 5)
   
@@ -909,6 +828,16 @@ function enemy_shoot_radial(e)
   elseif pattern_type == 1 then
     e.burst_index = nil
     create_radial_pattern(e, e.cluster_count + health_boost, s)
+  elseif pattern_type == 3 then
+    e.burst_index = nil
+    -- falling wall with a drifting gap: one row per 0.6s however many bosses
+    if time() > (wall_t or 0) then
+      wall_t = time() + 0.6
+      local g = 64 + sin(time() / 8) * 40
+      for x = 4, 124, 8 do
+        if abs(x - g) > 14 then spawn_enemy_bullet(x, e.y + e.height / 2, 0, s) end
+      end
+    end
   else
     create_aimed_pattern(e, flr(e.cluster_count / 2) + health_boost, s)
   end
@@ -939,8 +868,8 @@ function create_aimed_pattern(e, count, speed)
   if not e.burst_index then
     e.burst_index = 1
     e.burst_timer = 0
-    e.burst_max = 3
-    e.burst_delay = 16
+    e.burst_max = count
+    e.burst_delay = 10
   end
   
   if e.burst_timer <= 0 then
@@ -966,7 +895,7 @@ end
 function spawn_powerup(x, y, ptype, value)
   local p = {
     x = x, y = y, type = ptype,
-    value = value or 0.5,
+    value = value,
     width = 8, height = 8,
     speed = 2, dx = 0, dy = 0
   }
@@ -986,8 +915,8 @@ function spawn_powerup_explosion(x, y)
     p.dy = sin(angle) * 1.5
   end
   
-  if rnd(1) < 0.05 then
-    local ptype = rnd(1) < 0.5 and "bomb" or "1up"
+  if rnd(1) < 0.03 then
+    local ptype = rnd(1) < 0.75 and "bomb" or "1up"
     local p = spawn_powerup(x, y, ptype)
     p.dx = cos(rnd(1)) * 1
     p.dy = sin(rnd(1)) * 1
@@ -1017,10 +946,9 @@ function update_powerups()
     local dy = (player.y + 4) - (p.y + 4)
     local dist = sqrt(dx * dx + dy * dy)
     
-    if p.attracted or dist < 48 then
-      local spd = p.attract_speed or 0.15
-      p.x += dx * spd
-      p.y += dy * spd
+    if dist < 20 then
+      p.x += dx * 0.15
+      p.y += dy * 0.15
       p.dx = 0
       p.dy = 0
     elseif p.dx == 0 and p.dy == 0 then
@@ -1033,7 +961,7 @@ end
 
 function check_powerup_collection()
   for p in all(powerups) do
-    if collides(p, player) then
+    if collides(p, player) and not game_over then
       if p.type == "bomb" then
         player.bombs += 1
       elseif p.type == "1up" then
@@ -1181,7 +1109,7 @@ function activate_bomb()
     bullets = {}
     
     for enemy in all(enemies) do
-      if enemy.type and enemy.health then
+      if enemy.type != "normal" then
         enemy.health -= BMB_DMG
         if enemy.health <= 0 then
           create_explosion_chain(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, 8, enemy.width)
@@ -1214,7 +1142,6 @@ end
 
 function draw_bomb_effect()
   if bomb_effect_timer > 0 then
-    if bomb_effect_timer > 40 then rectfill(0, 0, 127, 127, 7) end
     circ(64, 64, 64 - bomb_effect_timer, 7)
     circfill(64, 64, 5 + bomb_effect_timer % 10, 7)
   end
@@ -1242,17 +1169,16 @@ function handle_boss_defeat(enemy)
     if boss_exists("final_boss") == 0 then
       phase = "level_complete"
       boss_defeat_grace = 180
+      update_music("fade")
       create_final_boss_defeat_explosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2)
     end
   elseif enemy.type == "true_last_boss" then
     create_explosion_chain(enemy.x + 16, enemy.y + 16, 0, 0, true)
     convert_enemy_bullets_to_explosions()
     add_score(50)
-    enemy.health = 0
-    enemy.paused = true
     phase = "victory_lap"
     game_complete_grace = 240
-    final_score = sc(calc_bonus())
+    update_music("fade")
   end
 end
 
@@ -1279,7 +1205,7 @@ function check_bullet_enemy_collisions()
     for enemy in all(enemies) do
       if collides(enemy, bullet) then
         local dmg = min(3, 2 + flr(rank / 3))
-        if not enemy.type or enemy.type == "normal" then
+        if enemy.type == "normal" then
           enemy.health -= dmg
           del(bullets, bullet)
           release_bullet(bullet)
@@ -1416,6 +1342,7 @@ end
 function update_game()
   rank = min(10, max(rank, flr(score_multiplier / 2)))
   if hitstop > 0 then hitstop -= 1 return end
+  if shake_amount > 0 then shake_amount -= 1 end
   update_explosions()
   update_bomb_effect()
   update_powerups()
@@ -1460,15 +1387,6 @@ function update_game()
       boss_warning = 180
       sfx(5, 2)
     end
-  elseif phase == "mini_boss" then
-    check_end_mini_boss()
-  elseif phase == "final_boss" then
-    if boss_exists("final_boss") == 0 then
-      phase = "level_complete"
-      boss_defeat_grace = 180
-      create_final_boss_defeat_explosion(64, 48)
-      update_music("fade")
-    end
   elseif phase == "level_complete" then
     if boss_defeat_grace > 0 then
       boss_defeat_grace -= 1
@@ -1484,7 +1402,6 @@ function update_game()
       else
         current_level += 1
         warp_time = warp_duration
-        phase = "warping"
         sfx(19, 3)
         update_music("silent")
       end
@@ -1507,13 +1424,11 @@ function update_game()
     if game_over_grace > 0 then game_over_grace -= 1 end
     
     if game_over_timer == 599 then
-      final_score = sc(calc_bonus())
-      update_high_scores(final_score, get_initials())
+      update_high_scores(sc(calc_bonus()), get_initials())
     end
 
     if game_over_timer <= 0 then
-      final_score = sc(calc_bonus())
-      if score_gt(final_score, high_scores[3].score) then
+      if hs_pos < 4 then
         current_initials = nil
         game_state = "enter_initials"
       else
@@ -1551,19 +1466,19 @@ function update_game()
   end
   
   -- player movement
-  if btn(0) and player.x > 0 then
+  if btn(0) then
     player.x -= player.speed
     player.sprite = 17
-  elseif btn(1) and player.x < 120 then
+  elseif btn(1) then
     player.x += player.speed
     player.sprite = 33
   else
     player.sprite = 1
   end
-  if btn(2) and player.y > 0 then
+  if btn(2) then
     player.y -= player.speed
   end
-  if btn(3) and player.y < 128 - player.height then
+  if btn(3) then
     player.y += player.speed
   end
   
@@ -1574,15 +1489,13 @@ function update_game()
   check_enemy_bullet_collisions()
   check_player_enemy_collisions()
   check_bullet_enemy_collisions()
-  
+  -- clamp after knockback too, so a hit can't shove the ship off-screen
+  player.x, player.y = mid(0, player.x, 120), mid(0, player.y, 120)
+
   -- update timers
   if player.invincible_timer > 0 then
     player.invincible_timer -= 1
-    player.visible = not player.visible
-    if player.invincible_timer <= 0 then player.visible = true end
   end
-  
-  if shake_amount > 0 then shake_amount -= 1 end
   
   if btn(0) or btn(1) or btn(2) or btn(3) then
     player.thrust_frame = (player.thrust_frame + 1) % 3
@@ -1615,7 +1528,7 @@ function draw_game()
     elseif p.type == "1up" then
       spr(6, p.x, p.y)
     elseif p.type == "score" then
-      if p.timer and p.timer < 30 and (time() * 10) % 2 < 1 then pal(8, 7) end
+      if p.timer < 30 and (time() * 10) % 2 < 1 then pal(8, 7) end
       spr(7 + af, p.x, p.y)
       pal()
     end
@@ -1643,18 +1556,15 @@ function draw_game()
   -- draw enemies
   for enemy in all(enemies) do
     if enemy.is_big_sprite then
-      pal()
       if enemy.type == "final_boss" then
-        pal(8, 12) pal(9, 13) pal(10, 14) pal(7, 7)
-        if enemy.phase and enemy.phase >= 3 then
+        pal(8, 12) pal(9, 13) pal(10, 14)
+        if enemy.phase >= 3 then
           pal(12, 8) pal(13, 9) pal(14, 10)
         end
       elseif enemy.type == "true_last_boss" and enemy.rage_mode then
         local pulse = sin(time() * 8) * 3
         local base = 8 + flr(abs(pulse))
         pal(8, base) pal(9, base + 1) pal(10, 7)
-      elseif enemy.color_offset and enemy.color_offset > 0 then
-        for c = 0, 15 do pal(c, (c + enemy.color_offset) % 16) end
       end
       
       if enemy.is_tlb then
@@ -1669,7 +1579,9 @@ function draw_game()
       end
       pal()
     else
+      pal(8, enemy.col)
       spr(enemy.sprite, enemy.x, enemy.y)
+      pal()
     end
   end
   
@@ -1747,10 +1659,9 @@ end
 -- main entry points
 ----------------------------------------
 function _init()
-  init_save_system()
+  cartdata("murdercrab_v2")
   init_high_scores()
   init_starfield()
-  current_music = -1
   update_music("title")
 end
 
@@ -1796,7 +1707,8 @@ function _update60()
       game_loop = 1
       warp_time = 0
       current_initials = nil
-      game_state = "enter_initials"
+      update_high_scores(sc(calc_bonus()), get_initials())
+      game_state = hs_pos < 4 and "enter_initials" or "title"
       update_music("title")
     end
   end

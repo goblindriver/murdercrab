@@ -5,8 +5,9 @@ unmodified. We use it for Murdercrab because the cart is token-full and cannot
 be instrumented from inside. All TAS controls, RNG seeding, and (future) bot
 logic live host-side.
 
-This is **v1 of the harness**: seeded, playable, frame-by-frame TAS. No AI bot
-yet — that's v2.
+Current state: seeded frame-by-frame TAS, a simple scripted bot (v2.0b), and
+headless regression traces. The bot holds fire, sweeps the playfield,
+panic-bombs, and drives every menu. It does not dodge yet; that's v2.1.
 
 ## Setup (macOS)
 
@@ -27,7 +28,7 @@ known Celia incompatibilities.
   - `K` — rewind one frame
   - `D` — rewind to frame 0
   - `P` — real-time play
-  - `Shift+P` — fast-forward
+  - `Shift+P` — seek to the last input frame
   - `M` — save current input sequence to a `.lua` file
   - `Shift+W` — load an input sequence
   - `F3` / `F4` — start / stop GIF recording
@@ -36,6 +37,18 @@ known Celia incompatibilities.
   - `Ctrl+Z` / `Ctrl+Shift+Z` — undo / redo (30 deep)
   - Interactive Lua console — inspect any cart global mid-TAS without editing
     the cart
+
+## Watching the bot
+
+```
+./watch.sh [seed] [speed]     # e.g. ./watch.sh 7 2 for seed 7 at double speed
+MC_GOD=1 ./watch.sh           # never dies: every level, bosses, true last boss
+```
+
+Starts playing on launch with sound and keeps running when the window isn't
+focused. The title bar shows level, phase, rank, multiplier, lives, bombs and
+continues (also echoed to the terminal every ~10s). Any key pauses; `P`
+resumes. Savestates drop to one per 5s, so long watches stay light on memory.
 
 ## Changing the seed
 
@@ -47,7 +60,46 @@ M.SEED = 42  -- any nonzero integer
 
 Setting a different integer produces different enemy spawn positions,
 powerup drops, etc. Use this to stress-test TAS inputs against RNG variance,
-or to pick a "lucky" seed for score runs.
+or to pick a "lucky" seed for score runs. `MC_SEED=7 ./run.sh` overrides it
+without editing the file.
+
+## Regression traces (headless)
+
+`trace.sh` runs a cart under the bot with no TAS UI, writing one line of game
+state per frame (score, rank, phase, player, enemy/bullet checksums), then the
+saved high-score table and an RNG probe. Same seed + same logic gives a
+byte-identical file. A LÖVE window flashes up for a few seconds.
+
+```
+./regress.sh           # working-copy cart vs git HEAD, 6 scenarios, ~2 min
+./trace.sh [cart] [out.txt] [frames] [seed]
+```
+
+`regress.sh` prints `IDENTICAL` or `DIFF` per scenario. Use it after token
+cleanups and refactors: all-IDENTICAL means no observable behavior changed.
+Deliberate gameplay changes will show DIFF, so check those with targeted traces.
+
+Scenario switches (env vars, combinable):
+
+| Var | Effect |
+|-----|--------|
+| `MC_NOCONT=1` | never continue, so game over runs out to name entry and the table |
+| `MC_GOD=1` | player never dies, so no continues and the L5 clear reaches the true last boss |
+| `MC_EXIT=1` | press X at the victory screen (record score + exit) instead of looping |
+| `MC_WATCH=1` | interactive only (see `watch.sh`): auto-play, run unfocused, stats in the title bar. `MC_SPEED=n` = n frames per displayed frame |
+| `MC_EVAL='lua'` | skip the run: execute a plain-Lua chunk against the cart's globals after `_init` and write its return value. Cart env has PICO-8's API, so use `tostr`, not `tostring`. |
+
+In `MC_GOD=1` traces, `wh=` counts would-be hits: enemy bullets that touched
+the player's hitbox (once per bullet), i.e. the hits a player who never dodges
+would have taken. `balance.py` turns god + nocont traces into a per-level
+table (time, would-hits/min, bullets on screen, rank, pickups, where one-credit
+games end). Its docstring has the trace commands.
+
+Example unit check:
+
+```
+MC_EVAL='credits_used = 2 init_game() return tostr(credits_used)' ./trace.sh "" /tmp/out.txt 1 && cat /tmp/out.txt
+```
 
 ## Known limitations (upstream Celia)
 
@@ -61,16 +113,18 @@ or to pick a "lucky" seed for score runs.
 - No coroutine serialization. Murdercrab has no coroutines, so irrelevant for
   us. (Verified: no `cocreate` / `coresume` in `pico8/murdercrab.p8`.)
 
-## What's next (not in v1)
+## What's next
 
-- **v2:** host-side rule-based bot in `murdercrab_bootstrap.lua` — dodge
-  bullets, preserve cherry chain, manage bombs. Debug HUD overlay.
+- **v2.1:** a dodging bot. Score candidate moves by predicted bullet proximity a
+  few frames ahead, bias toward cherries, and save bombs for unavoidable hits.
+  Debug HUD overlay.
+- **v2.2:** batch runs over many seeds, logging deaths, rank, multiplier, and
+  score per level: the actual AI playtest for balance.
 - **v3:** cherry-chain + bomb-economy heuristics to 1CC L1, then extend.
 - **v4:** hand-TAS starting from a Celia savestate, push into NG+ / secret
   L6 boss for a score-record run.
 
-See `/Users/jasongronvold/.claude/plans/golden-seeking-gem.md` for the full
-roadmap, and `UPSTREAM.md` for Celia provenance and patch locations.
+See `UPSTREAM.md` for Celia provenance and patch locations.
 
 ## Directory layout
 
@@ -79,8 +133,12 @@ tools/celia/
 ├── README.md                     # this file
 ├── README-celia-upstream.md      # Celia's original README
 ├── UPSTREAM.md                   # upstream commit SHA + patch notes
-├── murdercrab_bootstrap.lua      # our host-side hook (RNG seed, future bot)
+├── murdercrab_bootstrap.lua      # our host-side hook (RNG seed, bot, trace/eval modes)
 ├── run.sh                        # launcher
+├── watch.sh                      # watch the bot play in real time
+├── trace.sh                      # headless per-frame state trace
+├── regress.sh                    # working copy vs HEAD across 6 seeded scenarios
+├── balance.py                    # per-level balance table from traces
 ├── carts/
 │   └── murdercrab.p8             # copy from ../../pico8/ (regenerated by run.sh; gitignored)
 ├── api.lua                       # Celia (modified: +4 lines near 1699)
