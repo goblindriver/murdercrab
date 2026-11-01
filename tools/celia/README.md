@@ -111,6 +111,21 @@ Same seeds and cap:
 
 Bombing earlier doesn't help: `bomb_h` 5 and 9 on v2.1 lost 6.5 and 11.3 lives
 an hour. `MC_W='{lex=0}'` reproduces v2.1.
+
+The next death log (v2.2, 60-min runs) showed slow traps: a hit predicted at
+the edge of the 12-frame lookahead, then counting down every frame because
+no move escaped, often with the bombs already spent. A longer lookahead sees
+them in time. One credit, seeds 201-212, 60-min cap:
+
+| Dodger | Mean survival | Alive at 60 min | Lives lost / hour | Mean score |
+|--------|--------------:|----------------:|------------------:|-----------:|
+| v2.2, `horizon=12` | 3468 s | 10/12 | 5.6 | 2783k |
+| **v2.2, `horizon=16`** (default) | 3589 s | 12/12 | 2.1 | 3078k |
+| v2.2, `horizon=20` | 3590 s | 12/12 | 2.3 | 2844k |
+
+A two-segment escape search (when no held move is safe, try turning once
+after 4 or 8 frames, 81 paths) didn't beat `horizon=16` (3.2 and 2.3 lives
+lost per hour) and was dropped.
 `MC_W` overrides weights for one run. (An evolutionary tuner over these
 weights was tried and dropped for the RL route; its first generation already
 beat the defaults: fitness 6035 vs 4631 on 4 seeds, every seed alive at the

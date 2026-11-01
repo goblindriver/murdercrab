@@ -72,7 +72,7 @@ M.net = rl and policy_path and policy_path ~= "" and rl.load_policy(policy_path)
 -- Dodger weights. MC_W (JSON or a Lua table literal) overrides any of
 -- them for one run, e.g. MC_W='{"hit":500}'. Unknown keys are ignored.
 M.W = {
-	horizon = 12,  -- frames of lookahead per candidate move
+	horizon = 16,  -- frames of lookahead per candidate move (was 12)
 	hit = 1000,    -- predicted hit, scaled by how soon it lands
 	near = 40,     -- threats passing within near_r px of the hitbox
 	near_r = 6,
@@ -229,9 +229,9 @@ local function plan(cart)
 		if g - H * (v + 1) < near_r then th[#th + 1] = t end
 	end
 	M.last_threats = #th
-	local lex = W.lex > 0
-	local best, best_s, best_r, doomed, hits, nears, body = 1, -math.huge, -1, true, {}, {}, {}
-	for mi, mv in ipairs(MOVES) do
+	-- Hold mv for H frames against th. Returns the first hit frame (nil if
+	-- none), the near-miss sum, and whether an enemy body made the hit.
+	local function sim(mv)
 		local x, y, hit_at, near, wk, by_body = p.x, p.y, nil, 0, 1, false
 		for k = 1, H do
 			x, y = clamp(x + mv[1], 0, 120), clamp(y + mv[2], 0, 120)
@@ -251,6 +251,12 @@ local function plan(cart)
 			end
 			wk = wk * decay
 		end
+		return hit_at, near, by_body
+	end
+	local lex = W.lex > 0
+	local best, best_s, best_r, doomed, hits, nears, body = 1, -math.huge, -1, true, {}, {}, {}
+	for mi, mv in ipairs(MOVES) do
+		local hit_at, near, by_body = sim(mv)
 		if not hit_at or hit_at > W.bomb_h then doomed = false end
 		hits[mi], nears[mi], body[mi] = hit_at or false, near, by_body
 		local ex, ey = clamp(p.x + mv[1] * H, 0, 120), clamp(p.y + mv[2] * H, 0, 120)
