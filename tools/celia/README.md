@@ -247,12 +247,17 @@ Results on one credit, seeds 201-212, 30-min cap:
 | PPO, skip 1, no floor, 3M steps (`teach4`) | 501 s | 0/12 | 26.4 | 328k |
 | **dodger v2.2** | 1792 s | 12/12 | 3.7 | 1625k |
 
-At a 60-min cap, the clone playing the v2.2 dodger matches it:
+At a 60-min cap the clone tracks the dodger it reads (same seeds):
 
 | Bot | Mean survival | Alive at 60 min | Lives lost / hour | Mean score | Reached |
 |-----|--------------:|----------------:|------------------:|-----------:|---------|
-| dodger v2.2 | 3468 s | 10/12 | 5.6 | 2783k | loop 4 L4 to loop 6 L2 |
-| net (skip-1 clone) | 3315 s | 10/12 | 5.6 | 2699k | loop 2 L5 to loop 6 L2 |
+| dodger v2.2, `horizon=12` | 3468 s | 10/12 | 5.6 | 2783k | loop 4 L4 to loop 6 L2 |
+| net (skip-1 clone) on it | 3315 s | 10/12 | 5.6 | 2699k | loop 2 L5 to loop 6 L2 |
+| **dodger v2.2, `horizon=16`** (current) | 3589 s | 12/12 | 2.1 | 3078k | loop 5 L6 to loop 6 L1 |
+| net (same clone, no retraining) on it | 3503 s | 11/12 | 2.7 | 2934k | loop 4 L6 to loop 5 L6 |
+
+The clone was cloned with 12-frame danger features; re-cloning at
+`horizon=16` would likely close the small gap.
 
 Commands for the current best net (the skip-1 clone):
 
@@ -341,7 +346,10 @@ MC_EVAL='credits_used = 2 init_game() return tostr(credits_used)' ./trace.sh "" 
   weights per situation instead of raw moves. Then long runs on GOBLINDRIVER
   (CUDA) and MC2's env server (plan: `docs/rl-workflow.md`, drafted on the
   status-check branch).
-- **v2.3:** use `MC_DEATHLOG` on v2.2 to find what still kills it.
+- **v2.3:** the last death log (v2.2, `horizon=16`, 12 h of play, 25 lives
+  lost, every one with all moves predicted hit) points at bomb economy (7
+  with no bombs left, 5 inside the 60-frame bomb cooldown) and corners (ship
+  pinned at x=120 during the loop-3 L6 true last boss, 25-52 bullets up).
 - **v3:** cherry-chain + bomb-economy heuristics for the dodger (bombs refill
   on every death, so it should spend them freely), aiming for a loop-2 1CC.
 - **v4:** hand-TAS starting from a Celia savestate, push into NG+ / secret
