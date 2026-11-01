@@ -308,9 +308,9 @@ local function deathlog_frame(cart, mi, doomed, hits)
 	for i = 1, 9 do if hits[i] and (not first or hits[i] < first) then first = hits[i] end end
 	local safe = 0
 	for i = 1, 9 do if not hits[i] then safe = safe + 1 end end
-	dl_ring[#dl_ring + 1] = ("  f%d p=%.0f,%.0f inv=%d move=%d hit=%s earliest=%s safe_moves=%d doomed=%s threats=%d"):format(
+	dl_ring[#dl_ring + 1] = ("  f%d p=%.0f,%.0f inv=%d move=%d hit=%s earliest=%s safe_moves=%d doomed=%s threats=%d bombs=%d%s"):format(
 		_G.pico8.frames, p.x, p.y, p.invincible_timer or 0, mi, tostring(hits[mi]), tostring(first), safe,
-		tostring(doomed), M.last_threats or 0)
+		tostring(doomed), M.last_threats or 0, p.bombs or 0, cart.bomb_active and " bomb_active" or "")
 	if #dl_ring > 12 then table.remove(dl_ring, 1) end
 end
 

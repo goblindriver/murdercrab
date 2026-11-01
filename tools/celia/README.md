@@ -195,6 +195,57 @@ Lua export (`eval.sh`):
 - The dodger is still well ahead. It replans every frame; the net decides
   every 4.
 
+### Train-harder pass (Nov 2026)
+
+What it took to get a net that plays as well as the dodger, and why PPO
+hasn't beaten it yet:
+
+1. **A 50M-step run made things worse.** 30-min episodes, 6.6 h. Once the
+   teacher loss faded, PPO tripled its scoring rate and gave up survival
+   (held-out 195 s): at score/1000 a lost life cost only ~3 s of points.
+   Now `--reward '{score=1e-4}'`.
+2. **The decision interval was a ceiling.** The dodger held to skip 4 is
+   only as good as the best skip-4 nets (~330 s). Nets now train at skip 1.
+3. **`--obs teacher`** shows the net the dodger's own pick, so cloning is
+   exact (100% accuracy) and the clone plays like the dodger. It reads the
+   pick live, so a better dodger makes a better net with no retraining.
+   `--bc-smooth` keeps the clone from starting PPO at zero entropy.
+4. **The dodger itself had the big wins** (`MC_DEATHLOG`, above): `home`
+   5 -> 30 and the v2.2 move choice took it from 17.6 to 3.7 lives lost per
+   hour.
+5. **PPO on top of the clone hasn't found improvements.** With the teacher
+   loss fading to 0 (`teach4`), it overruled the dodger on 10% of states by
+   3M steps and lost 26.4 lives an hour. With `--bc-floor 0.1` (`teach5`) it
+   stayed stable but never overruled it in 10M steps (greedy action = the
+   dodger's on 6000 probe states). At 1-frame actions single moves barely
+   change the outcome, and advantage normalization blows that noise up.
+
+Results on one credit, seeds 201-212, 30-min cap:
+
+| Bot | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|-----|--------------:|----------------:|------------------:|-----------:|
+| dodger v2.1, old weights | 920 s | 3/12 | 17.6 | 1332k |
+| clone at skip 2 (v2.1 teacher) | 795 s | 0/12 | 23.4 | 1164k |
+| PPO from that clone, skip 2, 4M steps (`teach-v1`) | 460 s | 0/12 | | |
+| dodger v2.1, `home=30` | 1683 s | 11/12 | 5.2 | 1530k |
+| clone at skip 1 (`home=30` teacher) | 1683 s | 11/12 | 5.7 | 1484k |
+| PPO, skip 1, no floor, 3M steps (`teach4`) | 501 s | 0/12 | 26.4 | 328k |
+| **dodger v2.2** | 1792 s | 12/12 | 3.7 | 1625k |
+
+At a 60-min cap, the clone playing the v2.2 dodger matches it:
+
+| Bot | Mean survival | Alive at 60 min | Lives lost / hour | Mean score | Reached |
+|-----|--------------:|----------------:|------------------:|-----------:|---------|
+| dodger v2.2 | 3468 s | 10/12 | 5.6 | 2783k | loop 4 L4 to loop 6 L2 |
+| net (skip-1 clone) | 3315 s | 10/12 | 5.6 | 2699k | loop 2 L5 to loop 6 L2 |
+
+Commands for the current best net (the skip-1 clone):
+
+```
+uv run ppo.py --run clone --obs teacher --skip 2 --gamma 0.995 --bc-iters 4 --total-steps 0
+sed 's/skip=2/skip=1/' runs/clone/bc.lua > runs/clone/bc-s1.lua   # the clone's weights don't depend on skip
+```
+
 ## Changing the seed
 
 Edit `murdercrab_bootstrap.lua`:
@@ -270,9 +321,12 @@ MC_EVAL='credits_used = 2 init_game() return tostr(credits_used)' ./trace.sh "" 
 
 ## What's next
 
-- **RL phase 2+:** long runs on GOBLINDRIVER (CUDA) with iMac variants, then
-  distributed env workers if env-bound; MC2 env server on its Lua sim core
-  (plan: `docs/rl-workflow.md`, drafted on the status-check branch).
+- **RL phase 2+:** PPO needs a different setup to beat the dodger: a
+  residual action that only fires in danger states, or RL over the dodger's
+  weights per situation instead of raw moves. Then long runs on GOBLINDRIVER
+  (CUDA) and MC2's env server (plan: `docs/rl-workflow.md`, drafted on the
+  status-check branch).
+- **v2.3:** use `MC_DEATHLOG` on v2.2 to find what still kills it.
 - **v3:** cherry-chain + bomb-economy heuristics for the dodger (bombs refill
   on every death, so it should spend them freely), aiming for a loop-2 1CC.
 - **v4:** hand-TAS starting from a Celia savestate, push into NG+ / secret
