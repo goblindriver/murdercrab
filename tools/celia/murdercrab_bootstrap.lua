@@ -15,6 +15,9 @@
 -- MC_FRAMES frames under the bot, writes one state line per frame, then exits.
 -- Same seed + same cart logic => byte-identical trace, so diffing two traces
 -- proves a refactor is behavior-preserving. See trace.sh.
+--
+-- The neural-net side (MC_RL env server, MC_POLICY playback) lives in
+-- murdercrab_rl.lua.
 
 local M = {}
 
@@ -46,12 +49,64 @@ M.EXIT = os.getenv("MC_EXIT") == "1"
 
 -- Button bit indices (PICO-8 standard).
 local BTN_LEFT, BTN_RIGHT, BTN_UP, BTN_DOWN, BTN_O, BTN_X = 0, 1, 2, 3, 4, 5
+M.BTN = {LEFT = BTN_LEFT, RIGHT = BTN_RIGHT, UP = BTN_UP, DOWN = BTN_DOWN, O = BTN_O, X = BTN_X}
 
--- Kept as state so a HUD can read it (v2.1).
+-- Kept as state so a HUD can read it.
 M.last_mask = 0
 M.last_threats = 0
 
 local function press(mask, b) return bit.bor(mask, bit.lshift(1, b)) end
+M.press = press
+
+-- MC_BOT=sweep restores the v2.0b policy (fixed sweep + panic bomb) for
+-- comparison. Default is the v2.1 dodger below.
+M.SWEEP = os.getenv("MC_BOT") == "sweep"
+
+-- MC_RL=1 turns the run into an env server for tools/rl; MC_POLICY=<file>
+-- plays an exported net instead of the dodger. Both live in murdercrab_rl.lua.
+M.RL = os.getenv("MC_RL") == "1"
+local policy_path = os.getenv("MC_POLICY")
+local rl = (M.RL or (policy_path and policy_path ~= "")) and require("murdercrab_rl") or nil
+M.net = rl and policy_path and policy_path ~= "" and rl.load_policy(policy_path) or nil
+
+-- v2.1 dodger weights. MC_W (JSON or a Lua table literal) overrides any of
+-- them for one run, e.g. MC_W='{"hit":500}'. Unknown keys are ignored.
+M.W = {
+	horizon = 12,  -- frames of lookahead per candidate move
+	hit = 1000,    -- predicted hit, scaled by how soon it lands
+	near = 40,     -- threats passing within near_r px of the hitbox
+	near_r = 6,
+	decay = 0.85,  -- per-frame discount on the near penalty
+	cherry = 30,   -- pull toward score cherries
+	item = 60,     -- pull toward bomb / 1UP pickups
+	align = 20,    -- sitting under enemies, so shots keep landing
+	edge = 30,     -- inside edge_m px of a screen edge
+	edge_m = 12,
+	home_y = 100,  -- preferred height
+	home = 5,
+	bomb_h = 2,    -- bomb when every move is hit within this many frames
+}
+
+-- Parse MC_W / MC_RL_REWARD: flat JSON objects become Lua table literals by
+-- rewriting "key": to key=. Returns nil on anything unparseable.
+local function parse_table(src)
+	if not src then return nil end
+	local f = loadstring("return " .. src:gsub('"([%w_]+)"%s*:', "%1="))
+	if not f then return nil end
+	local ok, t = pcall(setfenv(f, {}))
+	return ok and type(t) == "table" and t or nil
+end
+M.parse_table = parse_table
+
+do
+	local env = os.getenv("MC_W")
+	if env and env ~= "" then
+		local over = assert(parse_table(env), "MC_W: not a JSON object or Lua table: " .. env)
+		for k, v in pairs(over) do
+			if M.W[k] ~= nil and type(v) == "number" then M.W[k] = v end
+		end
+	end
+end
 
 -- True if any enemy bullet is within r px of the player's center.
 local function bullet_near(cart, r)
@@ -61,6 +116,153 @@ local function bullet_near(cart, r)
 		if dx * dx + dy * dy < r * r then return true end
 	end
 	return false
+end
+
+-- v2.0b: hold fire, sweep across the playfield on a triangle wave (period
+-- 6s), panic-bomb when a bullet gets close.
+local function sweep_action(cart, frame_counter, mask)
+	local t = frame_counter % 360
+	local tx = 8 + (t < 180 and t or 360 - t) * 104 / 180
+	local px = cart.player.x or 60
+	if px > tx + 1 then mask = press(mask, BTN_LEFT)
+	elseif px < tx - 1 then mask = press(mask, BTN_RIGHT) end
+	if frame_counter % 2 == 0 and (cart.player.bombs or 0) > 0 and bullet_near(cart, 10) then
+		mask = press(mask, BTN_X)
+	end
+	return mask
+end
+
+-- Things that hurt on contact, as boxes with a per-frame velocity, in the
+-- shape cart.collides() tests. Bullets fly straight. Normal enemies follow
+-- update_normal_enemy(): descend + drift (state 0), drift (1), dive (2).
+-- A drifter whose timer runs out within the lookahead dives at the ship's
+-- current spot (at = frame it turns, then v2). Divers hit the whole 8x8
+-- ship; everything else hits the 2x2 core. Bosses slide on dx.
+local function threats(cart, H)
+	local list, p = {}, cart.player
+	for _, b in ipairs(cart.enemy_bullets or {}) do
+		list[#list + 1] = {x = b.x, y = b.y, w = b.width or 8, h = b.height or 8, vx = b.dx or 0, vy = b.dy or 0}
+	end
+	for _, e in ipairs(cart.enemies or {}) do
+		local t = {x = e.x, y = e.y, w = e.width or 8, h = e.height or 8, vx = 0, vy = 0}
+		if e.type == "normal" then
+			if e.state == 0 then t.vx, t.vy = (e.dir or 0) * 0.25, e.dy or 0
+			elseif e.state == 1 then
+				t.vx = (e.dir or 0) * 0.35
+				if (e.timer or H + 1) <= H then
+					local at = math.max(e.timer, 1)
+					local x0 = e.x + t.vx * at
+					local dx, dy = p.x - x0, p.y - e.y
+					local d = math.sqrt(dx * dx + dy * dy)
+					local spd = (e.speed or 1) * 2 / (d > 0 and d or 1)
+					t.at, t.x0, t.vx2, t.vy2 = at, x0, dx * spd, dy * spd
+				end
+			else t.vx, t.vy, t.full = e.dx or 0, e.dy or 0, true end
+		else
+			t.vx = e.dx or 0
+		end
+		list[#list + 1] = t
+	end
+	return list
+end
+
+-- Candidate moves; first wins ties, so standing still is the default.
+local MOVES = {{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}}
+M.MOVES = MOVES
+
+local function clamp(v, lo, hi) return v < lo and lo or (v > hi and hi or v) end
+
+-- Goal terms, judged where the move leaves the ship after the lookahead.
+local function goal_score(cart, x, y, H, W)
+	local cx, cy, s = x + 4, y + 4, 0
+	for _, o in ipairs(cart.powerups or {}) do
+		local ox, oy = o.x, o.y
+		if (o.dx or 0) ~= 0 or (o.dy or 0) ~= 0 then ox, oy = ox + o.dx * H, oy + o.dy * H
+		else oy = oy + (o.speed or 0) * H end
+		local dx, dy = ox + 4 - cx, oy + 4 - cy
+		local pull = 1 / (1 + math.sqrt(dx * dx + dy * dy) / 16)
+		s = s + pull * (o.type == "score" and W.cherry or W.item)
+	end
+	-- Shots leave at cx-10 and cx+2, 8 px wide: anything centered within
+	-- ~14 px (plus half its width) above the ship gets hit.
+	for _, e in ipairs(cart.enemies or {}) do
+		local ew = e.width or 8
+		if e.y + (e.height or 8) < y then
+			local tol = 10 + ew / 2
+			s = s + W.align * math.max(0, 1 - math.abs(e.x + ew / 2 - cx) / tol)
+		end
+	end
+	local m = math.max(W.edge_m, 1)
+	s = s - W.edge * (math.max(0, 1 - x / m) + math.max(0, 1 - (120 - x) / m)
+		+ math.max(0, 1 - y / m) + math.max(0, 1 - (120 - y) / m))
+	s = s - W.home * math.abs(y - W.home_y) / 64
+	return s
+end
+
+-- v2.1: try all 9 moves, holding each for `horizon` frames against threats
+-- extrapolated at their own velocity. update_game() moves bullets and enemies
+-- before the ship and tests collision after both, so frame k pairs threat
+-- positions t+k*v with ship positions p+k*m. I-frames (invincible_timer,
+-- decremented after the test) cover frames k <= timer; MC_GOD's are fake.
+-- Returns move index, whether every move is hit within bomb_h frames, and
+-- per move: first hit frame (false if none) and near-miss sum (RL features).
+local function plan(cart)
+	local p, W = cart.player, M.W
+	local H = math.max(1, math.floor(W.horizon + 0.5))
+	local inv = M.GOD and 0 or (p.invincible_timer or 0)
+	local near_r, decay = math.max(W.near_r, 0.01), W.decay
+	-- Drop threats that can't reach near_r of the ship within H frames even
+	-- closing at full speed (gap vs the 8x8 ship bounds the 2x2 core's gap).
+	local th = {}
+	for _, t in ipairs(threats(cart, H)) do
+		local g = math.max(t.x - (p.x + 8), p.x - (t.x + t.w), t.y - (p.y + 8), p.y - (t.y + t.h))
+		local v = math.max(math.abs(t.vx), math.abs(t.vy), math.abs(t.vx2 or 0), math.abs(t.vy2 or 0))
+		if g - H * (v + 1) < near_r then th[#th + 1] = t end
+	end
+	M.last_threats = #th
+	local best, best_s, doomed, hits, nears = 1, -math.huge, true, {}, {}
+	for mi, mv in ipairs(MOVES) do
+		local x, y, hit_at, near, wk = p.x, p.y, nil, 0, 1
+		for k = 1, H do
+			x, y = clamp(x + mv[1], 0, 120), clamp(y + mv[2], 0, 120)
+			if k > inv then
+				for _, t in ipairs(th) do
+					local tx, ty, full = t.x + t.vx * k, t.y + t.vy * k, t.full
+					if t.at and k >= t.at then
+						tx, ty, full = t.x0 + t.vx2 * (k - t.at), t.y + t.vy2 * (k - t.at), true
+					end
+					local ax, ay, aw = x + 3, y + 3, 2
+					if full then ax, ay, aw = x, y, 8 end
+					local g = math.max(tx - (ax + aw), ax - (tx + t.w), ty - (ay + aw), ay - (ty + t.h))
+					if g <= 0 then hit_at = k break end
+					if g < near_r then near = near + wk * (1 - g / near_r) end
+				end
+				if hit_at then break end
+			end
+			wk = wk * decay
+		end
+		if not hit_at or hit_at > W.bomb_h then doomed = false end
+		hits[mi], nears[mi] = hit_at or false, near
+		local ex, ey = clamp(p.x + mv[1] * H, 0, 120), clamp(p.y + mv[2] * H, 0, 120)
+		local s = goal_score(cart, ex, ey, H, W) - W.near * near
+		if hit_at then s = s - W.hit * (H - hit_at + 1) / H end
+		if s > best_s then best, best_s = mi, s end
+	end
+	return best, doomed, hits, nears, H
+end
+M.plan = plan
+
+local function dodge_action(cart, mask)
+	local mi, doomed = plan(cart)
+	local mv = MOVES[mi]
+	if mv[1] < 0 then mask = press(mask, BTN_LEFT) elseif mv[1] > 0 then mask = press(mask, BTN_RIGHT) end
+	if mv[2] < 0 then mask = press(mask, BTN_UP) elseif mv[2] > 0 then mask = press(mask, BTN_DOWN) end
+	-- btnp needs X released the frame before; a held X would never re-fire.
+	if doomed and (cart.player.bombs or 0) > 0 and not cart.bomb_active
+		and bit.band(M.last_mask, bit.lshift(1, BTN_X)) == 0 then
+		mask = press(mask, BTN_X)
+	end
+	return mask
 end
 
 -- Murdercrab game_state values: "title", "starting", "game",
@@ -74,6 +276,7 @@ local function compute_action(cart, frame_counter)
 	local mask = 0
 	local state = cart.game_state
 	local pulse = (frame_counter % 2 == 0)
+	if M.net and not (state == "game" and not cart.game_over) then rl.policy_idle() end
 
 	if state == "title" then
 		-- X inserts a coin, Z starts. Alternate so both fire as btnp.
@@ -95,23 +298,16 @@ local function compute_action(cart, frame_counter)
 				mask = press(mask, (cart.credits or 0) > 0 and BTN_O or BTN_X)
 			end
 		else
-			-- v2.0b: hold fire, sweep across the playfield on a triangle wave
-			-- (period 6s), panic-bomb when a bullet gets close. Deterministic,
-			-- cheap, and reaches bosses + bombs for regression coverage.
 			mask = press(mask, BTN_O)
-			local t = frame_counter % 360
-			local tx = 8 + (t < 180 and t or 360 - t) * 104 / 180
-			local px = cart.player.x or 60
-			if px > tx + 1 then mask = press(mask, BTN_LEFT)
-			elseif px < tx - 1 then mask = press(mask, BTN_RIGHT) end
-			if pulse and (cart.player.bombs or 0) > 0 and bullet_near(cart, 10) then
-				mask = press(mask, BTN_X)
-			end
+			if M.net then mask = rl.policy_mask(M, M.net, cart)
+			elseif M.SWEEP then mask = sweep_action(cart, frame_counter, mask)
+			else mask = dodge_action(cart, mask) end
 		end
 	end
 
 	return mask
 end
+M.compute_action = compute_action
 
 -- Write mask bits into pico8.keypressed in the same shape Celia's own
 -- update_buttons() uses (nil or increasing frame counter). This is what
@@ -127,6 +323,7 @@ local function apply_mask_to_keypressed(pico8, mask)
 		end
 	end
 end
+M.apply_mask = apply_mask_to_keypressed
 
 -- GOD runs still measure bullet pressure: count enemy bullets that touch the
 -- player's hitbox (once per bullet, on first contact) — the hits a player
@@ -193,6 +390,10 @@ local function trace_line(cart, frame)
 		#(c.explosions or {}))
 end
 
+-- MC_ONEGAME=1: stop the trace on the frame the first game ends (pair with
+-- MC_NOCONT for one-credit runs).
+M.ONEGAME = os.getenv("MC_ONEGAME") == "1"
+
 local function run_trace(cart, api, out_path)
 	local pico8 = _G.pico8
 	local frames = tonumber(os.getenv("MC_FRAMES") or "") or 36000
@@ -214,6 +415,7 @@ local function run_trace(cart, api, out_path)
 			if cart._draw then cart._draw() end
 			love.graphics.pop()
 			out:write(trace_line(cart, f), "\n")
+			if M.ONEGAME and cart.game_over then break end
 		end
 	end)
 	if not ok then out:write("ERROR ", tostring(err), "\n") end
@@ -267,6 +469,21 @@ local function start_watch()
 	end
 end
 
+-- ─── Headless drawing ──────────────────────────────────────────────────────
+
+-- Traces and the RL server never show a frame, and the cart never reads
+-- pixels back (no pget/sget/peek), so the GL calls behind its drawing are
+-- dead weight, and parallel processes contend for the GPU (stubbing doubled
+-- 6-env RL throughput; a lone trace runs 1.5x faster). Stub them: the cart's
+-- _draw Lua, rnd() calls included, still runs, so game state is unchanged
+-- (traces stay byte-identical).
+function M.stub_gpu()
+	local nop = function() end
+	for _, k in ipairs({"draw", "points", "point", "rectangle", "line", "print", "clear"}) do
+		love.graphics[k] = nop
+	end
+end
+
 -- ─── pre_init: before cart _init ───────────────────────────────────────────
 
 -- Eval mode (MC_EVAL=<plain Lua chunk>, MC_TRACE=<out>): run the chunk with
@@ -285,11 +502,16 @@ end
 
 function M.pre_init(cart, api)
 	api.srand(M.SEED)
+	if M.RL then
+		M.stub_gpu()
+		rl.serve(M, cart, api)
+	end
 	local out_path = os.getenv("MC_TRACE")
 	if not out_path or out_path == "" then
 		if M.WATCH then start_watch() end
 		return
 	end
+	M.stub_gpu()
 	local code = os.getenv("MC_EVAL")
 	if code and code ~= "" then run_eval(cart, code, out_path) end
 	run_trace(cart, api, out_path)

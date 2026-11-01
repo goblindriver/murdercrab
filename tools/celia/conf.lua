@@ -15,4 +15,13 @@ function love.conf(t)
 	t.window.width = 1344
 	t.window.height = 768
 	t.window.resizable = true
+
+	-- murdercrab: headless traces and the RL env server (MC_TRACE / MC_RL,
+	-- see trace.sh, rl.sh) never present a frame, so park a tiny borderless
+	-- window off-screen instead of flashing the TAS UI up on every run.
+	if os.getenv("MC_TRACE") or os.getenv("MC_RL") then
+		t.window.width, t.window.height = 128, 128
+		t.window.borderless, t.window.resizable = true, false
+		t.window.x, t.window.y = -4000, -4000
+	end
 end
