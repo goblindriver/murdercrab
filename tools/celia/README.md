@@ -76,6 +76,22 @@ weights in `M.W`:
 | `bomb_h` | bomb only when every move is hit within this many frames |
 
 Goal terms are judged where the move leaves the ship after the lookahead.
+
+`home` was 5 until `MC_DEATHLOG` showed where the dodger died: 80% of lives
+were lost in the top 40 px of the screen, where it spent 10% of its time
+chasing drops into close-range shotgun bursts with every move already hit.
+One credit, seeds 201-212, 30-min cap:
+
+| `home` | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|-------:|--------------:|----------------:|------------------:|-----------:|
+| 5 (old) | 920 s | 3/12 | 17.6 | 1332k |
+| 20 | 1631 s | 9/12 | 10.3 | 1826k |
+| **30** | 1683 s | 11/12 | 5.2 | 1530k |
+| 45 | 1696 s | 10/12 | 4.1 | 1076k |
+| 80 | 1779 s | 11/12 | 2.5 | 690k |
+| 30, item/cherry halved | 1792 s | 12/12 | 2.8 | 744k |
+
+Past 30 it trades score (fewer drops, slower kills) for little safety.
 `MC_W` overrides weights for one run. (An evolutionary tuner over these
 weights was tried and dropped for the RL route; its first generation already
 beat the defaults: fitness 6035 vs 4631 on 4 seeds, every seed alive at the
@@ -205,6 +221,7 @@ Scenario switches (env vars, combinable):
 | `MC_W='json'` | dodger weights for this run, e.g. `MC_W='{"hit":500}'` (JSON or a Lua table literal) |
 | `MC_BOT=sweep` | the v2.0b bot instead of the dodger: fixed sweep, panic bomb, never dodges |
 | `MC_POLICY=file` | play an exported net (`tools/rl` `policy.lua`) instead of the dodger |
+| `MC_DEATHLOG=file` | dodger only: on each life lost, append its last 12 frames (position, move, predicted hit frame, how many moves were safe) and everything touching the ship |
 | `MC_EVAL='lua'` | skip the run: execute a plain-Lua chunk against the cart's globals after `_init` and write its return value. Cart env has PICO-8's API, so use `tostr`, not `tostring`. |
 
 In `MC_GOD=1` traces, `wh=` counts would-be hits: enemy bullets that touched

@@ -83,7 +83,7 @@ M.W = {
 	edge = 30,     -- inside edge_m px of a screen edge
 	edge_m = 12,
 	home_y = 100,  -- preferred height
-	home = 5,
+	home = 30,     -- was 5: chasing drops up-screen caused most deaths
 	bomb_h = 2,    -- bomb when every move is hit within this many frames
 }
 
@@ -252,8 +252,55 @@ local function plan(cart)
 end
 M.plan = plan
 
+-- MC_DEATHLOG=<file>: on every life lost, append the dodger's last frames
+-- (position, chosen move, its predicted hit frame, earliest hit any move
+-- had) and whatever was touching the ship, to see whether it was out-guessed
+-- (no hit predicted) or boxed in (every move hit).
+local deathlog = os.getenv("MC_DEATHLOG")
+deathlog = deathlog ~= "" and deathlog or nil
+local dl_ring, dl_lives = {}, nil
+local function deathlog_frame(cart, mi, doomed, hits)
+	local p = cart.player
+	if dl_lives and (p.lives or 0) < dl_lives then
+		local f = io.open(deathlog, "a")
+		f:write(("== seed %d frame %d lvl %s loop %s phase %s lives %d bombs %d\n"):format(M.SEED,
+			_G.pico8.frames, tostring(cart.current_level), tostring(cart.game_loop),
+			tostring(cart.phase_state), p.lives or 0, p.bombs or 0))
+		for _, r in ipairs(dl_ring) do f:write(r, "\n") end
+		local cx, cy = p.x + 4, p.y + 4
+		local function near(kind, list)
+			for _, o in ipairs(list or {}) do
+				local dx, dy = o.x + (o.width or 8) / 2 - cx, o.y + (o.height or 8) / 2 - cy
+				if math.max(math.abs(dx), math.abs(dy)) < 12 then
+					local keys = {}
+					for k, v in pairs(o) do
+						if type(v) == "number" or type(v) == "string" or type(v) == "boolean" then
+							keys[#keys + 1] = k .. "=" .. (type(v) == "number" and ("%.2f"):format(v) or tostring(v))
+						end
+					end
+					table.sort(keys)
+					f:write(("  %s dx=%.1f dy=%.1f %s\n"):format(kind, dx, dy, table.concat(keys, " ")))
+				end
+			end
+		end
+		near("bullet", cart.enemy_bullets)
+		near("enemy", cart.enemies)
+		f:close()
+	end
+	dl_lives = p.lives
+	local first = false
+	for i = 1, 9 do if hits[i] and (not first or hits[i] < first) then first = hits[i] end end
+	local safe = 0
+	for i = 1, 9 do if not hits[i] then safe = safe + 1 end end
+	dl_ring[#dl_ring + 1] = ("  f%d p=%.0f,%.0f inv=%d move=%d hit=%s earliest=%s safe_moves=%d doomed=%s threats=%d"):format(
+		_G.pico8.frames, p.x, p.y, p.invincible_timer or 0, mi, tostring(hits[mi]), tostring(first), safe,
+		tostring(doomed), M.last_threats or 0)
+	if #dl_ring > 12 then table.remove(dl_ring, 1) end
+end
+
 local function dodge_action(cart, mask)
-	local mi, doomed = plan(cart)
+	local mi, doomed, hits = plan(cart)
+	if deathlog then deathlog_frame(cart, mi, doomed, hits) end
 	local mv = MOVES[mi]
 	if mv[1] < 0 then mask = press(mask, BTN_LEFT) elseif mv[1] > 0 then mask = press(mask, BTN_RIGHT) end
 	if mv[2] < 0 then mask = press(mask, BTN_UP) elseif mv[2] > 0 then mask = press(mask, BTN_DOWN) end
