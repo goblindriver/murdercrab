@@ -20,24 +20,24 @@ last_entered_initials = {"A", "C", "E"}
 -- player constants
 P_LIVES, P_BMBS = 3, 3
 B_SPD = 3
-BMB_DUR, BMB_DMG = 60, 30
+BMB_DUR, BMB_DMG = 60, 20
 
 -- enemy constants
 E_SPD, E_SPD_SCL, E_SPD_MAX = 1, 0.2, 1.75
-E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 120, 8, 80
+E_SHT_BASE, E_SHT_SCL, E_SHT_MIN = 75, 8, 45
 E_B_SPD, E_B_SPREAD = 2.25, 10
 E_BURST_SPD, E_BURST_DLY = 2.5, 6
 
 
 
 -- boss constants
-MB_HP, MB_HP_SCL = 60, 5
-FB_HP, FB_HP_SCL = 100, 5
-B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 20, 45
+MB_HP, MB_HP_SCL = 150, 20
+FB_HP, FB_HP_SCL = 250, 25
+B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 0.5, 45
 BASE_CLUSTERS = 6
 
 -- scoring
-S_BMB, S_LIFE = 25, 25
+S_BMB, S_LIFE = 500, 1000
 
 
 ----------------------------------------
@@ -371,7 +371,7 @@ function draw_enter_initials()
     end
     if (time() * 10) % 2 < 1 then line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8) end
   end
-  shadow_text("up/down: letter  left/right: position", 80, 8)
+  shadow_text("up/down: letter l/r: slot", 80, 8)
   shadow_text("z/x: confirm", 90, 8)
 end
 
@@ -416,7 +416,7 @@ end
 
 function update_spawn_delay()
   local loop_reduction = (game_loop - 1) * 5
-  spawn_delay = max(60 - loop_reduction * 2, 110 - (current_level - 1) * 12 - loop_reduction * 2)
+  spawn_delay = max(45 - loop_reduction * 2, 80 - (current_level - 1) * 8 - loop_reduction * 2)
 end
 
 ----------------------------------------
@@ -482,7 +482,7 @@ function player_hit()
   player.lives -= 1
   player.bombs = P_BMBS
   player.invincible_timer = 60
-  sfx(7, 2)
+  sfx(4, 2)
   create_hit_feedback(player.x + 4, player.y + 4)
   score_multiplier = 1
   score_streak = 0
@@ -537,7 +537,7 @@ end
 -- enemy functions
 ----------------------------------------
 function spawn_enemy()
-  local count = current_level >= 4 and 2 or 1
+  local count = current_level >= 3 and 2 or 1
   for i = 1, count do spawn_normal_enemy() end
 end
 
@@ -684,7 +684,7 @@ function get_boss_max_health(t)
   local loop_mult = 1 + (game_loop - 1) * 0.5
   if t == "mini_boss" then return flr((MB_HP + (current_level - 1) * MB_HP_SCL) * loop_mult)
   elseif t == "final_boss" then return flr((FB_HP + (current_level - 1) * FB_HP_SCL) * loop_mult)
-  else return flr(450 * loop_mult) end
+  else return flr(900 * loop_mult) end
 end
 
 function boss_exists(t)
@@ -843,8 +843,8 @@ function create_aimed_pattern(e, count, speed)
   if not e.burst_index then
     e.burst_index = 1
     e.burst_timer = 0
-    e.burst_max = 3
-    e.burst_delay = 16
+    e.burst_max = count
+    e.burst_delay = 10
   end
   
   if e.burst_timer <= 0 then
@@ -890,8 +890,8 @@ function spawn_powerup_explosion(x, y)
     p.dy = sin(angle) * 1.5
   end
   
-  if rnd(1) < 0.05 then
-    local ptype = rnd(1) < 0.5 and "bomb" or "1up"
+  if rnd(1) < 0.03 then
+    local ptype = rnd(1) < 0.75 and "bomb" or "1up"
     local p = spawn_powerup(x, y, ptype)
     p.dx = cos(rnd(1)) * 1
     p.dy = sin(rnd(1)) * 1
@@ -921,7 +921,7 @@ function update_powerups()
     local dy = (player.y + 4) - (p.y + 4)
     local dist = sqrt(dx * dx + dy * dy)
     
-    if dist < 48 then
+    if dist < 20 then
       p.x += dx * 0.15
       p.y += dy * 0.15
       p.dx = 0
@@ -1117,7 +1117,6 @@ end
 
 function draw_bomb_effect()
   if bomb_effect_timer > 0 then
-    if bomb_effect_timer > 40 then rectfill(0, 0, 127, 127, 7) end
     circ(64, 64, 64 - bomb_effect_timer, 7)
     circfill(64, 64, 5 + bomb_effect_timer % 10, 7)
   end
@@ -1145,6 +1144,7 @@ function handle_boss_defeat(enemy)
     if boss_exists("final_boss") == 0 then
       phase = "level_complete"
       boss_defeat_grace = 180
+      update_music("fade")
       create_final_boss_defeat_explosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2)
     end
   elseif enemy.type == "true_last_boss" then
@@ -1153,6 +1153,7 @@ function handle_boss_defeat(enemy)
     add_score(50)
     phase = "victory_lap"
     game_complete_grace = 240
+    update_music("fade")
   end
 end
 
@@ -1440,19 +1441,19 @@ function update_game()
   end
   
   -- player movement
-  if btn(0) and player.x > 0 then
+  if btn(0) then
     player.x -= player.speed
     player.sprite = 17
-  elseif btn(1) and player.x < 120 then
+  elseif btn(1) then
     player.x += player.speed
     player.sprite = 33
   else
     player.sprite = 1
   end
-  if btn(2) and player.y > 0 then
+  if btn(2) then
     player.y -= player.speed
   end
-  if btn(3) and player.y < 128 - player.height then
+  if btn(3) then
     player.y += player.speed
   end
   
@@ -1463,7 +1464,9 @@ function update_game()
   check_enemy_bullet_collisions()
   check_player_enemy_collisions()
   check_bullet_enemy_collisions()
-  
+  -- clamp after knockback too, so a hit can't shove the ship off-screen
+  player.x, player.y = mid(0, player.x, 120), mid(0, player.y, 120)
+
   -- update timers
   if player.invincible_timer > 0 then
     player.invincible_timer -= 1
