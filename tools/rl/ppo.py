@@ -177,6 +177,9 @@ def main():
     ap.add_argument('--clip', type=float, default=0.2)
     ap.add_argument('--ent-coef', type=float, default=0.003)
     ap.add_argument('--vf-coef', type=float, default=0.5)
+    ap.add_argument('--vf-clip', type=float, default=0.2, help='value-loss clip range (0 = plain MSE)')
+    ap.add_argument('--vf-warmup', type=int, default=0,
+                    help='first N updates train only the critic, so a cloned actor isn\'t steered by a cold value net')
     ap.add_argument('--bc-coef', type=float, default=0.5, help='aux CE toward the teacher, decays to 0')
     ap.add_argument('--bc-decay-steps', type=int, default=0, help='PPO steps for --bc-coef to reach 0 (0 = whole run)')
     ap.add_argument('--save-every', type=int, default=0, help='also keep snap/policy-<step>.lua every N steps')
@@ -271,11 +274,15 @@ def main():
                 madv = badv[idx]
                 madv = (madv - madv.mean()) / (madv.std() + 1e-8)
                 pg = torch.max(-madv * ratio, -madv * ratio.clamp(1 - a.clip, 1 + a.clip)).mean()
-                v_clip = bval[idx] + (nv - bval[idx]).clamp(-a.clip, a.clip)
-                vl = 0.5 * torch.max((nv - bret[idx]) ** 2, (v_clip - bret[idx]) ** 2).mean()
-                loss = pg - a.ent_coef * ent.mean() + a.vf_coef * vl
+                vl = (nv - bret[idx]) ** 2
+                if a.vf_clip > 0:
+                    v_clip = bval[idx] + (nv - bval[idx]).clamp(-a.vf_clip, a.vf_clip)
+                    vl = torch.max(vl, (v_clip - bret[idx]) ** 2)
+                vl = 0.5 * vl.mean()
+                warm = u <= a.vf_warmup
+                loss = a.vf_coef * vl if warm else pg - a.ent_coef * ent.mean() + a.vf_coef * vl
                 lab = bteach[idx]
-                if bc_coef > 0 and (lab >= 0).any():
+                if bc_coef > 0 and not warm and (lab >= 0).any():
                     loss = loss + bc_coef * nn.functional.cross_entropy(logits[lab >= 0], lab[lab >= 0],
                                                                         label_smoothing=a.bc_smooth)
                 opt.zero_grad()
