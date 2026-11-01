@@ -537,26 +537,39 @@ end
 -- enemy functions
 ----------------------------------------
 function spawn_enemy()
-  local count = current_level >= 3 and 2 or 1
-  for i = 1, count do spawn_normal_enemy() end
+  -- each level unlocks one more enemy kind
+  local top = min(current_level, 4)
+  if rnd(1) < 0.35 then
+    -- formation: a v, or a snake column that weaves down single file
+    local k, x = flr(rnd(top)) + 1, 16 + rnd(88)
+    for i = -1, 1 do
+      if k == 3 then spawn_normal_enemy(x, -22 + i * 14, k)
+      else spawn_normal_enemy(x + i * 14, -8 - abs(i) * 10, k) end
+    end
+  else
+    for i = 1, current_level >= 3 and 2 or 1 do spawn_normal_enemy(rnd(120), -8, flr(rnd(top)) + 1) end
+  end
 end
 
-function spawn_normal_enemy()
+function spawn_normal_enemy(x, y, k)
   local loop_bonus = (game_loop - 1) * 2
   local interval = max(E_SHT_MIN - loop_bonus * 2, E_SHT_BASE - (current_level - 1) * E_SHT_SCL - loop_bonus * 3)
+  -- kinds: basic, kamikaze (dives fast), snake (weaves straight through), sniper (hangs back, fires fast)
+  -- fields: dive delay, hover y, speed mult, tint, fire interval mult, weave
+  local timer, hov, spm, col, sim, wv = unpack(split(split("90,20,1,8,1,0|15,30,1.25,9,1,0|0,999,0.6,14,1,1.5|600,5,1,12,0.7,0", "|")[k]))
   local e = {
-    x = flr(rnd(120)), y = -8,
-    speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15),
+    x = x, y = y,
+    speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15) * spm,
     sprite = 3, width = 8, height = 8,
     shoot_timer = interval - 40 - flr(rnd(30)),
-    shoot_interval = interval,
+    shoot_interval = interval * sim,
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
     type = "normal", health = min(3, current_level + game_loop - 1),
     dx = 0, dy = 0, state = 0,
-    hover_y = 20 + rnd(15),
-    dir = rnd(1) < 0.5 and -1 or 1,
-    timer = 90,
+    hover_y = hov + rnd(15),
+    dir = x < 64 and 1 or -1,
+    timer = timer, col = col, wv = wv,
     anim_frame = 0, anim_timer = 0, anim_speed = 10
   }
   e.dy = e.speed
@@ -621,7 +634,7 @@ function update_normal_enemy(enemy)
   
   if enemy.state == 0 then
     enemy.y += enemy.dy
-    enemy.x += enemy.dir * 0.25
+    enemy.x += enemy.dir * 0.25 + cos(enemy.y / 50) * enemy.wv
 
     if enemy.x < 0 then enemy.x = 0 enemy.dir = 1
     elseif enemy.x > 119 then enemy.x = 119 enemy.dir = -1 end
@@ -801,9 +814,11 @@ function enemy_shoot_radial(e)
     local t = flr(time() * B_PAT_CHG) % 5
     pattern_type = t < 2 and 2 or (t - 2)
   else
-    pattern_type = flr(time() * B_PAT_CHG * 1.5) % 3
+    pattern_type = flr(time() * B_PAT_CHG * 1.5) % 4
   end
-  
+  -- each level's bosses lead with a different pair of patterns
+  pattern_type = (pattern_type + current_level - 1) % 4
+
   e.rotate_counter = (e.rotate_counter + B_ROT_SPD) % 360
   local health_boost = flr((1 - h) * 5)
   
@@ -813,6 +828,16 @@ function enemy_shoot_radial(e)
   elseif pattern_type == 1 then
     e.burst_index = nil
     create_radial_pattern(e, e.cluster_count + health_boost, s)
+  elseif pattern_type == 3 then
+    e.burst_index = nil
+    -- falling wall with a drifting gap: one row per 0.6s however many bosses
+    if time() > (wall_t or 0) then
+      wall_t = time() + 0.6
+      local g = 64 + sin(time() / 8) * 40
+      for x = 4, 124, 8 do
+        if abs(x - g) > 14 then spawn_enemy_bullet(x, e.y + e.height / 2, 0, s) end
+      end
+    end
   else
     create_aimed_pattern(e, flr(e.cluster_count / 2) + health_boost, s)
   end
@@ -1554,7 +1579,9 @@ function draw_game()
       end
       pal()
     else
+      pal(8, enemy.col)
       spr(enemy.sprite, enemy.x, enemy.y)
+      pal()
     end
   end
   
