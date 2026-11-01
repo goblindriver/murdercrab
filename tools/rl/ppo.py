@@ -182,6 +182,8 @@ def main():
                     help='first N updates train only the critic, so a cloned actor isn\'t steered by a cold value net')
     ap.add_argument('--bc-coef', type=float, default=0.5, help='aux CE toward the teacher, decays to 0')
     ap.add_argument('--bc-decay-steps', type=int, default=0, help='PPO steps for --bc-coef to reach 0 (0 = whole run)')
+    ap.add_argument('--bc-floor', type=float, default=0.0,
+                    help='teacher CE never decays below this: PPO may overrule the teacher only where it pays')
     ap.add_argument('--save-every', type=int, default=0, help='also keep snap/policy-<step>.lua every N steps')
     ap.add_argument('--max-grad-norm', type=float, default=0.5)
     ap.add_argument('--hidden', type=int, default=256)
@@ -232,7 +234,7 @@ def main():
         frac = 1.0 - (u - 1) / updates
         opt.param_groups[0]['lr'] = frac * a.lr
         bc_frac = max(0.0, 1 - (step - ppo_start) / a.bc_decay_steps) if a.bc_decay_steps else frac
-        bc_coef = a.bc_coef * bc_frac if teacher else 0.0
+        bc_coef = max(a.bc_floor, a.bc_coef * bc_frac) if teacher else 0.0
         for t in range(T):
             step += N
             obs_b[t], done_b[t], teach_b[t] = next_obs, next_done, next_teach
