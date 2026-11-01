@@ -28,6 +28,8 @@ Files we added (not upstream):
   `api.srand(SEED)` before the cart's `_init` runs. Future phases (host-side
   bot, debug HUD) will extend this file.
 - `run.sh` — convenience launcher.
+- `watch.sh`, `trace.sh`, `regress.sh`, `balance.py` — bot watching, headless
+  traces, regression diffs, balance tables (see `README.md`).
 - `UPSTREAM.md` (this file).
 - `README.md` — Murdercrab-specific usage notes. (Upstream README is
   `README-celia-upstream.md`.)

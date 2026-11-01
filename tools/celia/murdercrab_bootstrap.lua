@@ -128,6 +128,23 @@ local function apply_mask_to_keypressed(pico8, mask)
 	end
 end
 
+-- GOD runs still measure bullet pressure: count enemy bullets that touch the
+-- player's hitbox (once per bullet, on first contact) — the hits a player
+-- who never dodges would have taken.
+M.would_hits = 0
+local touching = {}
+local function count_would_hits(cart)
+	local p, now = cart.player, {}
+	local hb = {x = p.x + 3, y = p.y + 3, width = 2, height = 2}
+	for _, b in ipairs(cart.enemy_bullets or {}) do
+		if cart.collides(hb, b) then
+			now[b] = true
+			if not touching[b] then M.would_hits = M.would_hits + 1 end
+		end
+	end
+	touching = now
+end
+
 function M.pre_update(pico8)
 	if not M.BOT_ENABLED then return end
 	local cart = pico8.cart
@@ -135,7 +152,10 @@ function M.pre_update(pico8)
 	local mask = compute_action(cart, pico8.frames or 0)
 	M.last_mask = mask
 	apply_mask_to_keypressed(pico8, mask)
-	if M.GOD and cart.player and cart.player.lives then cart.player.invincible_timer = 2 end
+	if M.GOD and cart.player and cart.player.lives then
+		cart.player.invincible_timer = 2
+		if cart.game_state == "game" and (cart.warp_time or 0) == 0 then count_would_hits(cart) end
+	end
 end
 
 -- ─── Trace mode ────────────────────────────────────────────────────────────
@@ -159,13 +179,13 @@ local function trace_line(cart, frame)
 	if not (p and p.lives) then return head end
 	return head .. string.format(
 		" used=%s hsp=%s ph=%s/%s loop=%s sc=%s,%s x%s/%s rank=%s hp=%s b=%s p=%s,%s go=%s/%s kills=%s warn=%s"
-		.. " shk=%s hs=%s e=%d:%s eb=%d:%s pb=%d:%s pu=%d:%s ex=%d",
+		.. " shk=%s hs=%s wh=%d e=%d:%s eb=%d:%s pb=%d:%s pu=%d:%s ex=%d",
 		tostring(c.credits_used), tostring(c.hs_pos),
 		tostring(c.phase), tostring(c.phase_state), tostring(c.game_loop),
 		tostring(c.score_hi), tostring(c.score), tostring(c.score_multiplier), tostring(c.score_streak),
 		tostring(c.rank), tostring(p.lives), tostring(p.bombs), n4(p.x), n4(p.y),
 		tostring(c.game_over), tostring(c.game_over_timer), tostring(c.enemy_kill_count),
-		tostring(c.boss_warning), tostring(c.shake_amount), tostring(c.hitstop),
+		tostring(c.boss_warning), tostring(c.shake_amount), tostring(c.hitstop), M.would_hits,
 		#(c.enemies or {}), cksum(c.enemies, function(e) return e.x + e.y * 3 + (e.health or 0) * 7 end),
 		#(c.enemy_bullets or {}), cksum(c.enemy_bullets, function(b) return b.x + b.y * 3 end),
 		#(c.bullets or {}), cksum(c.bullets, function(b) return b.x + b.y * 3 end),
@@ -207,6 +227,46 @@ local function run_trace(cart, api, out_path)
 	os.exit(ok and 0 or 1)
 end
 
+-- ─── Watch mode ────────────────────────────────────────────────────────────
+
+-- MC_WATCH=1 (watch.sh): start real-time playback on launch, keep running when
+-- the window loses focus, and show live stats in the title bar (also echoed to
+-- stdout every ~10s). MC_SPEED=n runs n game frames per displayed frame.
+-- Savestates drop to one per 5s so a long watch doesn't eat ~0.5 MB a frame.
+M.WATCH = os.getenv("MC_WATCH") == "1"
+M.SPEED = tonumber(os.getenv("MC_SPEED") or "") or 1
+
+local function watch_title(cart)
+	local p = cart.player
+	if not (p and p.lives) then return "murdercrab bot | seed " .. M.SEED .. " | " .. tostring(cart.game_state) end
+	return string.format("murdercrab bot | seed %d | L%s loop %s %s | rank %s x%s | lives %s bombs %s | continues %s%s",
+		M.SEED, tostring(cart.current_level), tostring(cart.game_loop), tostring(cart.phase),
+		tostring(cart.rank), tostring(cart.score_multiplier), tostring(p.lives), tostring(p.bombs),
+		tostring(cart.credits_used), M.GOD and (" | would-hits " .. M.would_hits) or "")
+end
+
+local function start_watch()
+	if M.watching then return end
+	M.watching = true
+	local update, focus = love.update, love.focus
+	local ticks = 0
+	love.focus = function() focus(true) end
+	love.update = function(dt)
+		if ticks == 0 then
+			require("console").ENV.savestate_every(300)
+			love.keypressed("p", "p", false) -- same as pressing P: start playback
+		end
+		ticks = ticks + 1
+		for _ = 1, M.SPEED do update(dt) end
+		local cart = _G.pico8.cart
+		if cart and ticks % 15 == 0 then
+			local title = watch_title(cart)
+			love.window.setTitle(title)
+			if ticks % 600 == 0 then io.write(title, "\n") io.flush() end
+		end
+	end
+end
+
 -- ─── pre_init: before cart _init ───────────────────────────────────────────
 
 -- Eval mode (MC_EVAL=<plain Lua chunk>, MC_TRACE=<out>): run the chunk with
@@ -226,7 +286,10 @@ end
 function M.pre_init(cart, api)
 	api.srand(M.SEED)
 	local out_path = os.getenv("MC_TRACE")
-	if not out_path or out_path == "" then return end
+	if not out_path or out_path == "" then
+		if M.WATCH then start_watch() end
+		return
+	end
 	local code = os.getenv("MC_EVAL")
 	if code and code ~= "" then run_eval(cart, code, out_path) end
 	run_trace(cart, api, out_path)
