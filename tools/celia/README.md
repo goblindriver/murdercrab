@@ -148,7 +148,7 @@ One credit, seeds 201-212, 30-min cap:
 | `horizon=32` | 936 s | 0/12 | 22.7 | 651k |
 | `horizon=40` | 1053 s | 2/12 | 16.8 | 498k |
 | `horizon=48` | 1361 s | 2/12 | 15.7 | 544k |
-| **`horizon=64`** (default) | 1613 s | 8/12 | 11.2 | 394k |
+| **`horizon=64`** | 1613 s | 8/12 | 11.2 | 394k |
 | `horizon=80` | 1449 s | 1/12 | 12.2 | 209k |
 | `horizon=96` | 1009 s | 1/12 | 14.6 | 106k |
 
@@ -160,6 +160,17 @@ score back (654-874k) but lost twice the lives (23 an hour), and was
 dropped. Judging goals at the far end is what keeps the ship centered and
 off the walls. Also no help: `near=80,near_r=10` (39.6), `home_y=88`
 (51.0), `edge_m=20` (46.5), halving item/cherry pulls (40.8, and 134k).
+
+At `horizon=64` the death log still showed 45 of 72 deaths pinned at the
+bottom edge. A stronger edge penalty fixes some of that (same cap):
+
+| `horizon=64` plus | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|-------------------|--------------:|----------------:|------------------:|-----------:|
+| nothing | 1613 s | 8/12 | 11.2 | 394k |
+| **`edge=80`** (default) | 1619 s | 6/12 | 9.8 | 638k |
+| `edge=80,edge_m=20` | 1596 s | 7/12 | 10.3 | 560k |
+| `home=60` | 1594 s | 8/12 | 9.2 | 256k |
+| `home_y=80` | 1296 s | 4/12 | 14.1 | 497k |
 `MC_W` overrides weights for one run. (An evolutionary tuner over these
 weights was tried and dropped for the RL route; its first generation already
 beat the defaults: fitness 6035 vs 4631 on 4 seeds, every seed alive at the
@@ -290,8 +301,10 @@ At a 60-min cap the clone tracks the dodger it reads (same seeds):
 | dodger v2.2, `horizon=16` | 3589 s | 12/12 | 2.1 | 3078k | loop 5 L6 to loop 6 L1 |
 | net (same clone, no retraining) on it | 3503 s | 11/12 | 2.7 | 2934k | loop 4 L6 to loop 5 L6 |
 | *06dbd9f cart:* dodger, `horizon=16` | 333 s | 0/12 | 46.8 | 363k | L4 to loop 2 L4 |
-| **dodger, `horizon=64`** (current) | 1923 s | 0/12 | 13.1 | 451k | loop 2 L3 to loop 5 L3 |
+| dodger, `horizon=64` | 1923 s | 0/12 | 13.1 | 451k | loop 2 L3 to loop 5 L3 |
 | net (same clone, no retraining) on it | 1605 s | 0/12 | 14.4 | 375k | loop 2 L3 to loop 4 L4 |
+| **dodger, `horizon=64`, `edge=80`** (current) | 2289 s | 2/12 | 11.4 | 894k | loop 3 L3 to loop 6 L2 |
+| net (same clone, no retraining) on it | 1867 s | 0/12 | 14.8 | 676k | loop 2 L2 to loop 5 L4 |
 
 The clone was cloned on the old cart with 12-frame danger features and still
 plays the current dodger closely; re-cloning on the new cart would likely
