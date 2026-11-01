@@ -59,7 +59,7 @@ local function press(mask, b) return bit.bor(mask, bit.lshift(1, b)) end
 M.press = press
 
 -- MC_BOT=sweep restores the v2.0b policy (fixed sweep + panic bomb) for
--- comparison. Default is the v2.1 dodger below.
+-- comparison. Default is the v2.2 dodger below.
 M.SWEEP = os.getenv("MC_BOT") == "sweep"
 
 -- MC_RL=1 turns the run into an env server for tools/rl; MC_POLICY=<file>
@@ -69,7 +69,7 @@ local policy_path = os.getenv("MC_POLICY")
 local rl = (M.RL or (policy_path and policy_path ~= "")) and require("murdercrab_rl") or nil
 M.net = rl and policy_path and policy_path ~= "" and rl.load_policy(policy_path) or nil
 
--- v2.1 dodger weights. MC_W (JSON or a Lua table literal) overrides any of
+-- Dodger weights. MC_W (JSON or a Lua table literal) overrides any of
 -- them for one run, e.g. MC_W='{"hit":500}'. Unknown keys are ignored.
 M.W = {
 	horizon = 12,  -- frames of lookahead per candidate move
@@ -84,7 +84,8 @@ M.W = {
 	edge_m = 12,
 	home_y = 100,  -- preferred height
 	home = 30,     -- was 5: chasing drops up-screen caused most deaths
-	bomb_h = 2,    -- bomb when every move is hit within this many frames
+	bomb_h = 2,    -- bomb when the chosen move is hit within this many frames
+	lex = 1,       -- v2.2 move choice; 0 = v2.1 (see plan)
 }
 
 -- Parse MC_W / MC_RL_REWARD: flat JSON objects become Lua table literals by
@@ -144,7 +145,7 @@ local function threats(cart, H)
 		list[#list + 1] = {x = b.x, y = b.y, w = b.width or 8, h = b.height or 8, vx = b.dx or 0, vy = b.dy or 0}
 	end
 	for _, e in ipairs(cart.enemies or {}) do
-		local t = {x = e.x, y = e.y, w = e.width or 8, h = e.height or 8, vx = 0, vy = 0}
+		local t = {x = e.x, y = e.y, w = e.width or 8, h = e.height or 8, vx = 0, vy = 0, body = true}
 		if e.type == "normal" then
 			if e.state == 0 then t.vx, t.vy = (e.dir or 0) * 0.25, e.dy or 0
 			elseif e.state == 1 then
@@ -204,8 +205,16 @@ end
 -- before the ship and tests collision after both, so frame k pairs threat
 -- positions t+k*v with ship positions p+k*m. I-frames (invincible_timer,
 -- decremented after the test) cover frames k <= timer; MC_GOD's are fake.
--- Returns move index, whether every move is hit within bomb_h frames, and
--- per move: first hit frame (false if none) and near-miss sum (RL features).
+-- Returns move index, whether to bomb, and per move: first hit frame (false
+-- if none) and near-miss sum (RL features).
+--
+-- v2.1 (W.lex = 0) ranks moves by one score where a hit is a penalty, and
+-- bombs only when every move is hit within bomb_h. Goal terms could then
+-- outbid an earlier hit, so with no safe move it sometimes took a hit 1
+-- frame out over one 4 frames out, without bombing. v2.2 (W.lex = 1): a
+-- safe move always beats a hit move, a later hit beats an earlier one, the
+-- score only breaks ties; and it bombs when the chosen move is hit within
+-- bomb_h by a bullet (the bomb clears bullets, not enemy bodies).
 local function plan(cart)
 	local p, W = cart.player, M.W
 	local H = math.max(1, math.floor(W.horizon + 0.5))
@@ -220,9 +229,10 @@ local function plan(cart)
 		if g - H * (v + 1) < near_r then th[#th + 1] = t end
 	end
 	M.last_threats = #th
-	local best, best_s, doomed, hits, nears = 1, -math.huge, true, {}, {}
+	local lex = W.lex > 0
+	local best, best_s, best_r, doomed, hits, nears, body = 1, -math.huge, -1, true, {}, {}, {}
 	for mi, mv in ipairs(MOVES) do
-		local x, y, hit_at, near, wk = p.x, p.y, nil, 0, 1
+		local x, y, hit_at, near, wk, by_body = p.x, p.y, nil, 0, 1, false
 		for k = 1, H do
 			x, y = clamp(x + mv[1], 0, 120), clamp(y + mv[2], 0, 120)
 			if k > inv then
@@ -234,7 +244,7 @@ local function plan(cart)
 					local ax, ay, aw = x + 3, y + 3, 2
 					if full then ax, ay, aw = x, y, 8 end
 					local g = math.max(tx - (ax + aw), ax - (tx + t.w), ty - (ay + aw), ay - (ty + t.h))
-					if g <= 0 then hit_at = k break end
+					if g <= 0 then hit_at, by_body = k, t.body or false break end
 					if g < near_r then near = near + wk * (1 - g / near_r) end
 				end
 				if hit_at then break end
@@ -242,12 +252,18 @@ local function plan(cart)
 			wk = wk * decay
 		end
 		if not hit_at or hit_at > W.bomb_h then doomed = false end
-		hits[mi], nears[mi] = hit_at or false, near
+		hits[mi], nears[mi], body[mi] = hit_at or false, near, by_body
 		local ex, ey = clamp(p.x + mv[1] * H, 0, 120), clamp(p.y + mv[2] * H, 0, 120)
 		local s = goal_score(cart, ex, ey, H, W) - W.near * near
-		if hit_at then s = s - W.hit * (H - hit_at + 1) / H end
-		if s > best_s then best, best_s = mi, s end
+		if lex then
+			local r = hit_at or H + 1
+			if r > best_r or (r == best_r and s > best_s) then best, best_s, best_r = mi, s, r end
+		else
+			if hit_at then s = s - W.hit * (H - hit_at + 1) / H end
+			if s > best_s then best, best_s = mi, s end
+		end
 	end
+	if lex then doomed = hits[best] and hits[best] <= W.bomb_h and not body[best] or false end
 	return best, doomed, hits, nears, H
 end
 M.plan = plan

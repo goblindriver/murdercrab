@@ -6,7 +6,7 @@ be instrumented from inside. All TAS controls, RNG seeding, and (future) bot
 logic live host-side.
 
 Current state: seeded frame-by-frame TAS, headless regression traces, a
-heuristic dodging bot (v2.1), and an RL env server + PPO trainer
+heuristic dodging bot (v2.2), and an RL env server + PPO trainer
 (`tools/rl/`) whose nets play back in plain Lua. The dodger holds fire,
 scores all 9 moves each frame against extrapolated bullets and enemies, chases
 cherries, lines up under enemies, bombs only when every move is a hit, and
@@ -55,7 +55,7 @@ focused. The title bar shows level, phase, rank, multiplier, lives, bombs and
 continues (also echoed to the terminal every ~10s). Any key pauses; `P`
 resumes. Savestates drop to one per 5s, so long watches stay light on memory.
 
-## The bot (v2.1 dodger)
+## The bot (v2.2 dodger)
 
 Each gameplay frame the bot holds fire and scores the 9 moves (8 directions +
 standing still). It holds each move for `horizon` frames against every enemy
@@ -73,7 +73,8 @@ weights in `M.W`:
 | `align` | enemies above within shot width, so fire keeps landing |
 | `edge`, `edge_m` | within `edge_m` px of a screen edge |
 | `home`, `home_y` | distance from a preferred height |
-| `bomb_h` | bomb only when every move is hit within this many frames |
+| `bomb_h` | bomb when the chosen move is hit by a bullet within this many frames (v2.1: when every move is) |
+| `lex` | 1 = v2.2 move choice (safe beats hit, later hit beats sooner); 0 = v2.1 single score |
 
 Goal terms are judged where the move leaves the ship after the lookahead.
 
@@ -92,6 +93,24 @@ One credit, seeds 201-212, 30-min cap:
 | 30, item/cherry halved | 1792 s | 12/12 | 2.8 | 744k |
 
 Past 30 it trades score (fewer drops, slower kills) for little safety.
+
+v2.2 (`lex`, default 1) fixes how it picks a move once no move is safe. The
+death log showed 19 of 27 deaths where every move was predicted hit but not
+all within `bomb_h`, so v2.1 never bombed, and goal terms could still outbid
+a hit 1 frame out over one 4 frames out. Now a safe move always beats a hit
+move, a later hit beats an earlier one (the score only breaks ties), and it
+bombs when the chosen move is hit within `bomb_h` by a bullet: the cart's
+bomb clears enemy bullets but not enemy bodies, and grants no i-frames.
+Same seeds and cap:
+
+| Dodger | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|--------|--------------:|----------------:|------------------:|-----------:|
+| v2.1, `home=30` | 1683 s | 11/12 | 5.2 | 1530k |
+| **v2.2** | 1792 s | 12/12 | 3.7 | 1625k |
+| v2.2, `bomb_h=3` | 1791 s | 12/12 | 5.2 | 1626k |
+
+Bombing earlier doesn't help: `bomb_h` 5 and 9 on v2.1 lost 6.5 and 11.3 lives
+an hour. `MC_W='{lex=0}'` reproduces v2.1.
 `MC_W` overrides weights for one run. (An evolutionary tuner over these
 weights was tried and dropped for the RL route; its first generation already
 beat the defaults: fitness 6035 vs 4631 on 4 seeds, every seed alive at the
