@@ -72,7 +72,7 @@ M.net = rl and policy_path and policy_path ~= "" and rl.load_policy(policy_path)
 -- Dodger weights. MC_W (JSON or a Lua table literal) overrides any of
 -- them for one run, e.g. MC_W='{"hit":500}'. Unknown keys are ignored.
 M.W = {
-	horizon = 16,  -- frames of lookahead per candidate move (was 12)
+	horizon = 64,  -- frames of lookahead per candidate move
 	hit = 1000,    -- predicted hit, scaled by how soon it lands
 	near = 40,     -- threats passing within near_r px of the hitbox
 	near_r = 6,
@@ -147,7 +147,18 @@ local function threats(cart, H)
 	for _, e in ipairs(cart.enemies or {}) do
 		local t = {x = e.x, y = e.y, w = e.width or 8, h = e.height or 8, vx = 0, vy = 0, body = true}
 		if e.type == "normal" then
-			if e.state == 0 then t.vx, t.vy = (e.dir or 0) * 0.25, e.dy or 0
+			if e.state == 0 then
+				t.vx, t.vy = (e.dir or 0) * 0.25, e.dy or 0
+				-- snakes (and any kind with wv) weave: x += cos(y/50)*wv after
+				-- y += dy each frame (PICO-8 cos takes turns)
+				if (e.wv or 0) ~= 0 then
+					t.wx, t.wv = {}, math.abs(e.wv)
+					local off = 0
+					for k = 1, H do
+						off = off + math.cos((e.y + t.vy * k) / 50 * 2 * math.pi) * e.wv
+						t.wx[k] = off
+					end
+				end
 			elseif e.state == 1 then
 				t.vx = (e.dir or 0) * 0.35
 				if (e.timer or H + 1) <= H then
@@ -225,7 +236,7 @@ local function plan(cart)
 	local th = {}
 	for _, t in ipairs(threats(cart, H)) do
 		local g = math.max(t.x - (p.x + 8), p.x - (t.x + t.w), t.y - (p.y + 8), p.y - (t.y + t.h))
-		local v = math.max(math.abs(t.vx), math.abs(t.vy), math.abs(t.vx2 or 0), math.abs(t.vy2 or 0))
+		local v = math.max(math.abs(t.vx) + (t.wv or 0), math.abs(t.vy), math.abs(t.vx2 or 0), math.abs(t.vy2 or 0))
 		if g - H * (v + 1) < near_r then th[#th + 1] = t end
 	end
 	M.last_threats = #th
@@ -237,7 +248,7 @@ local function plan(cart)
 			x, y = clamp(x + mv[1], 0, 120), clamp(y + mv[2], 0, 120)
 			if k > inv then
 				for _, t in ipairs(th) do
-					local tx, ty, full = t.x + t.vx * k, t.y + t.vy * k, t.full
+					local tx, ty, full = t.x + t.vx * k + (t.wx and t.wx[k] or 0), t.y + t.vy * k, t.full
 					if t.at and k >= t.at then
 						tx, ty, full = t.x0 + t.vx2 * (k - t.at), t.y + t.vy2 * (k - t.at), true
 					end
