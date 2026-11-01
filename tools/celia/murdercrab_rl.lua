@@ -35,11 +35,17 @@ local N_BUL, N_ENE, N_PICK = 16, 8, 4
 R.N_BASE = 5 + N_BUL * 4 + N_ENE * 5 + N_PICK * 2 + 4 + 4
 -- Danger features: the dodger's physics per move (how soon it's hit, how
 -- close threats pass), so the net doesn't have to rediscover box collision
--- from raw coordinates. MC_RL_OBS=base drops them; playback picks by the
--- net's input size.
+-- from raw coordinates. MC_RL_OBS=base drops them.
 R.N_DANGER = 9 * 2
-R.DANGER = os.getenv("MC_RL_OBS") ~= "base"
-R.N_OBS = R.N_BASE + (R.DANGER and R.N_DANGER or 0)
+-- Teacher features (MC_RL_OBS=teacher, on top of danger): the dodger's own
+-- pick, one-hot over the 9 moves plus its bomb flag. The net can copy it
+-- outright and spend training on when to overrule it. Playback picks the
+-- mode by the net's input size.
+R.N_TEACH = 9 + 1
+local OBS = os.getenv("MC_RL_OBS") or "danger"
+R.DANGER = OBS ~= "base"
+R.TEACH = OBS == "teacher"
+R.N_OBS = R.N_BASE + (R.DANGER and R.N_DANGER or 0) + (R.TEACH and R.N_TEACH or 0)
 
 -- Reward per step: score delta, a bonus per phase advanced (5 a level) and
 -- per level cleared, a penalty per life lost. MC_RL_REWARD overrides any of
@@ -96,7 +102,7 @@ end
 -- center in 64 px units; empty slots sit 128 px off (above for threats,
 -- below for pickups) so they read as harmless. The dodger's plan for this
 -- state is kept in R.last_plan (teacher reuses it).
-function R.observe(c, M, danger)
+function R.observe(c, M, danger, teach)
 	local p, o = c.player, {}
 	local cx, cy = p.x + 4, p.y + 4
 	push(o, p.x / 120, p.y / 120, math.min(p.bombs or 0, 5) / 5, math.min(p.lives or 0, 5) / 5,
@@ -132,6 +138,11 @@ function R.observe(c, M, danger)
 		local hits, nears, H = plan[3], plan[4], plan[5]
 		for mi = 1, 9 do
 			push(o, hits[mi] and (H - hits[mi] + 1) / H or 0, math.min(nears[mi] / 4, 1))
+		end
+		if teach then
+			local t = R.teacher(M, c, plan)
+			for mi = 0, 8 do push(o, t % 9 == mi and 1 or 0) end
+			push(o, t >= 9 and 1 or 0)
 		end
 	end
 	return o
@@ -195,7 +206,7 @@ function R.serve(M, cart, api)
 		info[1], info[2], info[3] = R.score(c), R.progress(c), c.player.lives or 0
 		info[4], info[5] = ep.frames, ep.trunc and 1 or 0
 		R.last_plan = nil
-		local obs = R.observe(c, M, R.DANGER)
+		local obs = R.observe(c, M, R.DANGER, R.TEACH)
 		info[6] = (want_teacher and not done) and R.teacher(M, c, R.last_plan) or -1
 		local parts = {"@" .. fmt(reward), done and "1" or "0"}
 		for _, v in ipairs(info) do parts[#parts + 1] = fmt(v) end
@@ -268,9 +279,11 @@ function R.load_policy(path)
 	f:close()
 	local chunk = assert(loadstring(src, "=" .. path))
 	local net = setfenv(chunk, {})()
-	net.danger = net.obs == R.N_BASE + R.N_DANGER
+	local nd = R.N_BASE + R.N_DANGER
+	net.danger, net.teach = net.obs == nd or net.obs == nd + R.N_TEACH, net.obs == nd + R.N_TEACH
 	assert(net.danger or net.obs == R.N_BASE,
-		("MC_POLICY: net expects %d obs, adapter makes %d (+%d danger)"):format(net.obs or -1, R.N_BASE, R.N_DANGER))
+		("MC_POLICY: net expects %d obs, adapter makes %d (+%d danger, +%d teacher)"):format(
+			net.obs or -1, R.N_BASE, R.N_DANGER, R.N_TEACH))
 	return net
 end
 
@@ -295,7 +308,7 @@ end
 local held, left = 0, 0
 function R.policy_mask(M, net, c)
 	if left <= 0 then
-		held, left = R.forward(net, R.observe(c, M, net.danger)), net.skip or R.SKIP
+		held, left = R.forward(net, R.observe(c, M, net.danger, net.teach)), net.skip or R.SKIP
 	end
 	local i = (net.skip or R.SKIP) - left + 1
 	left = left - 1

@@ -99,10 +99,15 @@ MurderCrab 2 unchanged:
      4 nearest pickups (dx, dy), boss (present, hp fraction, dx, dy), level,
      phase, rank, loop, and 18 danger features: for each of the 9 moves, how
      soon the dodger's physics says it's hit and how close threats pass.
-     `MC_RL_OBS=base` drops the danger features (125 floats).
+     `MC_RL_OBS=base` drops the danger features (125 floats);
+     `MC_RL_OBS=teacher` adds the dodger's own pick as 10 more (one-hot move
+     plus bomb flag, 153 floats), so the net starts as a copy of the dodger
+     and learns when to overrule it. Playback picks the mode from the net's
+     input size.
    - 18 actions: 9 moves x bomb on/off; fire is always held.
    - reward: score delta / 1000, +1 per phase reached, +3 per level, -10 per
-     life lost (`MC_RL_REWARD='{"death":20}'` to change).
+     life lost (`MC_RL_REWARD='{"death":20}'` to change). `ppo.py --obs` and
+     `--reward` set both for a run.
    - `MC_RL_TEACHER=1` adds the dodger's action to each reply.
 3. **Trainer** (`tools/rl/`, Python, engine-agnostic): `lineenv.py` is a
    gymnasium vector env over server subprocesses, and `ppo.py` is single-file

@@ -143,7 +143,7 @@ def behavior_clone(a, envs, agent, opt, stats, writer, dev):
             perm = torch.randperm(len(X), device=dev)
             for s in range(0, len(X), 512):
                 idx = perm[s:s + 512]
-                loss = nn.functional.cross_entropy(agent.actor(X[idx]), Y[idx]) \
+                loss = nn.functional.cross_entropy(agent.actor(X[idx]), Y[idx], label_smoothing=a.bc_smooth) \
                     + 0.5 * ((agent.value(X[idx]) - R[idx]) ** 2).mean()
                 opt.zero_grad()
                 loss.backward()
@@ -165,6 +165,8 @@ def main():
     ap.add_argument('--num-envs', type=int, default=6)
     ap.add_argument('--max-frames', type=int, default=18000, help='episode cap (truncation), 0 = none')
     ap.add_argument('--skip', type=int, default=4, help='frames per action (MC_RL_SKIP)')
+    ap.add_argument('--obs', default='danger', help='MC_RL_OBS: base | danger | teacher')
+    ap.add_argument('--reward', default='', help='MC_RL_REWARD override, e.g. "{score=1e-4}"')
     ap.add_argument('--total-steps', type=int, default=1_000_000)
     ap.add_argument('--num-steps', type=int, default=256, help='rollout length per env')
     ap.add_argument('--lr', type=float, default=2.5e-4)
@@ -183,6 +185,8 @@ def main():
     ap.add_argument('--bc-iters', type=int, default=0)
     ap.add_argument('--bc-steps', type=int, default=30000, help='states collected per DAgger iteration')
     ap.add_argument('--bc-epochs', type=int, default=8)
+    ap.add_argument('--bc-smooth', type=float, default=0.1,
+                    help='label smoothing on teacher CE, so a near-perfect clone keeps some entropy for PPO')
     ap.add_argument('--init', help='start from an agent.pt')
     ap.add_argument('--seed', type=int, default=1)
     a = ap.parse_args()
@@ -196,7 +200,8 @@ def main():
     # aux CE toward the teacher only when warm-starting (cloning now, or --init)
     teacher = a.bc_coef > 0 and (a.bc_iters > 0 or bool(a.init))
     envs = LineVecEnv(a.num_envs, a.game, a.max_frames, seed=a.seed,
-                      env={'MC_RL_SKIP': str(a.skip), 'MC_RL_TEACHER': '1' if teacher else '0'})
+                      env={'MC_RL_SKIP': str(a.skip), 'MC_RL_TEACHER': '1' if teacher else '0',
+                           'MC_RL_OBS': a.obs, 'MC_RL_REWARD': a.reward})
     n_obs, n_act = envs.single_observation_space.shape[0], envs.single_action_space.n
     agent = Agent(n_obs, n_act, a.hidden).to(dev)
     if a.init:
@@ -271,7 +276,8 @@ def main():
                 loss = pg - a.ent_coef * ent.mean() + a.vf_coef * vl
                 lab = bteach[idx]
                 if bc_coef > 0 and (lab >= 0).any():
-                    loss = loss + bc_coef * nn.functional.cross_entropy(logits[lab >= 0], lab[lab >= 0])
+                    loss = loss + bc_coef * nn.functional.cross_entropy(logits[lab >= 0], lab[lab >= 0],
+                                                                        label_smoothing=a.bc_smooth)
                 opt.zero_grad()
                 loss.backward()
                 nn.utils.clip_grad_norm_(agent.parameters(), a.max_grad_norm)
