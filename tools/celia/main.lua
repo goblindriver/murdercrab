@@ -339,15 +339,17 @@ function love.load(argv)
 		return x % 1
 	end
 
-	__audio_channels = {
-		[0] = QueueableSource:new(8),
-		QueueableSource:new(8),
-		QueueableSource:new(8),
-		QueueableSource:new(8),
-	}
+	if love.audio then -- murdercrab: headless runs load without audio (conf.lua)
+		__audio_channels = {
+			[0] = QueueableSource:new(8),
+			QueueableSource:new(8),
+			QueueableSource:new(8),
+			QueueableSource:new(8),
+		}
 
-	for i = 0, 3 do
-		__audio_channels[i]:play()
+		for i = 0, 3 do
+			__audio_channels[i]:play()
+		end
 	end
 
 	for i = 0, 3 do
@@ -357,7 +359,9 @@ function love.load(argv)
 		}
 	end
 
-	love.audio.setVolume(0)
+	if love.audio then
+		love.audio.setVolume(0)
+	end
 
 	love.graphics.clear()
 	love.graphics.setDefaultFilter("nearest", "nearest")
@@ -829,6 +833,9 @@ local function lerp(a, b, t)
 end
 
 local function update_audio(time)
+	if not __audio_channels then
+		return
+	end
 	-- check what sfx should be playing
 	local samples = flr(time * __sample_rate)
 

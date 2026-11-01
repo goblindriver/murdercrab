@@ -9,6 +9,9 @@
 # Use it for token cleanups / refactors. Deliberate gameplay changes will
 # (correctly) show DIFF; check those with targeted traces instead.
 set -euo pipefail
+# Pin the v2.0b sweep bot: it dies on schedule, so the scenarios keep covering
+# continues, game over and name entry no matter how good the dodger gets.
+export MC_BOT=sweep
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../.." && pwd)
 tmp=$(mktemp -d)
