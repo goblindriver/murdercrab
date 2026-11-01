@@ -7,7 +7,13 @@
 
 Writes runs/<run>/: TensorBoard events, agent.pt, and policy.lua / best.lua
 (the actor as a Lua table) for MC_POLICY=<file> ./watch.sh. best.lua is the
-policy with the best rolling-mean episode survival seen during PPO.
+policy with the best rolling-mean episode survival seen during PPO;
+--save-every keeps numbered snapshots in snap/ to score afterwards with
+tools/celia/eval.sh (training survival is a noisy pick).
+
+Long run, continuing from a checkpoint:
+  uv run ppo.py --run long --init runs/mc1-danger/agent.pt --max-frames 108000 \
+      --total-steps 50000000 --bc-decay-steps 3000000 --save-every 1000000
 
 Warm start (--bc-iters > 0, needs a server that reports a "teacher" action,
 MC1: the v2.1 dodger): DAgger. Iteration 0 plays the teacher, later ones play
@@ -170,6 +176,8 @@ def main():
     ap.add_argument('--ent-coef', type=float, default=0.003)
     ap.add_argument('--vf-coef', type=float, default=0.5)
     ap.add_argument('--bc-coef', type=float, default=0.5, help='aux CE toward the teacher, decays to 0')
+    ap.add_argument('--bc-decay-steps', type=int, default=0, help='PPO steps for --bc-coef to reach 0 (0 = whole run)')
+    ap.add_argument('--save-every', type=int, default=0, help='also keep snap/policy-<step>.lua every N steps')
     ap.add_argument('--max-grad-norm', type=float, default=0.5)
     ap.add_argument('--hidden', type=int, default=256)
     ap.add_argument('--bc-iters', type=int, default=0)
@@ -215,7 +223,8 @@ def main():
     for u in range(1, updates + 1):
         frac = 1.0 - (u - 1) / updates
         opt.param_groups[0]['lr'] = frac * a.lr
-        bc_coef = a.bc_coef * frac if teacher else 0.0
+        bc_frac = max(0.0, 1 - (step - ppo_start) / a.bc_decay_steps) if a.bc_decay_steps else frac
+        bc_coef = a.bc_coef * bc_frac if teacher else 0.0
         for t in range(T):
             step += N
             obs_b[t], done_b[t], teach_b[t] = next_obs, next_done, next_teach
@@ -280,6 +289,10 @@ def main():
             if len(stats.recent) >= 10 and surv > best:
                 best = surv
                 export_lua(agent, os.path.join(a.out, 'best.lua'), a.skip)
+        if a.save_every and step // a.save_every > (step - N * T) // a.save_every:
+            os.makedirs(os.path.join(a.out, 'snap'), exist_ok=True)
+            export_lua(agent, os.path.join(a.out, 'snap', f'policy-{step}.lua'), a.skip)
+            torch.save(agent.state_dict(), os.path.join(a.out, 'snap', f'agent-{step}.pt'))
         if u % 10 == 0 or u == updates:
             print(f'update {u}/{updates} step {step} | {sps:.0f} sps | {stats.summary()} | '
                   f'ent {ent.mean().item():.2f} kl {kl.item():.4f} agree {float(agree or 0):.2f}', flush=True)
