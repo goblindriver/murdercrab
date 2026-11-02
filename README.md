@@ -76,6 +76,15 @@ load murdercrab
 run
 ```
 
+Play it on the web at [tigerdust.party/games/murdercrab](https://tigerdust.party/games/murdercrab).
+
+## Publishing to the web
+
+After every cart merge to `main`, run `tools/publish-web.sh`. It exports `origin/main`
+with PICO-8's CLI and opens a PR on `goblindriver/tigerdust.party`; merging that PR
+deploys it. It skips if the site already carries that commit. The export needs the
+cart's `__label__` (the title screen), so keep it.
+
 ## TAS / bot harness
 
 `tools/celia/` is a vendored [Celia](https://github.com/gonengazit/Celia) TAS
