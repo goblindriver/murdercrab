@@ -68,7 +68,9 @@ function R.score(c) return (c.score_hi or 0) * 1000 + (c.score or 0) end
 -- Normal enemies' per-frame velocity, as in update_normal_enemy().
 local function enemy_v(e)
 	if e.type ~= "normal" then return e.dx or 0, 0 end
-	if e.state == 0 then return (e.dir or 0) * 0.25, e.dy or 0 end
+	if e.state == 0 then
+		return (e.dir or 0) * 0.25 + math.cos((e.y + (e.dy or 0)) / 50 * 2 * math.pi) * (e.wv or 0), e.dy or 0
+	end
 	if e.state == 1 then return (e.dir or 0) * 0.35, 0 end
 	return e.dx or 0, e.dy or 0
 end

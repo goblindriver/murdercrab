@@ -120,12 +120,57 @@ them in time. One credit, seeds 201-212, 60-min cap:
 | Dodger | Mean survival | Alive at 60 min | Lives lost / hour | Mean score |
 |--------|--------------:|----------------:|------------------:|-----------:|
 | v2.2, `horizon=12` | 3468 s | 10/12 | 5.6 | 2783k |
-| **v2.2, `horizon=16`** (default) | 3589 s | 12/12 | 2.1 | 3078k |
+| **v2.2, `horizon=16`** | 3589 s | 12/12 | 2.1 | 3078k |
 | v2.2, `horizon=20` | 3590 s | 12/12 | 2.3 | 2844k |
 
 A two-segment escape search (when no held move is safe, try turning once
 after 4 or 8 frames, 81 paths) didn't beat `horizon=16` (3.2 and 2.3 lives
 lost per hour) and was dropped.
+
+### The 06dbd9f cart (enemy kinds, formations, boss wall)
+
+Everything above was measured on the cart before 06dbd9f. That commit added
+four enemy kinds (basic, kamikaze, snake, sniper; one more unlocks per
+level), V and snake-column formations, and a falling bullet wall for
+bosses. On it the `horizon=16` dodger lost 46.8 lives an hour and never
+reached the 60-min cap. Its death log: half the deaths pinned at the bottom
+edge, 27 of 40 trapped for the last 12+ frames, killed by slow aimed spreads
+(~1.2 px/frame) with the bombs gone. Slow bullets close a trap long before a
+16-frame lookahead sees it. The bot now also models the snake weave
+(`cos(y/50)*wv` per frame), which on its own changed little.
+
+One credit, seeds 201-212, 30-min cap:
+
+| Dodger on the new cart | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|------------------------|--------------:|----------------:|------------------:|-----------:|
+| `horizon=16` | 294 s | 0/12 | 53.0 | 314k |
+| `horizon=24` | 598 s | 0/12 | 34.6 | 575k |
+| `horizon=32` | 936 s | 0/12 | 22.7 | 651k |
+| `horizon=40` | 1053 s | 2/12 | 16.8 | 498k |
+| `horizon=48` | 1361 s | 2/12 | 15.7 | 544k |
+| **`horizon=64`** | 1613 s | 8/12 | 11.2 | 394k |
+| `horizon=80` | 1449 s | 1/12 | 12.2 | 209k |
+| `horizon=96` | 1009 s | 1/12 | 14.6 | 106k |
+
+Past 32 it trades score for survival: with a long hold almost every move is
+hit somewhere, so the hit frame decides and goal terms rarely do. Ranking
+only hits within 16-24 frames strictly (later ones as a soft cost), or
+judging goal terms 16 frames out instead of at the end of the hold, won the
+score back (654-874k) but lost twice the lives (23 an hour), and was
+dropped. Judging goals at the far end is what keeps the ship centered and
+off the walls. Also no help: `near=80,near_r=10` (39.6), `home_y=88`
+(51.0), `edge_m=20` (46.5), halving item/cherry pulls (40.8, and 134k).
+
+At `horizon=64` the death log still showed 45 of 72 deaths pinned at the
+bottom edge. A stronger edge penalty fixes some of that (same cap):
+
+| `horizon=64` plus | Mean survival | Alive at 30 min | Lives lost / hour | Mean score |
+|-------------------|--------------:|----------------:|------------------:|-----------:|
+| nothing | 1613 s | 8/12 | 11.2 | 394k |
+| **`edge=80`** (default) | 1619 s | 6/12 | 9.8 | 638k |
+| `edge=80,edge_m=20` | 1596 s | 7/12 | 10.3 | 560k |
+| `home=60` | 1594 s | 8/12 | 9.2 | 256k |
+| `home_y=80` | 1296 s | 4/12 | 14.1 | 497k |
 `MC_W` overrides weights for one run. (An evolutionary tuner over these
 weights was tried and dropped for the RL route; its first generation already
 beat the defaults: fitness 6035 vs 4631 on 4 seeds, every seed alive at the
@@ -253,11 +298,17 @@ At a 60-min cap the clone tracks the dodger it reads (same seeds):
 |-----|--------------:|----------------:|------------------:|-----------:|---------|
 | dodger v2.2, `horizon=12` | 3468 s | 10/12 | 5.6 | 2783k | loop 4 L4 to loop 6 L2 |
 | net (skip-1 clone) on it | 3315 s | 10/12 | 5.6 | 2699k | loop 2 L5 to loop 6 L2 |
-| **dodger v2.2, `horizon=16`** (current) | 3589 s | 12/12 | 2.1 | 3078k | loop 5 L6 to loop 6 L1 |
+| dodger v2.2, `horizon=16` | 3589 s | 12/12 | 2.1 | 3078k | loop 5 L6 to loop 6 L1 |
 | net (same clone, no retraining) on it | 3503 s | 11/12 | 2.7 | 2934k | loop 4 L6 to loop 5 L6 |
+| *06dbd9f cart:* dodger, `horizon=16` | 333 s | 0/12 | 46.8 | 363k | L4 to loop 2 L4 |
+| dodger, `horizon=64` | 1923 s | 0/12 | 13.1 | 451k | loop 2 L3 to loop 5 L3 |
+| net (same clone, no retraining) on it | 1605 s | 0/12 | 14.4 | 375k | loop 2 L3 to loop 4 L4 |
+| **dodger, `horizon=64`, `edge=80`** (current) | 2289 s | 2/12 | 11.4 | 894k | loop 3 L3 to loop 6 L2 |
+| net (same clone, no retraining) on it | 1867 s | 0/12 | 14.8 | 676k | loop 2 L2 to loop 5 L4 |
 
-The clone was cloned with 12-frame danger features; re-cloning at
-`horizon=16` would likely close the small gap.
+The clone was cloned on the old cart with 12-frame danger features and still
+plays the current dodger closely; re-cloning on the new cart would likely
+close the small gap.
 
 Commands for the current best net (the skip-1 clone):
 
