@@ -13,7 +13,7 @@ __lua__
 game_state, title_timer = "title", 0
 current_level, max_level = 1, 5
 credits = 0
-warp_time, warp_duration = 0, 360
+warp_time, warp_duration = 0, 240
 current_music = -1
 last_entered_initials = {"A", "C", "E"}
 
@@ -54,7 +54,7 @@ end
 
 function draw_logo(y)
   local pulse = sin(time() * 0.8)
-  local color = pulse > 0.7 and 1 or 8
+  local color = pulse > 0.7 and 14 or 8
   local bounce = pulse * 3
   shadow_text("m u r d e r c r a b", y, color)
   print("!", 103, y + 1 - bounce, 1)
@@ -245,7 +245,8 @@ end
 function draw_starfield()
   if warp_time > 0 then
     local ratio = 1 - warp_time / warp_duration
-    rectfill(0, 0, 127, 127, 1 + flr(ratio * 7))
+    -- darks only (navy to gray): no fade to white
+    rectfill(0, 0, 127, 127, 1 + flr(ratio * 5))
     
     for star in all(starfield) do
       local streak = ratio * 20 * star.speed
@@ -254,12 +255,6 @@ function draw_starfield()
     
     if warp_time > warp_duration * 0.3 and warp_time < warp_duration * 0.7 then
       center_text("level " .. current_level, 60, 7)
-    end
-    
-    if warp_time < warp_duration * 0.2 then
-      fillp(▒)
-      rectfill(0, 0, 127, 127, 7)
-      fillp()
     end
   else
     -- background colors per level
@@ -335,27 +330,31 @@ function update_enter_initials()
     current_initials = {}
     local def = get_initials()
     for i = 1, 3 do current_initials[i] = sub(def, i, i) end
-    current_index = 1
+    current_index, title_timer = 1, 0
   end
+  title_timer += 1
+  -- letters cycle a-z only
   if btnp(2) then
     local cur = ord(current_initials[current_index])
-    cur = ((cur - 33 + 1 + 94) % 94) + 33
+    cur = ((cur - 65 + 1 + 26) % 26) + 65
     current_initials[current_index] = chr(cur)
   end
   if btnp(3) then
     local cur = ord(current_initials[current_index])
-    cur = ((cur - 33 - 1 + 94) % 94) + 33
+    cur = ((cur - 65 - 1 + 26) % 26) + 65
     current_initials[current_index] = chr(cur)
   end
   if btnp(0) then current_index = ((current_index - 2) % 3) + 1 end
   if btnp(1) then current_index = (current_index % 3) + 1 end
-  if btnp(4) or btnp(5) then
+  -- ignore confirm for 0.75s (fire-mashing from the death), auto-confirm at 30s
+  if title_timer > 45 and (btnp(4) or btnp(5)) or title_timer > 1800 then
     local str = current_initials[1] .. current_initials[2] .. current_initials[3]
     last_entered_initials = {current_initials[1], current_initials[2], current_initials[3]}
     for i = 1, 3 do dset(17 + i, ord(current_initials[i])) end
     if hs_pos < 4 then high_scores[hs_pos].initials = str save_high_scores() end
     current_initials = nil
-    game_state = "title"
+    -- back to the continue countdown if we came from a game over
+    game_state = game_over and "game" or "title"
     title_timer = 0
   end
 end
@@ -367,7 +366,7 @@ function draw_enter_initials()
   if current_initials then
     local x = 56
     for i = 1, 3 do
-      print(current_initials[i], x + (i - 1) * 8, 60, i == current_index and 8 or 1)
+      print(current_initials[i], x + (i - 1) * 8, 60, i == current_index and 8 or 7)
     end
     if (time() * 10) % 2 < 1 then line(56 + (current_index - 1) * 8, 68, 60 + (current_index - 1) * 8, 68, 8) end
   end
@@ -1167,6 +1166,7 @@ function handle_boss_defeat(enemy)
   elseif enemy.type == "final_boss" then
     add_score(100)
     if boss_exists("final_boss") == 0 then
+      convert_enemy_bullets_to_explosions()
       phase = "level_complete"
       boss_defeat_grace = 180
       update_music("fade")
@@ -1361,8 +1361,8 @@ function update_game()
   update_bullets()
   update_enemy_bullets()
   
-  -- spawn logic
-  if phase == "normal" then
+  -- spawn logic (paused while the continue countdown runs)
+  if phase == "normal" and not game_over then
     spawn_timer += 1
     if spawn_timer >= max(40, spawn_delay * (1 - rank * 0.03)) then
       spawn_timer = 0
@@ -1420,21 +1420,21 @@ function update_game()
   
   -- game over handling
   if game_over then
+    -- park the wreck off-screen until a continue
+    player.y = 999
     game_over_timer -= 1
     if game_over_grace > 0 then game_over_grace -= 1 end
     
+    -- each credit is its own run: a qualifying score gets its initials
+    -- now, then the countdown resumes
     if game_over_timer == 599 then
       update_high_scores(sc(calc_bonus()), get_initials())
+      if hs_pos < 4 then current_initials = nil game_state = "enter_initials" end
     end
 
     if game_over_timer <= 0 then
-      if hs_pos < 4 then
-        current_initials = nil
-        game_state = "enter_initials"
-      else
-        game_state = "title"
-        title_timer = 0
-      end
+      game_state = "title"
+      title_timer = 0
       update_music("title")
       return
     end
@@ -1448,6 +1448,9 @@ function update_game()
       game_over_grace = 60
       player.lives = P_LIVES
       player.bombs = P_BMBS
+      -- fresh start: clear the screen, respawn at the start spot, 2s of i-frames
+      convert_enemy_bullets_to_explosions()
+      player.x, player.y, player.invincible_timer = 60, 100, 120
       score = 0
       score_hi = 0
       rank = 0
@@ -1681,8 +1684,9 @@ function _update60()
   elseif game_state == "game" then
     update_game()
   elseif game_state == "game_complete" then
+    -- keeps counting past 0 so an unattended cabinet exits after 20s
+    game_complete_grace -= 1
     if game_complete_grace > 0 then
-      game_complete_grace -= 1
     elseif btnp(4) then
       game_loop += 1
       credits_used = 0
@@ -1703,7 +1707,7 @@ function _update60()
       game_state = "game"
       sfx(19, 3)
       update_music("silent")
-    elseif btnp(5) then
+    elseif btnp(5) or game_complete_grace < -1200 then
       game_loop = 1
       warp_time = 0
       current_initials = nil
@@ -1727,10 +1731,13 @@ function _draw()
   elseif game_state == "game_complete" then
     draw_game_complete()
   end
-  if credits > 0 then
-    shadow_text("credits "..credits, 120, 8)
-  elseif time() * 2 % 1 < 0.5 then
-    shadow_text("insert coin", 120, 8)
+  -- coin prompt stays off the playfield during live play
+  if game_state != "game" or game_over then
+    if credits > 0 then
+      shadow_text("credits "..credits, 120, 8)
+    elseif time() * 2 % 1 < 0.5 then
+      shadow_text("insert coin", 120, 8)
+    end
   end
 end
 
