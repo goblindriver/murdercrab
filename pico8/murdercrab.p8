@@ -31,8 +31,8 @@ E_BURST_SPD, E_BURST_DLY = 2.5, 6
 
 
 -- boss constants
-MB_HP, MB_HP_SCL = 150, 20
-FB_HP, FB_HP_SCL = 250, 25
+MB_HP, MB_HP_SCL = 120, 20
+FB_HP, FB_HP_SCL = 200, 25
 B_ROT_SPD, B_PAT_CHG, B_SPRL_STP = 20, 0.5, 45
 BASE_CLUSTERS = 6
 
@@ -524,7 +524,8 @@ function update_enemy_bullets()
 end
 
 function spawn_enemy_bullet(cx, cy, dx, dy)
-  local r = 1 + rank * 0.04
+  -- bullet speed: 0.8x at rank 0, 1x at rank 4, 1.3x at rank 10
+  local r = 0.8 + rank * 0.05
   local b = get_enemy_bullet()
   b.x, b.y = cx - 4, cy - 4
   b.dx, b.dy = dx * r, dy * r
@@ -561,7 +562,8 @@ function spawn_normal_enemy(x, y, k)
     speed = min(E_SPD_MAX + game_loop * 0.25, E_SPD + (current_level - 1) * E_SPD_SCL + game_loop * 0.15) * spm,
     sprite = 3, width = 8, height = 8,
     shoot_timer = interval - 40 - flr(rnd(30)),
-    shoot_interval = interval * sim,
+    -- rank 0 fires half again slower; rank 10 is full rate
+    shoot_interval = interval * sim * (1.5 - rank * 0.05),
     weapon = rnd(1) < 0.5 and "shotgun" or "burst",
     burst_count = 0,
     type = "normal", health = min(3, current_level + game_loop - 1),
@@ -719,7 +721,7 @@ function spawn_boss(btype)
       width = 16, height = 16,
       health = get_boss_max_health(btype),
       type = btype,
-      shoot_timer = 0, shoot_interval = is_final and 16 or 40,
+      shoot_timer = 0, shoot_interval = (is_final and 16 or 40) * (1.4 - rank * 0.04),
       rotate_counter = 0,
       cluster_count = BASE_CLUSTERS + current_level,
       sprite = 8, is_big_sprite = true,
@@ -830,11 +832,12 @@ function enemy_shoot_radial(e)
   elseif pattern_type == 3 then
     e.burst_index = nil
     -- falling wall with a drifting gap: one row per 0.6s however many bosses
+    -- rows sparser and gaps wider at low rank
     if time() > (wall_t or 0) then
-      wall_t = time() + 0.6
+      wall_t = time() + 0.9 - rank * 0.03
       local g = 64 + sin(time() / 8) * 40
       for x = 4, 124, 8 do
-        if abs(x - g) > 14 then spawn_enemy_bullet(x, e.y + e.height / 2, 0, s) end
+        if abs(x - g) > 22 - rank then spawn_enemy_bullet(x, e.y + e.height / 2, 0, s) end
       end
     end
   else
@@ -1364,7 +1367,7 @@ function update_game()
   -- spawn logic (paused while the continue countdown runs)
   if phase == "normal" and not game_over then
     spawn_timer += 1
-    if spawn_timer >= max(40, spawn_delay * (1 - rank * 0.03)) then
+    if spawn_timer >= max(40, spawn_delay * (1.3 - rank * 0.05)) then
       spawn_timer = 0
       spawn_enemy()
     end
